@@ -82,7 +82,7 @@ public class Project1 {
  			Scanner keyboard = new Scanner(System.in);
 			System.out.println("enter global chat message");
         	String messageToServer = keyboard.nextLine();
-			messageToServer = "101 " + messageToServer + "<EOM>";
+			messageToServer = "101  " + messageToServer + "<EOM>";
 			byte[] toServerByteArray = new byte[512];
 			toServerByteArray = messageToServer.getBytes("UTF-8");
 			out.write(toServerByteArray, 0, toServerByteArray.length);
