@@ -65,8 +65,6 @@ public class Project1 {
 					}
 				}
              }
-   
-    
         }   
         catch(java.net.UnknownHostException e){
             System.out.println("Host error" + e);
