@@ -74,6 +74,8 @@ public class Project1 {
 
     	while(true);
     }
+
+
     public static void sendMessage(DataOutputStream out){
    		System.out.println("\tsendMessage()");
 		try {
@@ -90,6 +92,7 @@ public class Project1 {
         
     }
     
+
 	private static void setUsername(DataOutputStream out) {
 		System.out.println("\tsetUsername()");
 		try {
@@ -103,4 +106,6 @@ public class Project1 {
 			System.out.println(e.getMessage());
 		}
 	}
+
+
 }
