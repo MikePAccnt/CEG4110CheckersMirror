@@ -30,10 +30,21 @@ public class Project1 {
              PrintWriter out = new PrintWriter(echoSocket.getOutputStream(), true); //Open writerstream
              
              DataInputStream inFromServer = new DataInputStream(echoSocket.getInputStream());
-             byte[] b = new byte[512];
              
-             System.out.println(inFromServer.read(b));
-             System.out.println(new String(b, "UTF-8"));
+             while(true){
+                 //Recieve message from server and convert to string
+             byte[] rawMessage = new byte[512];
+             inFromServer.read(rawMessage);
+             String inMessage = new String(rawMessage, "UTF-8");
+             //String trimmedMessage = inMessage.replaceAll("/[\\s]<EOM>.*/g" , "");
+             String trimmedMessage;
+             
+             trimmedMessage = inMessage.substring(inMessage.indexOf("<EOM>"), inMessage.length());
+             inMessage = inMessage.replace(trimmedMessage,"");
+                 System.out.println(inMessage);
+            
+
+             }
    
     
         }   
