@@ -1,7 +1,7 @@
-package edu.wright.crowningkingsandroid;
+package edu.wright.crowningkings.android;
 
 import android.support.v7.app.AppCompatActivity;
-import edu.wright.crowningkingsbase.*;
+import edu.wright.crowningkings.base.*;
 import android.os.Bundle;
 
 public class MainActivity extends AppCompatActivity {
