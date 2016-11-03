@@ -2,39 +2,28 @@ package edu.wright.crowningkings.base;
 
 /**
  * Created by csmith on 10/26/16.
- */
-
-import java.security.Policy;
-
-/**
+ *
  * This is where we will create a message by the "Server Message Handling" package from project 2.
  *
- * When we want to send a message to the server, we want to call toString() and use that string to
- * send to the server. This is obviously not implemented yet, but this is my vision for the future.
+ * When we want to send a message to the server, we want to call a method that returns a formatted
+ * String that will be translated into a byte[] for sending to the server. the ServerMessage class
+ * will be the parent of many different classes of messages
+ *
  */
+
 public class ServerMessage {
-    public static final String EOM = "<EOM>";
+    private static final String EOM = "<EOM>";
     private String[] parameters;
     private int messageCode;
 
 
-    public ServerMessage(String stringFromServer) {
-        System.out.println("\tServerMessage(String)");
-        String[] parameters = stringFromServer.split("<EOM>");
-        for (String parameter : parameters) {
-            System.out.println("\t" + parameter);
-        }
-        try {
-            messageCode = Integer.parseInt(parameters[0]);
-        } catch (NumberFormatException nfe) {
-            System.out.println("No code given");
-            messageCode = -1;
-        }
-    }
+//    public ServerMessage(String stringFromServer) {
+//
+//    }
 
 
     public ServerMessage(int messageCode, String ... parameters) {
-        System.out.println("\tServerMessage(int, String ...)");
+//        System.out.println("\tServerMessage(int, String ...)");
 
         this.messageCode = messageCode;
         this.parameters = parameters;
@@ -62,5 +51,9 @@ public class ServerMessage {
 
     public int getMessageCode(){
         return messageCode;
+    }
+
+    public void run() {
+//        System.out.println("ServerMessage.run()");
     }
 }

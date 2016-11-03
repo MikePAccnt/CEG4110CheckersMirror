@@ -9,6 +9,8 @@ import java.net.Socket;
 
 /**
  * Created by csmith on 10/26/16.
+ *
+ * This is responsible for reading messages from, and sending messages to the server.
  */
 
 public class ServerConnection {
@@ -19,10 +21,9 @@ public class ServerConnection {
     public ServerConnection(String ipAddress, int portNumber) {
         System.out.println("\tServerConnection(String, int)");
         try {
-            Socket serverSocket = new Socket(ipAddress, portNumber);
-            //ServerSocket ss = new ServerSocket(portNumber);
-            serverInputStream = new DataInputStream(serverSocket.getInputStream());
-            serverOutputStream = new DataOutputStream(serverSocket.getOutputStream());
+            Socket checkersServerSocket = new Socket(ipAddress, portNumber);
+            serverInputStream = new DataInputStream(checkersServerSocket.getInputStream());
+            serverOutputStream = new DataOutputStream(checkersServerSocket.getOutputStream());
 
         } catch (IOException ioe) {
             System.out.println(ioe.getMessage()+ ":_:");
@@ -36,7 +37,7 @@ public class ServerConnection {
     }
 
 
-    private void sendServerMessage(String message) {
+    public void sendServerMessage(String message) {
         try{
             //message = message + " " + ServerMessage.EOM;
             sendServerMessage(message.getBytes("UTF-8"));
@@ -55,21 +56,26 @@ public class ServerConnection {
     }
 
 
-    public void getServerMessage() {
-        System.out.println("\tgetServerMessage()");
+    public String[] getServerMessageString() {
+//        System.out.println("\tgetServerMessage()");
+        String[] messages = null;
         try {
+//            inMessage = serverInputStream.readUTF();
+//            System.out.println("inMessage=\"" + inMessage + "\"");
+
             byte[] rawMessage = new byte[512];
-            serverInputStream.read(rawMessage);
-            String inMessage = new String(rawMessage, "UTF-8");
-            System.out.println("inMessage=\"" + inMessage + "\"");
+            int numberOfBytes = serverInputStream.read(rawMessage);
+//            System.out.println("\tnumberOfBytes=" + numberOfBytes);
 
-            ServerMessage sm = new ServerMessage(inMessage);
-            ServerMessageHandler.interpretMessage(sm);
-        } catch (IOException ioe) {
-            System.out.println(ioe.getMessage() + ":_:");
+            String inMessage = new String(rawMessage, 0, numberOfBytes, "UTF-8");
+//            System.out.println("\tinMessage=\"" + inMessage + "\"");
+
+            messages = inMessage.split("<EOM>");
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage() + ":_:");
         }
+
+        return messages;
     }
-
-
-
 }
