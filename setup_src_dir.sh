@@ -10,6 +10,7 @@ cd src
 
 ln -s ../android/app/src/main/java/edu/wright/crowningkings/android/ android
 ln -s ../android/crowningkingsbase/src/main/java/edu/wright/crowningkings/base/ base
+ln -s ../android/crowningkingsdesktop/src/main/java/edu/wright/crowningkings/desktop/ desktop
 cd ..
 
 echo "Done setting up links. All source files are located in the src folder at

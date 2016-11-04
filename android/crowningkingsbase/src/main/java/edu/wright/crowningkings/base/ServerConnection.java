@@ -4,8 +4,9 @@ package edu.wright.crowningkings.base;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
+
+import edu.wright.crowningkings.base.ServerMessage.AbstractServerMessage;
 
 /**
  * Created by csmith on 10/26/16.
@@ -31,20 +32,20 @@ public class ServerConnection {
     }
 
 
-    public void sendServerMessage(ServerMessage message) {
+    public void sendServerMessage(AbstractServerMessage message) {
         System.out.println("\tsendServerMessage(ServerMessage)");
         sendServerMessage(message.toBytesArray());
     }
 
 
-    public void sendServerMessage(String message) {
-        try{
-            //message = message + " " + ServerMessage.EOM;
-            sendServerMessage(message.getBytes("UTF-8"));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
+//    public void sendServerMessage(String message) {
+//        try{
+//            //message = message + " " + ServerMessage.EOM;
+//            sendServerMessage(message.getBytes("UTF-8"));
+//        } catch (Exception e) {
+//            System.out.println(e.getMessage());
+//        }
+//    }
 
 
     private void sendServerMessage(byte[] bytes) {
@@ -74,6 +75,7 @@ public class ServerConnection {
 
         } catch (Exception e) {
             System.out.println(e.getMessage() + ":_:");
+//            messages = new String[0];
         }
 
         return messages;

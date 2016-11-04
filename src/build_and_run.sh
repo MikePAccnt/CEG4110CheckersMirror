@@ -1,4 +1,4 @@
 #! /bin/bash
 
-javac -d . *.java
+ant
 java edu.wright.crowningkings.base.MainTest

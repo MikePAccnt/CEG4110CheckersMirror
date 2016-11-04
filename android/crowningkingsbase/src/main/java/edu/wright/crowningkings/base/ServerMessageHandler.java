@@ -1,5 +1,7 @@
 package edu.wright.crowningkings.base;
 
+import edu.wright.crowningkings.base.ServerMessage.*;
+
 /**
  * Created by csmith on 10/28/16.
  *
@@ -13,7 +15,7 @@ package edu.wright.crowningkings.base;
 
 public class ServerMessageHandler {
 
-    public static ServerMessage interpretMessage(String message) {
+    public static AbstractServerMessage interpretMessage(String message) {
 //        System.out.println("interpretMessage(String)");
 //        System.out.println("message=" + message);
         String[] params = message.split(" ");
@@ -29,9 +31,6 @@ public class ServerMessageHandler {
         }
         System.out.println("");
         switch (messageCode) {
-            case -1 :
-                System.out.println("\t-1 : unknown message code");
-                break;
             case 201:
                 System.out.println("\t201 : MSG – client received message <3> from client <1>. If <2> = 1, the message is private");
                 break;
@@ -55,27 +54,34 @@ public class ServerMessageHandler {
                 break;
             default:
                 System.out.println("\tdefault messageCode");
+                if (message.equals("Send username:")) {
+                    System.out.println("\tSendUsernamestuff");
+                }
         }
-        System.out.println("\t" + message);
+        System.out.println("\tmessage=" + message);
 //        System.out.println("Math.round(messageCode/100)=" + Math.round(messageCode/100));
 
-        return new ServerMessage(messageCode, params);
+        //return new ServerMessage(messageCode, params);
+        return new TestMessage();
     }
 
 
-	//Work in progress
-    public static ServerMessage prepareMessage(int code, String ... parameters) {
-        switch (code) {
-            case 101:
-                System.out.println("\t101 : MSG_ALL – client <1> sends message <2> to everyone in the lobby.");
-                break;
-            case 102:
-                System.out.println("\t102 : MSG_C - client <1> sends message <3> to client <2>.");
-                break;
-            default:
-                System.out.println("\tdefault prepareMessage(int) code");
-        }
-        return null;
-    }
+//    //Work in progress
+//    public static ServerMessage prepareMessage(int code, String ... parameters) {
+//        switch (code) {
+//            case 101:
+//                System.out.println("\t101 : MSG_ALL – client <1> sends message <2> to everyone in the lobby.");
+//                String message = "message";
+//                MessageAll ma;
+//                return new MessageAll(message);
+//                //break;
+//            case 102:
+//                System.out.println("\t102 : MSG_C - client <1> sends message <3> to client <2>.");
+//                break;
+//            default:
+//                System.out.println("\tdefault prepareMessage(int) code");
+//        }
+//        return null;
+//    }
 
 }

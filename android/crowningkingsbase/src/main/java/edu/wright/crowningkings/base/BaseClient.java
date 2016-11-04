@@ -1,5 +1,9 @@
 package edu.wright.crowningkings.base;
 
+import edu.wright.crowningkings.base.ServerMessage.*;
+import edu.wright.crowningkings.base.UserInterface.*;
+import edu.wright.crowningkings.base.UserInterface.CommandLineUI;
+
 import java.util.Scanner;
 
 /**
@@ -11,6 +15,9 @@ import java.util.Scanner;
  */
 
 public class BaseClient {
+    ServerConnection server;
+    AbstractUserInterface ui;
+    private final int PORT_NUMBER = 45322;
 
     public void run(){
         System.out.println("BaseClient.run()");
@@ -18,14 +25,13 @@ public class BaseClient {
 
         Scanner keyboard = new Scanner(System.in);
         String serverAddress = "192.168.122.1";
-        int portNumber = 45322;
-        final ServerConnection server;
-        final UserInterface ui = new UserInterface();
 
 //        System.out.println("Enter the server address");
 //        serverAddress = keyboard.nextLine();
 
-        server = new ServerConnection(serverAddress, portNumber);
+        server = new ServerConnection(serverAddress, PORT_NUMBER);
+        ui = new CommandLineUI();
+
 
         Thread getServerMessagesThread = new Thread() {
             public void run(){
@@ -52,8 +58,12 @@ public class BaseClient {
 //
 //                      ServerMessage sm = new ServerMessage(messageCode, stringMessage);
 //                      ServerMessageHandler.interpretMessage(sm);
-                        ServerMessage sm = ServerMessageHandler.interpretMessage(stringMessage);
-                        sm.run();
+                        AbstractServerMessage sm = ServerMessageHandler.interpretMessage(stringMessage);
+                        try{
+                            sm.run();
+                        } catch (java.lang.NullPointerException npe) {
+                            System.out.println("\tnpe: " + npe.getMessage());
+                        }
                     }
                 }
             }
@@ -63,25 +73,17 @@ public class BaseClient {
 
         while(true) {
             System.out.println("\n\n\n\nWhat do you want to do?");
-            System.out.println("[\"sendMessage\", \"setusername\", \"sendprivatemessage\" <--(Work in progress)]");
+            System.out.println("[\"setusername\", \"sendpublicmessage\", \"sendprivatemessage\"]");
             String command = keyboard.nextLine();
             switch (command.toLowerCase()) {
-                case "sendmessage" :
-                    System.out.println("enter global chat message");
-                    String messageToServer = keyboard.nextLine();
-                    server.sendServerMessage(new ServerMessage(101, messageToServer));
+                case "sendpublicmessage" :
+                    sendPublicMessage();
                     break;
                 case "setusername" :
-                    String username = ui.getUsernameFromUser();
-                    //ServerMessage sm = ServerMessageHandler.prepareMessage(0);
-                    setUsername(username, server);
+                    setUsername();
                     break;
                 case "sendprivatemessage" :
-                    System.out.println("enter global chat message");
-                    String pmessageToServer = keyboard.nextLine();
-                    System.out.println("to who?");
-                    String to = keyboard.nextLine();
-                    server.sendServerMessage(new ServerMessage(102, to, pmessageToServer));
+                    sendPrivateMessage();
                     break;
                 default :
                     System.out.println("default switch");
@@ -90,7 +92,19 @@ public class BaseClient {
         }
     }
 
-    private static void setUsername(String username, ServerConnection server) {
-        server.sendServerMessage(username);
+    private void setUsername() {
+        String username = ui.getUsernameFromUser();
+        server.sendServerMessage(new SendUsername(username));
+    }
+
+    private void sendPublicMessage() {
+        String publicMessage = ui.getMessageFromUser();
+        server.sendServerMessage(new MessageAll(publicMessage));
+    }
+
+    private void sendPrivateMessage() {
+        String recipient = ui.getRecipientFromUser();
+        String privateMessage = ui.getMessageFromUser();
+        server.sendServerMessage(new MessageClient(privateMessage, recipient));
     }
 }

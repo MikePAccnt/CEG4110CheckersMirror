@@ -1,1 +1,1 @@
-include ':app', ':crowningkingsbase'
+include ':app', ':crowningkingsbase', ':crowningkingsdesktop'
