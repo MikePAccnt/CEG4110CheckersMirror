@@ -31,4 +31,21 @@ public class CommandLineUI extends AbstractUserInterface {
         System.out.println("Enter table ID");
         return (new Scanner(System.in)).nextLine().replace(" ", "").trim();
     }
+
+    @Override
+    public String[] getMoveFromUser() {
+        System.out.println("Enter from x (0-7)");
+        String fromx =  (new Scanner(System.in)).nextLine().replace(" ", "").trim();
+
+        System.out.println("Enter from y (0-7)");
+        String fromy =  (new Scanner(System.in)).nextLine().replace(" ", "").trim();
+
+        System.out.println("Enter to x (0-7)");
+        String tox =  (new Scanner(System.in)).nextLine().replace(" ", "").trim();
+
+        System.out.println("Enter to y (0-7)");
+        String toy =  (new Scanner(System.in)).nextLine().replace(" ", "").trim();
+
+        return new String[] {fromx, fromy, tox, toy};
+    }
 }

@@ -35,10 +35,25 @@ public class ServerMessageHandler {
              * messages from the server to the client.
              */
             case 201 :
-                System.out.println("\t201 : MSG – client received message <3> from client <1>. If <2> = 1, the message is private");
+                System.out.println("\t201 : MSG – client received message <3> from client <1>. If <2> = 1, the message is private.");
                 break;
             case 202 :
-                System.out.println("\t202 : NEW_TBL – a new table has been created with id <1>");
+                System.out.println("\t202 : NEW_TBL – a new table has been created with id <1>.");
+                break;
+            case 203 :
+                System.out.println("\t203 : GAME_START – the game being played at the table you are sitting at as a player has begun.");
+                break;
+            case 204 :
+                System.out.println("\t204 : COLOR_BLACK – you are playing as black.");
+                break;
+            case 206 :
+                System.out.println("\t206 : OPP_MOVE – your opponent moved a piece from <1> to <2>.");
+                break;
+            case 207 :
+                System.out.println("\t207 : BOARD_STATE – the current board state on table <1> is <2>. <2> is a string encoding of the board");
+                break;
+            case 221 :
+                System.out.println("\t221 : YOUR_TURN – it’s your turn to play.");
                 break;
             case 210 :
                 System.out.println("\t210 : TBL_JOINED – the client has joined table <1>.");
@@ -75,9 +90,14 @@ public class ServerMessageHandler {
                 System.out.println("\t408 : BAD_NAME – the username requested is bad (no whitespace allowed).");
                 break;
             default:
-                System.out.println("\tdefault messageCode");
                 if (message.equals("Send username:")) {
-                    System.out.println("\tSendUsernamestuff");
+                    System.out.println("\t000 : SEND_USERNAME – Send username to server");
+                }
+                else if (message.equals("ping")) {
+                    System.out.println("000 : PING – server sent ping message");
+                }
+                else {
+                    System.out.println("\tdefault messageCode");
                 }
         }
         System.out.println("\tmessage=" + message);

@@ -28,4 +28,6 @@ public abstract class AbstractUserInterface {
     public abstract String getRecipientFromUser();
 
     public abstract String getTableIdFromUser();
+
+    public abstract String[] getMoveFromUser();
 }

@@ -82,7 +82,9 @@ public class BaseClient {
                     "\"quit\", " +
                     "\"maketable\", " +
                     "\"jointable\", " +
-                    "\"leavetable\"" +
+                    "\"leavetable\", " +
+                    "\"ready\", " +
+                    "\"move\", " +
                     "]");
             String command = keyboard.nextLine();
             switch (command.toLowerCase()) {
@@ -107,6 +109,12 @@ public class BaseClient {
                     break;
                 case "leavetable" :
                     leaveTable();
+                    break;
+                case "ready" :
+                    ready();
+                    break;
+                case "move" :
+                    move();
                     break;
                 default :
                     System.out.println("default switch");
@@ -154,5 +162,14 @@ public class BaseClient {
 
     private void leaveTable() {
         server.sendServerMessage(new LeaveTable());
+    }
+
+    private void ready() {
+        server.sendServerMessage(new Ready());
+    }
+
+    private void move() {
+        String[] move = ui.getMoveFromUser();
+        server.sendServerMessage(new Move(move[0], move[1], move[2], move[3]));
     }
 }
