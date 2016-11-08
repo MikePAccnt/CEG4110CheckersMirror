@@ -16,27 +16,15 @@ public abstract class AbstractServerMessage {
     private String[] parameters;
     private final String EOM = "<EOM>";
 
-//    public ServerMessage() {}
-
-//    public ServerMessage(int messageCode) {
-//        this.messageCode = messageCode;
-//    }
-
-//    public ServerMessage(int messageCode, String[] parameters) {
-////        System.out.println("\tServerMessage(int, String ...)");
-//
-//        this.messageCode = messageCode;
-//        this.parameters = parameters;
-//    }
-
 
     public String toServerMessage() {
         String message = "";
         for (String param : parameters) {
-            System.out.println("\t\t\tparam=" + param);
-            message = message + " " + param;
+            message = message + param + " " ;
         }
-        return message + " " + EOM;
+        message = message + EOM;
+        System.out.println("\ttoServerMessage() message=" + message);
+        return message;
     }
 
 
@@ -57,11 +45,5 @@ public abstract class AbstractServerMessage {
         return parameters;
     }
 
-    public String getMessageCode() {
-        return parameters[0];
-    }
-
-    public abstract void run();// {
-//        System.out.println("ServerMessage.run()");
-  //  }
+    public abstract void run();
 }
