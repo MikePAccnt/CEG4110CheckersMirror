@@ -22,44 +22,10 @@ public abstract class AbstractUserInterface {
 
 
     public abstract String getUsernameFromUser();
-    /*{
-        switch (ui) {
-            case CMND_LINE:
-                System.out.println("Enter desired username with no spaces");
-                return (new Scanner(System.in)).nextLine().replace(" ", "").trim();
-            case ANDROID:
-                break;
-            case DESKTOP_UI:
-                break;
-        }
-        return "";
-    }*/
 
     public abstract String getMessageFromUser();
-    /*{
-        switch (ui) {
-            case CMND_LINE:
-                System.out.println("Enter global chat message to send");
-                return (new Scanner(System.in)).nextLine().replace(" ", "").trim();
-            case ANDROID:
-                break;
-            case DESKTOP_UI:
-                break;
-        }
-        return "";
-    }*/
 
     public abstract String getRecipientFromUser();
-    /*{
-        switch (ui) {
-            case CMND_LINE:
-                System.out.println("Enter recipient username");
-                return (new Scanner(System.in)).nextLine().replace(" ", "").trim();
-            case ANDROID:
-                break;
-            case DESKTOP_UI:
-                break;
-        }
-        return "";
-    }*/
+
+    public abstract String getTableIdFromUser();
 }

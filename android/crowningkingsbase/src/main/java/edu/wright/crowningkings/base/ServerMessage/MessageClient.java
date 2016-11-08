@@ -6,11 +6,10 @@ package edu.wright.crowningkings.base.ServerMessage;
 
 public class MessageClient extends AbstractServerMessage {
     public MessageClient(String message, String client) {
-        String[] parameters = new String[4];
-        parameters[0] = "102";
-        parameters[1] = "1";
-        parameters[2] = client;
-        parameters[3] = message;
+        String[] parameters = new String[3];
+        parameters[0] = "102 ";
+        parameters[1] = client;
+        parameters[2] = message;
         setParameters(parameters);
     }
 

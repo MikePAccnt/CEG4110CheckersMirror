@@ -1,13 +1,13 @@
 package edu.wright.crowningkings.base.ServerMessage;
 
 /**
- * Created by csmith on 11/3/16.
+ * Created by csmith on 11/8/16.
  */
 
-public class MakeTable extends AbstractServerMessage {
-    public MakeTable() {
+public class LeaveTable extends AbstractServerMessage {
+    public LeaveTable() {
         String[] parameters = new String[1];
-        parameters[0] = "103 ";
+        parameters[0] = "107 ";
         setParameters(parameters);
     }
 

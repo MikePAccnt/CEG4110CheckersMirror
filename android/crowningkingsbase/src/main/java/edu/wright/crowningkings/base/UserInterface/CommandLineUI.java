@@ -25,4 +25,10 @@ public class CommandLineUI extends AbstractUserInterface {
         System.out.println("Enter recipient username");
         return (new Scanner(System.in)).nextLine().replace(" ", "").trim();
     }
+
+    @Override
+    public String getTableIdFromUser() {
+        System.out.println("Enter table ID");
+        return (new Scanner(System.in)).nextLine().replace(" ", "").trim();
+    }
 }

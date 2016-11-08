@@ -36,11 +36,11 @@ public class BaseClient {
         Thread getServerMessagesThread = new Thread() {
             public void run(){
 //                System.out.println("\tgetServerMessagesThread.run()");
-                while (true) {
+                while (!Thread.interrupted()) {
 //                    System.out.println("\tserver.getServerMessage();");
                     String[] messages = server.getServerMessageString();
-
-                    for (String stringMessage : messages) {
+                    if (messages != null) {
+                        for (String stringMessage : messages) {
 //                        System.out.println("\n\tstringMessage=" + stringMessage);
 //
 //                        String[] params = stringMessage.split(" ");
@@ -58,11 +58,12 @@ public class BaseClient {
 //
 //                      ServerMessage sm = new ServerMessage(messageCode, stringMessage);
 //                      ServerMessageHandler.interpretMessage(sm);
-                        AbstractServerMessage sm = ServerMessageHandler.interpretMessage(stringMessage);
-                        try{
-                            sm.run();
-                        } catch (java.lang.NullPointerException npe) {
-                            System.out.println("\tnpe: " + npe.getMessage());
+                            AbstractServerMessage sm = ServerMessageHandler.interpretMessage(stringMessage);
+                            try {
+                                sm.run();
+                            } catch (java.lang.NullPointerException npe) {
+                                System.out.println("\tnpe: " + npe.getMessage());
+                            }
                         }
                     }
                 }
@@ -71,9 +72,18 @@ public class BaseClient {
         getServerMessagesThread.start();
 
 
-        while(true) {
+        boolean quit = false;
+        while(!quit) {
             System.out.println("\n\n\n\nWhat do you want to do?");
-            System.out.println("[\"setusername\", \"sendpublicmessage\", \"sendprivatemessage\"]");
+            System.out.println("[" +
+                    "\"setusername\", " +
+                    "\"sendpublicmessage\", " +
+                    "\"sendprivatemessage\", " +
+                    "\"quit\", " +
+                    "\"maketable\", " +
+                    "\"jointable\", " +
+                    "\"leavetable\"" +
+                    "]");
             String command = keyboard.nextLine();
             switch (command.toLowerCase()) {
                 case "sendpublicmessage" :
@@ -85,26 +95,64 @@ public class BaseClient {
                 case "sendprivatemessage" :
                     sendPrivateMessage();
                     break;
+                case "quit" :
+                    quitServer();
+                    quit = true;
+                    break;
+                case "maketable" :
+                    makeTable();
+                    break;
+                case "jointable" :
+                    joinTable();
+                    break;
+                case "leavetable" :
+                    leaveTable();
+                    break;
                 default :
                     System.out.println("default switch");
                     break;
             }
         }
+        getServerMessagesThread.interrupt();
     }
+
 
     private void setUsername() {
         String username = ui.getUsernameFromUser();
         server.sendServerMessage(new SendUsername(username));
     }
 
+
     private void sendPublicMessage() {
         String publicMessage = ui.getMessageFromUser();
         server.sendServerMessage(new MessageAll(publicMessage));
     }
 
+
     private void sendPrivateMessage() {
         String recipient = ui.getRecipientFromUser();
         String privateMessage = ui.getMessageFromUser();
         server.sendServerMessage(new MessageClient(privateMessage, recipient));
+    }
+
+
+    private void quitServer() {
+        server.sendServerMessage(new Quit());
+    }
+
+
+    private void makeTable() {
+        server.sendServerMessage(new MakeTable());
+    }
+
+
+    private void joinTable() {
+        String tableId = ui.getTableIdFromUser();
+        server.sendServerMessage(new JoinTable(tableId));
+    }
+
+
+    private void leaveTable() {
+        server.sendServerMessage(new LeaveTable());
     }
 }

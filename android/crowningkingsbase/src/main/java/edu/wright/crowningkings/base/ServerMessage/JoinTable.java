@@ -7,7 +7,7 @@ package edu.wright.crowningkings.base.ServerMessage;
 public class JoinTable extends AbstractServerMessage {
     public JoinTable(String tableId) {
         String[] parameters = new String[2];
-        parameters[0] = "104";
+        parameters[0] = "104 ";
         parameters[1] = tableId;
         setParameters(parameters);
     }
