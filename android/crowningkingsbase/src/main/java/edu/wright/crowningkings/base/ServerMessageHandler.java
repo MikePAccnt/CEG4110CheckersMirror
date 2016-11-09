@@ -16,24 +16,17 @@ import edu.wright.crowningkings.base.ServerMessage.*;
 public class ServerMessageHandler {
 
     public static AbstractServerMessage interpretMessage(String message) {
-//        System.out.println("interpretMessage(String)");
-//        System.out.println("message=" + message);
         String[] params = message.split(" ");
-//        for (String param : params) {
-//            System.out.println("\t\tparam=" + param);
-//        }
 
         int messageCode = -1;
         try {
             messageCode = Integer.parseInt(params[0].trim());
         } catch (NumberFormatException nfe) {
-//            System.out.println("\tNo code given");
+            System.out.println("interpretMessage NumberFormatException : " + nfe.getMessage());
         }
         System.out.println("");
         switch (messageCode) {
-            /*
-             * messages from the server to the client.
-             */
+            // messages from the server to the client.
             case 201 :
                 System.out.println("\t201 : MSG – client received message <3> from client <1>. If <2> = 1, the message is private.");
                 break;
@@ -80,9 +73,7 @@ public class ServerMessageHandler {
                 System.out.println("\t219 : WHO_ON_TBL – clients <2> and <3> are on table with id <1>. <2> is black. <3> is red. If <2> or <3> = -1, then that seat is open.");
                 break;
 
-            /*
-             * messages indicating an error, from the server to the client.
-             */
+            // messages indicating an error, from the server to the client.
             case 405 :
                 System.out.println("\t405 : BAD_MESSAGE – a TCP message sent to the server is in a bad format.");
                 break;
@@ -100,30 +91,10 @@ public class ServerMessageHandler {
                     System.out.println("\tdefault messageCode");
                 }
         }
-        System.out.println("\tmessage=" + message);
-//        System.out.println("Math.round(messageCode/100)=" + Math.round(messageCode/100));
 
-        //return new ServerMessage(messageCode, params);
+        System.out.println("\tmessage=" + message);
+
         return new TestMessage();
     }
-
-
-//    //Work in progress
-//    public static ServerMessage prepareMessage(int code, String ... parameters) {
-//        switch (code) {
-//            case 101:
-//                System.out.println("\t101 : MSG_ALL – client <1> sends message <2> to everyone in the lobby.");
-//                String message = "message";
-//                MessageAll ma;
-//                return new MessageAll(message);
-//                //break;
-//            case 102:
-//                System.out.println("\t102 : MSG_C - client <1> sends message <3> to client <2>.");
-//                break;
-//            default:
-//                System.out.println("\tdefault prepareMessage(int) code");
-//        }
-//        return null;
-//    }
 
 }

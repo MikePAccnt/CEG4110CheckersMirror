@@ -35,34 +35,15 @@ public class BaseClient {
 
         Thread getServerMessagesThread = new Thread() {
             public void run(){
-//                System.out.println("\tgetServerMessagesThread.run()");
                 while (!Thread.interrupted()) {
-//                    System.out.println("\tserver.getServerMessage();");
                     String[] messages = server.getServerMessageString();
                     if (messages != null) {
                         for (String stringMessage : messages) {
-//                        System.out.println("\n\tstringMessage=" + stringMessage);
-//
-//                        String[] params = stringMessage.split(" ");
-//                        for (String param : params) {
-//                            System.out.println("\t\tparam=" + param);
-//                        }
-//
-//                        int messageCode;
-//                        try {
-//                            messageCode = Integer.parseInt(params[0].trim());
-//                        } catch (NumberFormatException nfe) {
-//                            System.out.println("\tNo code given");
-//                            messageCode = -1;
-//                        }
-//
-//                      ServerMessage sm = new ServerMessage(messageCode, stringMessage);
-//                      ServerMessageHandler.interpretMessage(sm);
                             AbstractServerMessage sm = ServerMessageHandler.interpretMessage(stringMessage);
                             try {
                                 sm.run();
-                            } catch (java.lang.NullPointerException npe) {
-                                System.out.println("\tnpe: " + npe.getMessage());
+                            } catch (NullPointerException npe) {
+                                System.out.println("run NullPointerException : " + npe.getMessage());
                             }
                         }
                     }
@@ -164,9 +145,11 @@ public class BaseClient {
         server.sendServerMessage(new LeaveTable());
     }
 
+
     private void ready() {
         server.sendServerMessage(new Ready());
     }
+
 
     private void move() {
         String[] move = ui.getMoveFromUser();
