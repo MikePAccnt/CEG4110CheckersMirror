@@ -20,62 +20,41 @@ public class ServerConnection {
 
 
     public ServerConnection(String ipAddress, int portNumber) {
-        System.out.println("\tServerConnection(String, int)");
         try {
             Socket checkersServerSocket = new Socket(ipAddress, portNumber);
             serverInputStream = new DataInputStream(checkersServerSocket.getInputStream());
             serverOutputStream = new DataOutputStream(checkersServerSocket.getOutputStream());
 
         } catch (IOException ioe) {
-            System.out.println(ioe.getMessage()+ ":_:");
+            System.out.println("ServerConnection IOException : " + ioe.getMessage());
         }
     }
 
 
     public void sendServerMessage(AbstractServerMessage message) {
-        System.out.println("\tsendServerMessage(ServerMessage)");
         sendServerMessage(message.toBytesArray());
     }
-
-
-//    public void sendServerMessage(String message) {
-//        try{
-//            //message = message + " " + ServerMessage.EOM;
-//            sendServerMessage(message.getBytes("UTF-8"));
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage());
-//        }
-//    }
 
 
     private void sendServerMessage(byte[] bytes) {
         try {
             serverOutputStream.write(bytes, 0, bytes.length);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("sendServerMessage Exception : " + e.getMessage());
         }
     }
 
 
     public String[] getServerMessageString() {
-//        System.out.println("\tgetServerMessage()");
-        String[] messages = null;
+        String[] messages = new String[0];
         try {
-//            inMessage = serverInputStream.readUTF();
-//            System.out.println("inMessage=\"" + inMessage + "\"");
-
             byte[] rawMessage = new byte[512];
             int numberOfBytes = serverInputStream.read(rawMessage);
-//            System.out.println("\tnumberOfBytes=" + numberOfBytes);
-
             String inMessage = new String(rawMessage, 0, numberOfBytes, "UTF-8");
-//            System.out.println("\tinMessage=\"" + inMessage + "\"");
-
             messages = inMessage.split("<EOM>");
 
         } catch (Exception e) {
-            System.out.println(e.getMessage() + ":_:");
-//            messages = new String[0];
+            System.out.println("getServerMessage Exception : " + e.getMessage());
         }
 
         return messages;

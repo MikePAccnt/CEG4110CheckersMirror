@@ -1,5 +1,7 @@
 package edu.wright.crowningkings.base.ServerMessage;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * Created by csmith on 10/26/16.
  *
@@ -9,6 +11,8 @@ package edu.wright.crowningkings.base.ServerMessage;
  * String that will be translated into a byte[] for sending to the server. the ServerMessage class
  * will be the parent of many different classes of messages
  *
+ * Each extension of this AbstractServerMessage class will override the run method. In this method,
+ * the message will perform its unique task (change client state, call ui to change view, etc.
  */
 
 public abstract class AbstractServerMessage {
@@ -31,8 +35,8 @@ public abstract class AbstractServerMessage {
     public byte[] toBytesArray() {
         try {
             return this.toServerMessage().getBytes("UTF-8");
-        } catch (java.io.UnsupportedEncodingException uee) {
-            System.out.println(uee.getMessage());
+        } catch (UnsupportedEncodingException uee) {
+            System.out.println("toBytesArray UnsupportedEncodingException : " + uee.getMessage());
             return new byte[0];
         }
     }
