@@ -15,15 +15,18 @@ public class CommandLineUI extends AbstractUserInterface {
     }
 
     @Override
-    public String getMessageFromUser() {
+    public String[] getPublicMessageFromUser() {
         System.out.println("Enter global chat message to send");
-        return (new Scanner(System.in)).nextLine().trim();
+        return new String[] {(new Scanner(System.in)).nextLine().trim()};
     }
 
     @Override
-    public String getRecipientFromUser() {
+    public String[] getPrivateMessageFromUser() {
         System.out.println("Enter recipient username");
-        return (new Scanner(System.in)).nextLine().replace(" ", "").trim();
+        String recipient = (new Scanner(System.in)).nextLine().replace(" ", "").trim();
+        System.out.println("Enter private chat message to send");
+        String message = (new Scanner(System.in)).nextLine().trim();
+        return new String[] {recipient, message};
     }
 
     @Override

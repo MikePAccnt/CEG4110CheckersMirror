@@ -1,7 +1,5 @@
 package edu.wright.crowningkings.base.UserInterface;
 
-import java.util.Scanner;
-
 /**
  * Created by csmith on 11/1/16.
  *
@@ -13,9 +11,9 @@ public abstract class AbstractUserInterface {
 
     public abstract String getUsernameFromUser();
 
-    public abstract String getMessageFromUser();
+    public abstract String[] getPublicMessageFromUser();
 
-    public abstract String getRecipientFromUser();
+    public abstract String[] getPrivateMessageFromUser();
 
     public abstract String getTableIdFromUser();
 

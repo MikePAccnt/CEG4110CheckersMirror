@@ -113,14 +113,15 @@ public class BaseClient {
 
 
     private void sendPublicMessage() {
-        String publicMessage = ui.getMessageFromUser();
-        server.sendServerMessage(new MessageAll(publicMessage));
+        String[] publicMessage = ui.getPublicMessageFromUser();
+        server.sendServerMessage(new MessageAll(publicMessage[0]));
     }
 
 
     private void sendPrivateMessage() {
-        String recipient = ui.getRecipientFromUser();
-        String privateMessage = ui.getMessageFromUser();
+        String[] privateMessageArray = ui.getPrivateMessageFromUser();
+        String recipient = privateMessageArray[0];
+        String privateMessage = privateMessageArray[1];
         server.sendServerMessage(new MessageClient(privateMessage, recipient));
     }
 
