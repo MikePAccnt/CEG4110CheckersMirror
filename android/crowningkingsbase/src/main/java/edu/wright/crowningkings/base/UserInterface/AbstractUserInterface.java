@@ -14,7 +14,7 @@ public abstract class AbstractUserInterface {
      * This method is used for providing the username
      * of the client
      */
-    public abstract String getUserNameFromUser();
+    public abstract String getUsernameFromUser();
 
     
     /*
