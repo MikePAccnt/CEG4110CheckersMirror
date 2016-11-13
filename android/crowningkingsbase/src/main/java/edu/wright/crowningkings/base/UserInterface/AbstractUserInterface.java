@@ -11,17 +11,10 @@ public abstract class AbstractUserInterface {
 
     
     /*
-     * This method is used for sending the desired
-     * username by the client to the server
+     * This method is used for providing the username
+     * of the client
      */
-    public abstract void sendUserName();
-    
-    
-    /*
-     * If the server message is that there was a valid username
-     * then this is used to update the clients username
-     */
-    public abstract void setUsername(String username);
+    public abstract String getUserNameFromUser();
 
     
     /*
