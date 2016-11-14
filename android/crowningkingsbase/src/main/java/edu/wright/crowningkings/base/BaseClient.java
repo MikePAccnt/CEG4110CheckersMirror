@@ -67,6 +67,7 @@ public class BaseClient {
                     "\"ready\", " +
                     "\"move\", " +
                     "\"tablestatus\", " +
+                    "\"joinobserver\", " +
                     "]");
             String command = keyboard.nextLine();
             switch (command.toLowerCase()) {
@@ -100,6 +101,9 @@ public class BaseClient {
                     break;
                 case "tablestatus" :
                     status();
+                    break;
+                case "joinobserver" :
+                    joinTableObserver();
                     break;
                 default :
                     System.out.println("default switch");
@@ -148,6 +152,11 @@ public class BaseClient {
     private void joinTable() {
         String tableId = ui.getTableIdFromUser();
         server.sendServerMessage(new JoinTable(tableId));
+    }
+
+    private void joinTableObserver() {
+        String tableId = ui.getTableIdFromUser();
+        server.sendServerMessage(new JoinTableObserver(tableId));
     }
 
 
