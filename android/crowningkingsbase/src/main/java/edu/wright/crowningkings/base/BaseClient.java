@@ -24,7 +24,7 @@ public class BaseClient {
 
 
         Scanner keyboard = new Scanner(System.in);
-        String serverAddress = "192.168.122.1";
+        String serverAddress = "130.108.13.36";
 
 //        System.out.println("Enter the server address");
 //        serverAddress = keyboard.nextLine();
@@ -66,6 +66,7 @@ public class BaseClient {
                     "\"leavetable\", " +
                     "\"ready\", " +
                     "\"move\", " +
+                    "\"tablestatus\", " +
                     "]");
             String command = keyboard.nextLine();
             switch (command.toLowerCase()) {
@@ -97,6 +98,9 @@ public class BaseClient {
                 case "move" :
                     move();
                     break;
+                case "tablestatus" :
+                    status();
+                    break;
                 default :
                     System.out.println("default switch");
                     break;
@@ -105,6 +109,11 @@ public class BaseClient {
         getServerMessagesThread.interrupt();
     }
 
+
+    private void status() {
+        String table = ui.getTableIdFromUser();
+        server.sendServerMessage(new Status(table));
+    }
 
     private void setUsername() {
         String username = ui.getUsernameFromUser();
