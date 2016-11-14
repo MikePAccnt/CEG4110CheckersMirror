@@ -51,4 +51,33 @@ public class CommandLineUI extends AbstractUserInterface {
 
         return new String[] {fromx, fromy, tox, toy};
     }
+
+    //From the updated AbstractUserInterface class added to allow the
+    //Test client to still compile
+    @Override
+    public void sendWantTable(){}
+    @Override
+    public void makeTable(String tableID){}
+    @Override
+    public void makeTable(String[] tableID){}
+    @Override
+    public void sendJoinTable(){}
+    @Override
+    public void setJoinTable(String tableID, String type){}
+    @Override
+    public void sendPublicMessage(){}
+    @Override
+    public void sendPrivateMessage(){}
+    @Override
+    public void sendMoveToServer(){}
+    @Override
+    public void updateBoard(String[] board){}
+    @Override
+    public void updateLobbyChat(String newMessage){}
+    @Override
+    public void updateUsers(String newUser){}
+    @Override
+    public void updateError(String errorConst){}
+
+
 }

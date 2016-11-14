@@ -115,4 +115,13 @@ public abstract class AbstractUserInterface {
      */
     public abstract void updateError(String errorConst);
     
+
+    /*
+     * These methods are a few of the old ones that are still used
+     * in the commandline interface so they needed to stay to
+     * prevent crashing
+     */
+    public abstract String[] getPrivateMessageFromUser();
+    public abstract String[] getPublicMessageFromUser();
+    public abstract String[] getMoveFromUser();
 }
