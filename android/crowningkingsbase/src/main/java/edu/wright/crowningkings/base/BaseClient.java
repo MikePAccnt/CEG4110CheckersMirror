@@ -18,11 +18,13 @@ public class BaseClient {
     private ServerConnection server;
     private Thread serverMessageThread;
     private AbstractUserInterface ui;
+    private BaseClient client;
 
 
     public BaseClient(AbstractUserInterface ui) {
         String serverAddress = "192.168.122.1";
 
+        client = this;
         setServer(serverAddress, PORT_NUMBER);
         startServerMessageThread();
         setClientUI(ui);
@@ -43,7 +45,7 @@ public class BaseClient {
                         for (String stringMessage : messages) {
                             AbstractServerMessage sm = ServerMessageHandler.interpretMessage(stringMessage);
                             try {
-                                sm.run();
+                                sm.run(client);
                             } catch (NullPointerException npe) {
                                 System.out.println("run NullPointerException : " + npe.getMessage());
                             }

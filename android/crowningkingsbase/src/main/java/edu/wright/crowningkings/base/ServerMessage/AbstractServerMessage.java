@@ -2,6 +2,8 @@ package edu.wright.crowningkings.base.ServerMessage;
 
 import java.io.UnsupportedEncodingException;
 
+import edu.wright.crowningkings.base.BaseClient;
+
 /**
  * Created by csmith on 10/26/16.
  *
@@ -49,5 +51,5 @@ public abstract class AbstractServerMessage {
         return parameters;
     }
 
-    public abstract void run();
+    public abstract void run(BaseClient client);
 }

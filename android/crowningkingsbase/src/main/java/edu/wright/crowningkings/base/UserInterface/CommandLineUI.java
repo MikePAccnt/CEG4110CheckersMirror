@@ -9,8 +9,9 @@ import edu.wright.crowningkings.base.BaseClient;
  */
 
 public class CommandLineUI implements AbstractUserInterface {
+    BaseClient client;
     public void run() {
-        BaseClient client = new BaseClient(this);
+        client = new BaseClient(this);
 
         Scanner keyboard = new Scanner(System.in);
 
