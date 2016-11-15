@@ -1,6 +1,5 @@
 package edu.wright.crowningkings.desktop;
 
-//import edu.wright.crowningkings.base.UserInterface;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -40,19 +39,21 @@ import java.awt.Font;
 import javax.swing.ScrollPaneConstants;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 public class CheckersLobbyUI extends JFrame{
 
 	//private static final long serialVersionUID = 1L;
 	
-	//Not all of these are used might use them in the futre
+	//Not all of these are used might use them in the future
 	private JPanel checkersMainPanel;
 	private JTextField messageTextField;
 	private JTextArea currentUsersTextArea;
 	private JTextArea lobbyChatTextArea;
-	private JPanel gamePanel;
-	private JPanel currentLobbyPanel; //Might not need this later on
-	private Image im = new ImageIcon("C:\\Users\\Michael\\Pictures\\GameImages\\checkerboard.jpg").getImage();
+	private JPanel lobbyPanel; //Might not need this later on
 	private Graphics g;
 
 
@@ -79,6 +80,7 @@ public class CheckersLobbyUI extends JFrame{
 		title.setHorizontalAlignment(SwingConstants.CENTER);
 		title.setForeground(Color.WHITE);
 		title.setBounds(0, 0, 1360, 63);
+		
 		checkersMainPanel.add(title);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
@@ -87,19 +89,14 @@ public class CheckersLobbyUI extends JFrame{
 		scrollPane_1.getVerticalScrollBar().setUnitIncrement(15);
 		checkersMainPanel.add(scrollPane_1);
 		
-		currentLobbyPanel = new JPanel();
-		scrollPane_1.setViewportView(currentLobbyPanel);
-		currentLobbyPanel.setBackground(new Color(46, 139, 87));
-		currentLobbyPanel.setName("CurrentLobbyPanel");
-		currentLobbyPanel.setPreferredSize(new Dimension(1193, 50000));
-		currentLobbyPanel.setBounds(167, 62, 1193, 1000);
-		currentLobbyPanel.setLayout(null);
+		lobbyPanel = new JPanel();
+		scrollPane_1.setViewportView(lobbyPanel);
+		lobbyPanel.setBackground(new Color(46, 139, 87));
+		lobbyPanel.setName("lobbyPanel");
+		lobbyPanel.setPreferredSize(new Dimension(1193, 50000));
+		lobbyPanel.setBounds(167, 62, 1193, 1000);
 		
-//		ImagePanel panel = new ImagePanel(im);
-//		panel.setBounds(12, 13, 250, 250);
-//		currentLobbyPanel.add(panel);
-		
-		
+		lobbyPanel.setLayout(null);
 
 		
 		JPanel usernamesPanel = new JPanel();
@@ -120,19 +117,20 @@ public class CheckersLobbyUI extends JFrame{
 		currentUsersTextArea.setBounds(0, 0, 4, 22);
 		currentUsersTextArea.setName("CurrentUsersTextArea");
 		
+		
 		JScrollPane usersScrollPane = new JScrollPane(currentUsersTextArea);
 		usersScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		usersScrollPane.setBounds(10, 36, 147, 630);
 		usernamesPanel.add(usersScrollPane);
 		
 
-		//panel_1.add(textArea_1);
 		
 		JPanel lobbyChatPanel = new JPanel();
 		lobbyChatPanel.setBackground(new Color(255, 255, 255));
 		lobbyChatPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		lobbyChatPanel.setBounds(167, 499, 1193, 210);
 		lobbyChatPanel.setName("LobbyChatPanel");
+		
 		checkersMainPanel.add(lobbyChatPanel);
 		
 		lobbyChatTextArea = new JTextArea();
@@ -142,6 +140,7 @@ public class CheckersLobbyUI extends JFrame{
 		lobbyChatTextArea.setWrapStyleWord(true);
 		lobbyChatTextArea.setRows(16);
 		lobbyChatTextArea.setName("LobbyChatTextArea");
+		
 		
 		JScrollPane lobbyChatScrollPane = new JScrollPane(lobbyChatTextArea);
 		lobbyChatPanel.add(lobbyChatScrollPane);
@@ -158,52 +157,25 @@ public class CheckersLobbyUI extends JFrame{
 		messageTextField.setHorizontalAlignment(SwingConstants.LEFT);
 		messageTextField.setColumns(107);
 		messageTextField.setName("MessageTextField");
+		
 		messagePanel.add(messageTextField);
 		
-//		JButton btnNewButton = new JButton("New button");
-//		btnNewButton.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent arg0) {
-//				if(arg0.get)
-//			}
-//		});
-//		btnNewButton.setBounds(30, 22, 89, 23);
-//		checkersMainPanel.add(btnNewButton);
 	}
 	
-//	public JPanel getGamePanel(){
-//		GamePanel tempPanel = new GamePanel(im);
-//		tempPanel.setBounds(112, 113, 379, 371);
-//		//tempPanel.add(gamePanel);
-//		tempPanel.setLayout(null);
-//		currentLobbyPanel.add(tempPanel);
-//		return tempPanel;
-//	}
 	
-	//Get the text filed that a user inputs messages in
 	public JTextField getMessageTextField(){
 		return messageTextField;
 	}
 	
-	//Get the text of the current users component
-	public String getCurrentUsersTextAreaText(){
-		return currentUsersTextArea.getText();
+	public JTextArea getCurrentUsers(){
+		return currentUsersTextArea;
 	}
 	
-	//Set the text of the current users component
-	public void setCurrentUsersTextAreaText(String username){
-		currentUsersTextArea.setText(username + "\n");
+	public JTextArea getLobbyChatTextArea(){
+		return lobbyChatTextArea;
 	}
 	
-	//Get all of the text from the lobby chat component
-	public String getLobbyChatTextArea(){
-		return lobbyChatTextArea.getText();
-	}
-	
-	//Set the text of the lobby chat component
-	public void setLobbyChatTextArea(String message){
-		lobbyChatTextArea.setText(message);
-	}
 	public JPanel getLobbyPanel(){
-		return currentLobbyPanel;
+		return lobbyPanel;
 	}
 }
