@@ -1,5 +1,7 @@
 package edu.wright.crowningkings.base.UserInterface;
 
+import edu.wright.crowningkings.base.BaseClient;
+
 /**
  * Created by csmith on 11/1/16. Updated by mpurcell on 11/13/16
  *
@@ -7,21 +9,19 @@ package edu.wright.crowningkings.base.UserInterface;
  *
  */
 
-public abstract class AbstractUserInterface {
-
-    
+public interface AbstractUserInterface {
     /*
      * This method is used for providing the username
      * of the client
      */
-    public abstract String getUsernameFromUser();
+    String getUsernameFromUser();
 
     
     /*
      * This method is used to tell the server that
      * the client wants to create a new table
      */
-    public abstract void sendWantTable();
+    void sendWantTable();
     
     
     /*
@@ -29,15 +29,15 @@ public abstract class AbstractUserInterface {
      * or when initializing the UI this method is used
      * to update the UI to show all of the current tables 
      */
-    public abstract void makeTable(String tableID);
-    public abstract void makeTable(String[] tableID);
+    void makeTable(String tableID);
+    void makeTable(String[] tableID);
     
     
     /*
      * This method is used to tell the server that
      * the client wants to join a table
      */
-    public abstract void sendJoinTable();
+    void sendJoinTable();
     
     
     /*
@@ -47,21 +47,21 @@ public abstract class AbstractUserInterface {
      * 
      * String type is to specify if the client is a "player" or a "observer"
      */
-    public abstract void setJoinTable(String tableID, String type);
+    void setJoinTable(String tableID, String type);
     
     
     /*
      * This method is used to send a public message
      * to the server
      */
-    public abstract void sendPublicMessage();
+    void sendPublicMessage();
 
     
     /*
      * This method is used to send a private message
      * to the server
      */
-    public abstract void sendPrivateMessage();
+    void sendPrivateMessage();
 
     
     /*
@@ -69,14 +69,14 @@ public abstract class AbstractUserInterface {
      * or the server needs the current tableID
      * of the client right now
      */
-    public abstract String getTableIdFromUser();
+    String getTableIdFromUser();
 
     
     /*
      * This method is used to send the wanted move to the server
      * from the client
      */
-    public abstract void sendMoveToServer();
+    void sendMoveToServer();
     
     
     /*
@@ -84,7 +84,7 @@ public abstract class AbstractUserInterface {
      * this method needs to be called with the current state
      * of the board so the client can update its board
      */
-    public abstract void updateBoard(String[] board);
+    void updateBoard(String[] board);
     
     
     /*
@@ -94,14 +94,14 @@ public abstract class AbstractUserInterface {
      * public or private, call this method to update the lobby
      * chat.
      */
-    public abstract void updateLobbyChat(String newMessage);
+    void updateLobbyChat(String newMessage);
     
     
     /*
      * If the server sends a message that a new user has joined
      * call this method with the username so the UI can be updated
      */
-    public abstract void updateUsers(String newUser);
+    void updateUsers(String newUser);
     
     /*
      * If the message the server sent back was an error
@@ -113,7 +113,7 @@ public abstract class AbstractUserInterface {
      * Undecided on how to implement this yet, most likely
      * it will be with defined constants for certian error types
      */
-    public abstract void updateError(String errorConst);
+    void updateError(String errorConst);
     
 
     /*
@@ -121,7 +121,7 @@ public abstract class AbstractUserInterface {
      * in the commandline interface so they needed to stay to
      * prevent crashing
      */
-    public abstract String[] getPrivateMessageFromUser();
-    public abstract String[] getPublicMessageFromUser();
-    public abstract String[] getMoveFromUser();
+    String[] getPrivateMessageFromUser();
+    String[] getPublicMessageFromUser();
+    String[] getMoveFromUser();
 }

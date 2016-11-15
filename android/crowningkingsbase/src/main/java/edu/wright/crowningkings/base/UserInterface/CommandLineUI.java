@@ -2,13 +2,70 @@ package edu.wright.crowningkings.base.UserInterface;
 
 import java.util.Scanner;
 
-import edu.wright.crowningkings.base.UserInterface.AbstractUserInterface;
+import edu.wright.crowningkings.base.BaseClient;
 
 /**
  * Created by csmith on 11/4/16.
  */
 
-public class CommandLineUI extends AbstractUserInterface {
+public class CommandLineUI implements AbstractUserInterface {
+    public void run() {
+        BaseClient client = new BaseClient(this);
+
+        Scanner keyboard = new Scanner(System.in);
+
+        boolean quit = false;
+        while(!quit) {
+            System.out.println("\n\n\n\nWhat do you want to do?");
+            System.out.println("[" +
+                    "\"setusername\", " +
+                    "\"sendpublicmessage\", " +
+                    "\"sendprivatemessage\", " +
+                    "\"quit\", " +
+                    "\"maketable\", " +
+                    "\"jointable\", " +
+                    "\"leavetable\", " +
+                    "\"ready\", " +
+                    "\"move\", " +
+                    "]");
+            String command = keyboard.nextLine();
+            switch (command.toLowerCase()) {
+                case "sendpublicmessage" :
+                    client.sendPublicMessage();
+                    break;
+                case "setusername" :
+                    client.setUsername();
+                    break;
+                case "sendprivatemessage" :
+                    client.sendPrivateMessage();
+                    break;
+                case "quit" :
+                    client.quit();
+                    quit = true;
+                    break;
+                case "maketable" :
+                    client.makeTable();
+                    break;
+                case "jointable" :
+                    client.joinTable();
+                    break;
+                case "leavetable" :
+                    client.leaveTable();
+                    break;
+                case "ready" :
+                    client.ready();
+                    break;
+                case "move" :
+                    client.move();
+                    break;
+                default :
+                    System.out.println("default switch");
+                    break;
+            }
+        }
+    }
+
+
     public String getUsernameFromUser() {
         System.out.println("Enter desired username with no spaces");
         return (new Scanner(System.in)).nextLine().replace(" ", "").trim();
@@ -78,6 +135,4 @@ public class CommandLineUI extends AbstractUserInterface {
     public void updateUsers(String newUser){}
     @Override
     public void updateError(String errorConst){}
-
-
 }

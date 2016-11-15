@@ -2,42 +2,44 @@ package edu.wright.crowningkings.base;
 
 import edu.wright.crowningkings.base.ServerMessage.*;
 import edu.wright.crowningkings.base.UserInterface.*;
-import edu.wright.crowningkings.base.UserInterface.CommandLineUI;
-
-import java.util.Scanner;
 
 /**
  * Created by csmith on 11/1/16.
- *
+ * <p>
  * Right now the class name/design is still a prototype. As long as we can keep it out of using a
  * "public static void main(String[] args)" since Android doesn't really use that.
  *
+ * 11/15/2016
+ * BaseClient will be acting like the Controller between the UI (View) and server (Model) to follow
+ * the MVC design pattern.
  */
-
 public class BaseClient {
-    ServerConnection server;
-    AbstractUserInterface ui;
-    private final int PORT_NUMBER = 45322;
-
-    public void run(){
-        System.out.println("BaseClient.run()");
+    private static final int PORT_NUMBER = 45322;
+    private ServerConnection server;
+    private Thread serverMessageThread;
+    private AbstractUserInterface ui;
 
 
-        Scanner keyboard = new Scanner(System.in);
-        String serverAddress = "130.108.13.36";
+    public BaseClient(AbstractUserInterface ui) {
+        String serverAddress = "192.168.122.1";
 
-//        System.out.println("Enter the server address");
-//        serverAddress = keyboard.nextLine();
+        setServer(serverAddress, PORT_NUMBER);
+        startServerMessageThread();
+        setClientUI(ui);
+    }
 
-        server = new ServerConnection(serverAddress, PORT_NUMBER);
-        ui = new CommandLineUI();
 
+    private void setServer(String address, int port) {
+        server = new ServerConnection(address, port);
+    }
 
-        Thread getServerMessagesThread = new Thread() {
-            public void run(){
-                while (!Thread.interrupted()) {
-                    String[] messages = server.getServerMessageString();
-                    if (messages != null) {
+    private void startServerMessageThread() {
+        if (serverMessageThread == null) {
+            serverMessageThread = new Thread() {
+                public void run() {
+                    while (!Thread.interrupted()) {
+                        String[] messages = server.getServerMessageString();
+
                         for (String stringMessage : messages) {
                             AbstractServerMessage sm = ServerMessageHandler.interpretMessage(stringMessage);
                             try {
@@ -48,90 +50,35 @@ public class BaseClient {
                         }
                     }
                 }
-            }
-        };
-        getServerMessagesThread.start();
-
-
-        boolean quit = false;
-        while(!quit) {
-            System.out.println("\n\n\n\nWhat do you want to do?");
-            System.out.println("[" +
-                    "\"setusername\", " +
-                    "\"sendpublicmessage\", " +
-                    "\"sendprivatemessage\", " +
-                    "\"quit\", " +
-                    "\"maketable\", " +
-                    "\"jointable\", " +
-                    "\"leavetable\", " +
-                    "\"ready\", " +
-                    "\"move\", " +
-                    "\"tablestatus\", " +
-                    "\"joinobserver\", " +
-                    "]");
-            String command = keyboard.nextLine();
-            switch (command.toLowerCase()) {
-                case "sendpublicmessage" :
-                    sendPublicMessage();
-                    break;
-                case "setusername" :
-                    setUsername();
-                    break;
-                case "sendprivatemessage" :
-                    sendPrivateMessage();
-                    break;
-                case "quit" :
-                    quitServer();
-                    quit = true;
-                    break;
-                case "maketable" :
-                    makeTable();
-                    break;
-                case "jointable" :
-                    joinTable();
-                    break;
-                case "leavetable" :
-                    leaveTable();
-                    break;
-                case "ready" :
-                    ready();
-                    break;
-                case "move" :
-                    move();
-                    break;
-                case "tablestatus" :
-                    status();
-                    break;
-                case "joinobserver" :
-                    joinTableObserver();
-                    break;
-                default :
-                    System.out.println("default switch");
-                    break;
-            }
+            };
         }
-        getServerMessagesThread.interrupt();
+        serverMessageThread.start();
     }
 
 
-    private void status() {
+    private void setClientUI(AbstractUserInterface ui) {
+        this.ui = ui;
+    }
+
+
+    public void status() {
         String table = ui.getTableIdFromUser();
         server.sendServerMessage(new Status(table));
     }
 
-    private void setUsername() {
+
+    public void setUsername() {
         String username = ui.getUsernameFromUser();
         server.sendServerMessage(new SendUsername(username));
     }
 
 
-    private void sendPublicMessage() {
+    public void sendPublicMessage() {
         String[] publicMessage = ui.getPublicMessageFromUser();
         server.sendServerMessage(new MessageAll(publicMessage[0]));
     }
 
-
-    private void sendPrivateMessage() {
+    public void sendPrivateMessage() {
         String[] privateMessageArray = ui.getPrivateMessageFromUser();
         String recipient = privateMessageArray[0];
         String privateMessage = privateMessageArray[1];
@@ -139,38 +86,40 @@ public class BaseClient {
     }
 
 
-    private void quitServer() {
+    public void quit() {
         server.sendServerMessage(new Quit());
+        //serverMessageThread.interrupt();
     }
 
 
-    private void makeTable() {
+    public void makeTable() {
         server.sendServerMessage(new MakeTable());
     }
 
 
-    private void joinTable() {
+    public void joinTable() {
         String tableId = ui.getTableIdFromUser();
         server.sendServerMessage(new JoinTable(tableId));
     }
 
-    private void joinTableObserver() {
+
+    public void joinTableObserver() {
         String tableId = ui.getTableIdFromUser();
         server.sendServerMessage(new JoinTableObserver(tableId));
     }
 
 
-    private void leaveTable() {
+    public void leaveTable() {
         server.sendServerMessage(new LeaveTable());
     }
 
 
-    private void ready() {
+    public void ready() {
         server.sendServerMessage(new Ready());
     }
 
 
-    private void move() {
+    public void move() {
         String[] move = ui.getMoveFromUser();
         server.sendServerMessage(new Move(move[0], move[1], move[2], move[3]));
     }
