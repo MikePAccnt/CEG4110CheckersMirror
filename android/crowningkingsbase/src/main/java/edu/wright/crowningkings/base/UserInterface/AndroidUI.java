@@ -72,7 +72,7 @@ public class AndroidUI implements AbstractUserInterface {
     }
 
     @Override
-    public void updateBoard(String[] board) {
+    public void updateBoard(String[][] board) {
 
     }
 

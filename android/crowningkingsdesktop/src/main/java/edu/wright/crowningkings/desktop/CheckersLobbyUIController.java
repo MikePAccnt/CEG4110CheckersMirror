@@ -29,6 +29,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	private CheckersLobbyUI lobby;
 	private JTextField messageTextField;
 	private JPanel lobbyPanel;
+	private JPanel gameBoard;
 	private JTextArea currentUsers;
 	private JTextArea lobbyChat;
 	private int gamePanelx = 12;
@@ -97,9 +98,9 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 					currentGame.dispose();
 				}
 				//sendJoinTable(p.getName());
-				//currentGame = (CheckersGameUI) DesktopUIFactory.makeGameLobby("Name1", "Name2", tableID);
-				//currentGame.setVisible(true);
-				final JPanel pan = (JPanel)currentGame.checkerBoard;
+				currentGame = (CheckersGameUI) DesktopUIFactory.makeGameLobby("Name1", "Name2", tableID);
+				currentGame.setVisible(true);
+				gameBoard = (JPanel)currentGame.checkerBoard;
 
 				//System.out.println(currentGame.getComponents()[0].getComponentAt(500, 500).getName());
 
@@ -108,12 +109,12 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 				 * coordinates to the values that the server needs
 				 * Need to fix where a piece can be moved to the border of the board 
 				 */
-				pan.addMouseListener(new MouseAdapter(){
+				gameBoard.addMouseListener(new MouseAdapter(){
 					public void mouseClicked(MouseEvent e){
 						//System.out.println("Test");
 						//if(pan.getComponentAt(e.getX(), e.getY()) instanceof JLabel){
 							if(cords[0] == -1 && cords[1] == -1){
-								JLabel temp = pan.getComponentAt(e.getX(), e.getY()) instanceof JLabel ? (JLabel)pan.getComponentAt(e.getX(), e.getY()):null;
+								JLabel temp = gameBoard.getComponentAt(e.getX(), e.getY()) instanceof JLabel ? (JLabel)gameBoard.getComponentAt(e.getX(), e.getY()):null;
 								if(temp != null && temp.getIcon() != null && temp instanceof JLabel){	
 									cords[0] = e.getX();
 									cords[1] = e.getY();
@@ -123,8 +124,8 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 							}
 							//This needs to be changed to only send the move message with the specified coordinates
 							else {
-								JLabel temp2 = (JLabel)pan.getComponentAt((int)cords[0],(int)cords[1]);
-								int tX = (e.getX()/62);// * 62) + 2;
+								JLabel temp2 = (JLabel)gameBoard.getComponentAt((int)cords[0],(int)cords[1]);
+								int tX = (e.getX()/62);// * 62) + 2; //(cord * 62) + 2 converts from server cords to the gamBoard cords
 								int tY = (e.getY()/62);// * 62) + 2;
 								String fromx = Integer.toString(cords[0]);
 								String fromy = Integer.toString(cords[1]);
@@ -134,7 +135,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 								//sendMoveToServer(fromx,fromy,tox,toy);
 								cords[0] = -1;
 								cords[1] = -1;
-								pan.repaint();
+								gameBoard.repaint();
 								System.out.println("released");
 							}
 						}
@@ -305,8 +306,33 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
 
 	
-	public void updateBoard(String[] board) {
+	public void updateBoard(String[][] board) {
 		
+		//Later on update this so it draws the board differently depending on the players color
+		
+		//clear the entire board
+		for(Component c : gameBoard.getComponents()){
+			gameBoard.remove(c);
+		}
+
+		//Re-populate the board with the current board state from the server
+		for (int x = 0;x<board.length;x++ ) {
+			for(int y = 0;y<board[x].length;y++){
+				int cx = (x*62)+2;
+				int cy = (x*62)+2;
+				if(board[x][y] == "B"){
+					gameBoard.add(DesktopUIFactory.makePiece("Black"));
+				}
+				else if(board[x][y] == "R"){
+					gameBoard.add(DesktopUIFactory.makePiece("Red"));
+				}
+				else {
+					//Do nothing in the case that there is no piece in that spot.
+				}
+			}
+			
+		}
+
 	}
 
 

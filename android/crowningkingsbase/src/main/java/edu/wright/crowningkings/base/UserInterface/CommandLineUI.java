@@ -129,7 +129,7 @@ public class CommandLineUI implements AbstractUserInterface {
     @Override
     public void sendMoveToServer(){}
     @Override
-    public void updateBoard(String[] board){}
+    public void updateBoard(String[][] board){}
     @Override
     public void updateLobbyChat(String newMessage){}
     @Override

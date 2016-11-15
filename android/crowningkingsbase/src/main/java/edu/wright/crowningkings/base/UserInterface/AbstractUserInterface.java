@@ -84,7 +84,7 @@ public interface AbstractUserInterface {
      * this method needs to be called with the current state
      * of the board so the client can update its board
      */
-    void updateBoard(String[] board);
+    void updateBoard(String[][] board);
     
     
     /*

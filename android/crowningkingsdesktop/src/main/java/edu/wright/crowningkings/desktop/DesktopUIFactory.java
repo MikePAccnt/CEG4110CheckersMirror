@@ -22,6 +22,7 @@ public class DesktopUIFactory {
 	private static Image board = new ImageIcon("C:\\Users\\Michael\\Pictures\\GameImages\\RealCheckerBoard.jpg").getImage();
 	private static ImageIcon piece_black = new ImageIcon("C:\\Users\\Michael\\Pictures\\GameImages\\checkerspiece_black.png");
 	private static ImageIcon piece_red = new ImageIcon("C:\\Users\\Michael\\Pictures\\GameImages\\checkerspiece_red.png");
+	
 	public static JPanel makeGamePanel(String tableID, Image im, LayoutManager layout){
 		JPanel panel = new ImagePanel(im);
 		panel.setLayout(layout);
@@ -160,7 +161,7 @@ private static void fillBoard(JPanel cBoard){
 		}
 	} 
 
-private static JLabel makePiece(String color){
+public static JLabel makePiece(String color){
 	JLabel lab = new JLabel();
 	lab.setName(color);
 	if(color.equals("Black")){
