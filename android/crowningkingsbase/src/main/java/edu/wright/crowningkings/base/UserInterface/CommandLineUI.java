@@ -121,7 +121,7 @@ public class CommandLineUI implements AbstractUserInterface {
     @Override
     public void sendJoinTable(){}
     @Override
-    public void setJoinTable(String tableID, String type){}
+    public void setJoinTable(String tableID, String type, String oponent){}
     @Override
     public void sendPublicMessage(){}
     @Override
@@ -133,7 +133,9 @@ public class CommandLineUI implements AbstractUserInterface {
     @Override
     public void updateLobbyChat(String newMessage){}
     @Override
-    public void updateUsers(String newUser){}
+    public void addUser(String newUser){}
+    @Override
+    public void removeUser(String oldUser){}    
     @Override
     public void updateError(String errorConst){}
 }

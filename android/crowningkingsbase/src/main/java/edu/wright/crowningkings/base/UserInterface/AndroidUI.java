@@ -37,7 +37,7 @@ public class AndroidUI implements AbstractUserInterface {
     }
 
     @Override
-    public void setJoinTable(String tableID, String type) {
+    public void setJoinTable(String tableID, String type, String oponent) {
 
     }
 
@@ -82,8 +82,13 @@ public class AndroidUI implements AbstractUserInterface {
     }
 
     @Override
-    public void updateUsers(String newUser) {
+    public void addUser(String newUser) {
 
+    }
+
+    @Override
+    public void removeUser(String oldUser) {
+        
     }
 
     @Override

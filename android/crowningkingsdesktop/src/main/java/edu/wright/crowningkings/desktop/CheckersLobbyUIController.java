@@ -98,8 +98,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 					currentGame.dispose();
 				}
 				//sendJoinTable(p.getName());
-				currentGame = (CheckersGameUI) DesktopUIFactory.makeGameLobby("Name1", "Name2", tableID);
-				currentGame.setVisible(true);
+
 				gameBoard = (JPanel)currentGame.checkerBoard;
 
 				//System.out.println(currentGame.getComponents()[0].getComponentAt(500, 500).getName());
@@ -183,15 +182,14 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	//Update the current users UI when a new user joins
 	//Better the handle when you call this in the file that
 	//controls server messages
-	public void addUser(String username){
-		currentUsers.setText((currentUsers.getText()) + "\n" + username);
-	}
-	public void removeUser(String username){
-		currentUsers.setText((currentUsers.getText().replaceAll(username + "\n", "")));
+	public void addUser(String user){
+		currentUsers.setText((currentUsers.getText()) + "\n" + user);
 	}
 
+	public void removeUser(String user){
+		currentUsers.setText((currentUsers.getText().replaceAll(user + "\n", "")));
+	}
 
-	
 	public String getUsernameFromUser() {
 		return username;
 	}
@@ -229,17 +227,12 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
 
 	public void updateLobbyChat(String newMessage) {
-		// TODO Auto-generated method stub
+		
+		//Whatever calls this method can handle formatting it with the username of who
+		//sent the message and maybe a time-stamp if wanted or that can be implemented here
+		lobbyChat.setText(lobbyChat.getText() + "\n" + newMessage);
 		
 	}
-
-
-	
-	public void updateUsers(String newUser) {
-		// TODO Auto-generated method stub
-		
-	}
-
 
 	
 	public void sendWantTable() {
@@ -250,13 +243,17 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
 	
 	public void makeTable(String tableID) {
-		// TODO Auto-generated method stub
+		
+		makeNewGamePanel(tableID);
 		
 	}
 
 	
 	public void makeTable(String[] tableID) {
-		// TODO Auto-generated method stub
+		
+		for(String s : tableID){
+			makeNewGamePanel(s);
+		}
 		
 	}
 
@@ -269,9 +266,16 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
 
 	
-	public void setJoinTable(String tableID, String type) {
-		// TODO Auto-generated method stub
-		
+	public void setJoinTable(String tableID, String type, String oponentName) {
+
+		currentGame = (CheckersGameUI) DesktopUIFactory.makeGameLobby(username, oponentName, tableID);
+		currentGame.setVisible(true);
+		if(type.equalsIgnoreCase("player")){
+			//Add the action listiner to the game board so the player can move the pieces
+		}
+		else if(type.equalsIgnoreCase("observer")){
+			//Don't add the action listiner to the game board so the observer cannot move pieces
+		}
 	}
 
 
@@ -320,11 +324,16 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 			for(int y = 0;y<board[x].length;y++){
 				int cx = (x*62)+2;
 				int cy = (x*62)+2;
+
 				if(board[x][y] == "B"){
-					gameBoard.add(DesktopUIFactory.makePiece("Black"));
+					JLabel temp = DesktopUIFactory.makePiece("Black");
+					temp.setName("Black");
+					gameBoard.add(temp).setBounds(cx,cy,62,62);
 				}
 				else if(board[x][y] == "R"){
-					gameBoard.add(DesktopUIFactory.makePiece("Red"));
+					JLabel temp = DesktopUIFactory.makePiece("Red");
+					temp.setName("Red");
+					gameBoard.add(temp).setBounds(cx,cy,62,62);
 				}
 				else {
 					//Do nothing in the case that there is no piece in that spot.

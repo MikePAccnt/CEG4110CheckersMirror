@@ -161,14 +161,17 @@ private static void fillBoard(JPanel cBoard){
 		}
 	} 
 
+//Creates a new "Checker piece" and gives it a name based on its color for use in playing
 public static JLabel makePiece(String color){
 	JLabel lab = new JLabel();
 	lab.setName(color);
 	if(color.equals("Black")){
 		lab.setIcon(piece_black);
+		lab.setName("Black");
 	}
 	else if(color.equals("Red")){
 		lab.setIcon(piece_red);
+		lab.setName("Red");
 	}
 	return lab;
 }

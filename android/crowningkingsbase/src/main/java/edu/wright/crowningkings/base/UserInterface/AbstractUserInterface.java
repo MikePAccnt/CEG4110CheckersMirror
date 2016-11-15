@@ -47,7 +47,7 @@ public interface AbstractUserInterface {
      * 
      * String type is to specify if the client is a "player" or a "observer"
      */
-    void setJoinTable(String tableID, String type);
+    void setJoinTable(String tableID, String type, String oponent);
     
     
     /*
@@ -101,7 +101,13 @@ public interface AbstractUserInterface {
      * If the server sends a message that a new user has joined
      * call this method with the username so the UI can be updated
      */
-    void updateUsers(String newUser);
+    void addUser(String newUser);
+
+    /*
+     * If the server sends a message that a new user has left
+     * call this method with the username so the UI can be updated
+     */
+    void removeUser(String oldUser);
     
     /*
      * If the message the server sent back was an error
