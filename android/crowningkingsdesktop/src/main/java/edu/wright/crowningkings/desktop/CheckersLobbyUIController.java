@@ -41,13 +41,13 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	//private Graphics g;
 	
 	public CheckersLobbyUIController(){
-		lobby = new CheckersLobbyUI();
-		messageTextField = lobby.getMessageTextField();
-		lobbyPanel = lobby.getLobbyPanel();
-		currentUsers = lobby.getCurrentUsers();
-		lobbyChat = lobby.getLobbyChatTextArea();		
+		lobby = new CheckersLobbyUI(); //The whole game lobby
+		messageTextField = lobby.getMessageTextField(); //The area that messages are typed. Public / Private
+		lobbyPanel = lobby.getLobbyPanel(); //The area that shows all of the tables that are avilable
+		currentUsers = lobby.getCurrentUsers(); //The area that shows all of the current users in the lobby
+		lobbyChat = lobby.getLobbyChatTextArea(); //The area that shows all of the lobby chat that has happend since being in the server	
 		
-		//Creating the key listener for the message box to send messages though
+		//Creating the key listener for the messageTextField to send messages though (Can move the key listener to its own class)
 		messageTextField.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				String x = messageTextField.getText();
@@ -78,15 +78,18 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		
 	}
 
-	
+	//This adds a new table to the lobbyPanel for viewing
 	public void makeNewGamePanel(final String tableID){
 		JPanel p = DesktopUIFactory.makeGamePanel(tableID,im, null);
 		Component[] comp = p.getComponents(); 
 		final int[] cords = {-1,-1};
-		//These two buttons are known from the DeskTopUIFactory
+		//These two buttons are known from the DeskTopUIFactory 
 		JButton playButton = (JButton) comp[0];
 		JButton observeButton = (JButton) comp[1];
 		
+	    /* 
+		 * Adds the functinality to the play button to make a new game window
+		 */
 		playButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				if(currentGame != null){
@@ -98,10 +101,16 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 				//currentGame.setVisible(true);
 				final JPanel pan = (JPanel)currentGame.checkerBoard;
 
-				System.out.println(currentGame.getComponents()[0].getComponentAt(500, 500).getName());
+				//System.out.println(currentGame.getComponents()[0].getComponentAt(500, 500).getName());
+
+				/*  
+				 * This adds the mouse listener to the game window to handle moving it already converts to the
+				 * coordinates to the values that the server needs
+				 * Need to fix where a piece can be moved to the border of the board 
+				 */
 				pan.addMouseListener(new MouseAdapter(){
 					public void mouseClicked(MouseEvent e){
-						System.out.println("Test");
+						//System.out.println("Test");
 						//if(pan.getComponentAt(e.getX(), e.getY()) instanceof JLabel){
 							if(cords[0] == -1 && cords[1] == -1){
 								JLabel temp = pan.getComponentAt(e.getX(), e.getY()) instanceof JLabel ? (JLabel)pan.getComponentAt(e.getX(), e.getY()):null;
@@ -112,6 +121,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
 								} else {}
 							}
+							//This needs to be changed to only send the move message with the specified coordinates
 							else {
 								JLabel temp2 = (JLabel)pan.getComponentAt((int)cords[0],(int)cords[1]);
 								int tX = (e.getX()/62);// * 62) + 2;
@@ -134,6 +144,8 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 			}
 		});
 		
+		//Unimplemented but should just create a DesktopUIFactory.makeGamePanel(tableID,im, null) but not add the mouse listiner for
+		//the game board
 		observeButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				//Request to observe table with this tables tableID
@@ -156,23 +168,23 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	public void makeClientVisable(){
 		lobby.setVisible(true);
 	}
-	//Empty method for sending private messages
+	//Old DO NOT USE
 	public void sendPrivateChatMessage(String message, String to, String from){
 
 	}
 	
-	//Empty method for sending public messages to the lobby chat
+	//OLD DO NOT USE
 	public String getMessageFromUser(String message){
 		return message;
 	}
 	
+	//Not sure about these right now are NOT part of the Interface
 	//Update the current users UI when a new user joins
 	//Better the handle when you call this in the file that
 	//controls server messages
 	public void addUser(String username){
 		currentUsers.setText((currentUsers.getText()) + "\n" + username);
 	}
-
 	public void removeUser(String username){
 		currentUsers.setText((currentUsers.getText().replaceAll(username + "\n", "")));
 	}
@@ -183,22 +195,20 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		return username;
 	}
 
-
-
 	
 	public String getTableIdFromUser() {
 		return lobbyPanel.getComponents()[0].getName();
 	}
 
 
-	
+	//Old DO NOT USE
 	public String[] getMoveFromUser() {
 		
 		return null;
 	}
 
 
-	
+	//Old DO NOT USE
 	public String[] getPublicMessageFromUser() {
 		String[] message = {messageTextField.getText()};
 		lobbyChat.setText((lobbyChat.getText() + "\n" + messageTextField.getText()));
@@ -207,13 +217,16 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	}
 
 
-	
+	//Old DO NOT USE
 	public String[] getPrivateMessageFromUser() {
 			return null;
 	}
 
 
-	
+	//ALL Methods bewllow this point should be form the Interface
+	//There are a few above this that are also from the Interface
+
+
 	public void updateLobbyChat(String newMessage) {
 		// TODO Auto-generated method stub
 		
@@ -264,7 +277,8 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	
 	public void sendPublicMessage() {
 		
-		new MessageAll(messageTextField.getText().trim()).run();
+		//Not how we are doing this now
+		//new MessageAll(messageTextField.getText().trim()).run();
 		//messages = list<AbstractServerMessage> <---- Static 
 		//messages.add(new MessageAll(messageTextField.getText().trim())
 		
