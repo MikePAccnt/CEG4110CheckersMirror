@@ -21,6 +21,9 @@ public class BaseClient {
     private BaseClient client;
 
 
+    /**
+     * Constructor methods
+     */
     public BaseClient(AbstractUserInterface ui) {
         String serverAddress = "192.168.122.1";
 
@@ -63,49 +66,24 @@ public class BaseClient {
     }
 
 
-    public void status() {
-        String table = ui.getTableIdFromUser();
-        server.sendServerMessage(new Status(table));
-    }
 
-
+    /**
+     * Methods to be called FROM the user interface
+     * These methods will primarly be used for sending server messages
+     */
     public void setUsername(String username) {
         server.sendServerMessage(new SendUsername(username));
-    }
-
-    public void sendPublicMessage() {
-        String[] publicMessage = ui.getPublicMessageFromUser();
-        server.sendServerMessage(new MessageAll(publicMessage[0]));
-    }
-
-    public void sendPrivateMessage() {
-        String[] privateMessageArray = ui.getPrivateMessageFromUser();
-        String recipient = privateMessageArray[0];
-        String privateMessage = privateMessageArray[1];
-        server.sendServerMessage(new MessageClient(privateMessage, recipient));
     }
 
 
     public void quit() {
         server.sendServerMessage(new Quit());
-        //serverMessageThread.interrupt();
+        serverMessageThread.interrupt();
     }
 
 
     public void makeTable() {
         server.sendServerMessage(new MakeTable());
-    }
-
-
-    public void joinTable() {
-        String tableId = ui.getTableIdFromUser();
-        server.sendServerMessage(new JoinTable(tableId));
-    }
-
-
-    public void joinTableObserver() {
-        String tableId = ui.getTableIdFromUser();
-        server.sendServerMessage(new JoinTableObserver(tableId));
     }
 
 
@@ -119,23 +97,64 @@ public class BaseClient {
     }
 
 
-    public void move() {
-        String[] move = ui.getMoveFromUser();
-        server.sendServerMessage(new Move(move[0], move[1], move[2], move[3]));
-    }
 
+    /**
+     * Methods to be called FROM the server (i.e. from an AbstractServerMessage's run method)
+     * These methods will be used for updating the UI based on information given from server
+     */
     public void updateTableList(String[] tables) {
         ui.updateTablesList(tables);
     }
+
 
     public void addTable(String table) {
         ui.addTable(table);
     }
 
 
-    //Only here to keep the commandlineui functional
+
+    /**
+     * Only here to keep the commandlineui functional
+     */
     public void setUsername() {
         String username = ui.getUsernameFromUser();
-        server.sendServerMessage(new SendUsername(username));
+    }
+
+
+    public void sendPublicMessage() {
+        String[] publicMessage = ui.getPublicMessageFromUser();
+        server.sendServerMessage(new MessageAll(publicMessage[0]));
+    }
+
+
+    public void sendPrivateMessage() {
+        String[] privateMessageArray = ui.getPrivateMessageFromUser();
+        String recipient = privateMessageArray[0];
+        String privateMessage = privateMessageArray[1];
+        server.sendServerMessage(new MessageClient(privateMessage, recipient));
+    }
+
+
+    public void move() {
+        String[] move = ui.getMoveFromUser();
+        server.sendServerMessage(new Move(move[0], move[1], move[2], move[3]));
+    }
+
+
+    public void joinTableObserver() {
+        String tableId = ui.getTableIdFromUser();
+        server.sendServerMessage(new JoinTableObserver(tableId));
+    }
+
+
+    public void joinTable() {
+        String tableId = ui.getTableIdFromUser();
+        server.sendServerMessage(new JoinTable(tableId));
+    }
+
+
+    public void status() {
+        String table = ui.getTableIdFromUser();
+        server.sendServerMessage(new Status(table));
     }
 }
