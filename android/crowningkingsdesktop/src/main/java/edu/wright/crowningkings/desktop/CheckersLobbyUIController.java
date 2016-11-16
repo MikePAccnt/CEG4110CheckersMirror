@@ -18,6 +18,18 @@ import javax.swing.JTextArea;
 import edu.wright.crowningkings.desktop.DesktopUIFactory.CheckersGameUI;
 import edu.wright.crowningkings.base.ServerMessage.*;
 
+
+/*
+ * This is the clas that will be called to initilize the UI for the desktop client
+ * NOT all methods for updating the client are added yet because the
+ * AbstractUserInterface has not been finalized and is still missing possible
+ * updating methods and sending methods
+ * The actual game lobby where the players play the game is not finalized it still needs:
+ *  - A ready button added
+ *  - An exit button besides the top exit button
+ *  - Chat inside of the game between the two players (I think this is required)
+ *  - Extra visual stuff to show the player what is going on
+ */
 public class CheckersLobbyUIController implements AbstractUserInterface{
 
 	/**
@@ -49,6 +61,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		lobbyChat = lobby.getLobbyChatTextArea(); //The area that shows all of the lobby chat that has happend since being in the server	
 		
 		//Creating the key listener for the messageTextField to send messages though (Can move the key listener to its own class)
+		//This is still very messy and needs to be cleaned up at some point
 		messageTextField.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				String x = messageTextField.getText();
@@ -72,11 +85,8 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 				else if(e.getKeyCode()== KeyEvent.VK_ESCAPE){
 					messageTextField.setText("");
 				}
-
 			}
 		});
-		
-		
 	}
 
 	//This adds a new table to the lobbyPanel for viewing
@@ -89,69 +99,33 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		JButton observeButton = (JButton) comp[1];
 		
 	    /* 
-		 * Adds the functinality to the play button to make a new game window
+		 * When the play button is pressed it sends a message to the server
+		 * that it wants to join that table as a player
 		 */
 		playButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				if(currentGame != null){
-					//Handle this in a different way later on
-					currentGame.dispose();
+					//Handle this in a different way later on or leave it as is
+					updateLobbyChat("Server Message: " + "You are already in a game! You must quit this game to join another.");
+				} else {
+					//Send message that the client wants to join this table
+					sendJoinPlayTable(tableID);
 				}
-				//sendJoinTable(p.getName());
-
-				gameBoard = (JPanel)currentGame.checkerBoard;
-
-				//System.out.println(currentGame.getComponents()[0].getComponentAt(500, 500).getName());
-
-				/*  
-				 * This adds the mouse listener to the game window to handle moving it already converts to the
-				 * coordinates to the values that the server needs
-				 * Need to fix where a piece can be moved to the border of the board 
-				 */
-				gameBoard.addMouseListener(new MouseAdapter(){
-					public void mouseClicked(MouseEvent e){
-						//System.out.println("Test");
-						//if(pan.getComponentAt(e.getX(), e.getY()) instanceof JLabel){
-							if(cords[0] == -1 && cords[1] == -1){
-								JLabel temp = gameBoard.getComponentAt(e.getX(), e.getY()) instanceof JLabel ? (JLabel)gameBoard.getComponentAt(e.getX(), e.getY()):null;
-								if(temp != null && temp.getIcon() != null && temp instanceof JLabel){	
-									cords[0] = e.getX();
-									cords[1] = e.getY();
-									System.out.println("grabbed");
-
-								} else {}
-							}
-							//This needs to be changed to only send the move message with the specified coordinates
-							else {
-								JLabel temp2 = (JLabel)gameBoard.getComponentAt((int)cords[0],(int)cords[1]);
-								int tX = (e.getX()/62);// * 62) + 2; //(cord * 62) + 2 converts from server cords to the gamBoard cords
-								int tY = (e.getY()/62);// * 62) + 2;
-								String fromx = Integer.toString(cords[0]);
-								String fromy = Integer.toString(cords[1]);
-								String tox = Integer.toString(tX);
-								String toy = Integer.toString(tY);			
-								temp2.setBounds(tX,tY,62,62);
-								//sendMoveToServer(fromx,fromy,tox,toy);
-								cords[0] = -1;
-								cords[1] = -1;
-								gameBoard.repaint();
-								System.out.println("released");
-							}
-						}
-					//}
-				});
-				//Request to join table with this tables tableID
+				
 			}
 		});
 		
-		//Unimplemented but should just create a DesktopUIFactory.makeGamePanel(tableID,im, null) but not add the mouse listiner for
-		//the game board
+	    /* 
+		 * When the observe button is pressed it sends a message to the server
+		 * that it wants to join that table as an observer
+		 */
 		observeButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				//Request to observe table with this tables tableID
+				sendJoinObserveTable(tableID);
 			}
 		});
 		
+		//this is used to keep track of where to draw the tables that are avilable 
 		p.setBounds(gamePanelx, gamePanely, 250, 250);
 		p.setVisible(true);
 		lobbyPanel.add(p);
@@ -165,8 +139,10 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		
 	}
 	
+	//Used for when the client decides it is time to make the UI visable
 	public void makeClientVisable(){
 		lobby.setVisible(true);
+	
 	}
 	//Old DO NOT USE
 	public void sendPrivateChatMessage(String message, String to, String from){
@@ -184,10 +160,12 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	//controls server messages
 	public void addUser(String user){
 		currentUsers.setText((currentUsers.getText()) + "\n" + user);
+		updateLobbyChat("Server Message: " + user + " has joined the lobby");
 	}
 
 	public void removeUser(String user){
 		currentUsers.setText((currentUsers.getText().replaceAll(user + "\n", "")));
+		updateLobbyChat("Server Message: " + user + " has left the lobby");
 	}
 
 	public String getUsernameFromUser() {
@@ -258,45 +236,49 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	}
 
 	
-	public void sendJoinTable() {
+	public void sendJoinPlayTable(String tableID) {
 		
-		//message = new JoinTable(tableID);
+	}
+
+	public void sendJoinObserveTable(String tableID) {
 		
 	}
 
 
-	
-	public void setJoinTable(String tableID, String type, String oponentName) {
+	public void setJoinPlayTable(String tableID, String oponentName) {
 
 		currentGame = (CheckersGameUI) DesktopUIFactory.makeGameLobby(username, oponentName, tableID);
 		currentGame.setVisible(true);
-		if(type.equalsIgnoreCase("player")){
-			//Add the action listiner to the game board so the player can move the pieces
-		}
-		else if(type.equalsIgnoreCase("observer")){
-			//Don't add the action listiner to the game board so the observer cannot move pieces
-		}
+		gameBoard = (JPanel)currentGame.checkerBoard;
+
+		//Add the action listiner to the game board so the player can move the pieces
+		gameBoard.addMouseListener(new gameBoardListener(new int[] {-1,-1},gameBoard));
+			
 	}
 
+	public void setJoinObserveTable(String tableID, String user1,String user2) {
 
+		currentGame = (CheckersGameUI) DesktopUIFactory.makeGameLobby(user1, user2, tableID);
+		currentGame.setVisible(true);
+		gameBoard = (JPanel)currentGame.checkerBoard;
+		
+		
+	}
 	
 	public void sendPublicMessage() {
-		
-		//Not how we are doing this now
-		//new MessageAll(messageTextField.getText().trim()).run();
-		//messages = list<AbstractServerMessage> <---- Static 
-		//messages.add(new MessageAll(messageTextField.getText().trim())
-		
-		
+		//Not implemented yet
 	}
 
 
 	
 	public void sendPrivateMessage() {
-		String[] temp = messageTextField.getText().replace("private","").split(":");
-		String user = temp[0].replace("(", "").replace(")", "");
-		String msg = temp[1].trim();
-		message = new MessageAll(messageTextField.getText().trim());
+		
+		//Not implemented yet
+
+		// String[] temp = messageTextField.getText().replace("private","").split(":");
+		// String user = temp[0].replace("(", "").replace(")", "");
+		// String msg = temp[1].trim();
+		// message = new MessageAll(messageTextField.getText().trim());
 
 	}
 
@@ -308,8 +290,6 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		
 	}
 
-
-	
 	public void updateBoard(String[][] board) {
 		
 		//Later on update this so it draws the board differently depending on the players color
@@ -341,7 +321,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 			}
 			
 		}
-
+		gameBoard.repaint();
 	}
 
 
@@ -351,6 +331,46 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		
 	}
 	
+    /*
+     * This is the listiner that is added to the gameBoard if the
+     * client it actually playing in that game
+     */
+	private class gameBoardListener extends MouseAdapter {
+		
+		int[] cords;
+		JPanel pan;
+		
+		public gameBoardListener(int[] cords, JPanel pan){
+			this.cords = cords;
+			this.pan = pan;
+		}
+		
+		public void mouseClicked(MouseEvent e){
+			System.out.println("Test");
+			if(cords[0] == -1 && cords[1] == -1){
+				JLabel temp = pan.getComponentAt(e.getX(), e.getY()) instanceof JLabel ? (JLabel)pan.getComponentAt(e.getX(), e.getY()):null;
+				if(temp != null && temp.getIcon() != null && temp instanceof JLabel){	
+					cords[0] = e.getX();
+					cords[1] = e.getY();
+					System.out.println("grabbed");
+				} else {}
+			}
+			else {
+				JLabel temp2 = (JLabel)pan.getComponentAt((int)cords[0],(int)cords[1]);
+				int tX = ((e.getX()/62) * 62) + 2;
+				int tY = ((e.getY()/62) * 62) + 2;
+				temp2.setBounds(tX,tY,62,62);
+				//pan.remove(temp2);
+				//pan.add(DesktopUIFactory.makePiece("Red")).setBounds(tX,tY,62,62);
+				cords[0] = -1;
+				cords[1] = -1;
+				pan.repaint();
+				System.out.println("released");
+			}
+		}
+	}
+
+
 
 }
 

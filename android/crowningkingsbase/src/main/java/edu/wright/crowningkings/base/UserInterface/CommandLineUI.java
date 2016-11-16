@@ -119,9 +119,13 @@ public class CommandLineUI implements AbstractUserInterface {
     @Override
     public void makeTable(String[] tableID){}
     @Override
-    public void sendJoinTable(){}
+    public void sendJoinPlayTable(String tableID){}
     @Override
-    public void setJoinTable(String tableID, String type, String oponent){}
+    public void sendJoinObserveTable(String tableID){}
+    @Override
+    public void setJoinPlayTable(String tableID, String oponent){}
+    @Override
+    public void setJoinObserveTable(String tableID, String user1,String user2){}
     @Override
     public void sendPublicMessage(){}
     @Override

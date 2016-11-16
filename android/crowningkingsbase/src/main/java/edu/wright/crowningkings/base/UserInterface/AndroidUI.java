@@ -32,12 +32,22 @@ public class AndroidUI implements AbstractUserInterface {
     }
 
     @Override
-    public void sendJoinTable() {
+    public void sendJoinPlayTable(String tableID) {
 
     }
 
     @Override
-    public void setJoinTable(String tableID, String type, String oponent) {
+    public void sendJoinObserveTable(String tableID) {
+
+    }
+
+    @Override
+    public void setJoinPlayTable(String tableID, String oponent) {
+
+    }
+
+    @Override
+    public void setJoinObserveTable(String tableID, String user1,String user2) {
 
     }
 
@@ -88,7 +98,7 @@ public class AndroidUI implements AbstractUserInterface {
 
     @Override
     public void removeUser(String oldUser) {
-        
+
     }
 
     @Override
