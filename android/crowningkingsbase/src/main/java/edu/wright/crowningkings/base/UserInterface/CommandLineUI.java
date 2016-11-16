@@ -32,13 +32,15 @@ public class CommandLineUI implements AbstractUserInterface {
             String command = keyboard.nextLine();
             switch (command.toLowerCase()) {
                 case "sendpublicmessage" :
-                    client.sendPublicMessage();
+                    client.sendPublicMessage(getPublicMessageFromUser()[0]);
                     break;
                 case "setusername" :
-                    client.setUsername();
+                    String username = getUsernameFromUser();
+                    client.setUsername(username);
                     break;
                 case "sendprivatemessage" :
-                    client.sendPrivateMessage();
+                    String[] msg = getPrivateMessageFromUser();
+                    client.sendClientMessage(msg[0], msg[1]);
                     break;
                 case "quit" :
                     client.quit();
@@ -57,7 +59,8 @@ public class CommandLineUI implements AbstractUserInterface {
                     client.ready();
                     break;
                 case "move" :
-                    client.move();
+                    String[] move = getMoveFromUser();
+                    client.movePiece(move[0], move[1], move[2], move[3]);
                     break;
                 default :
                     System.out.println("default switch");
@@ -72,13 +75,11 @@ public class CommandLineUI implements AbstractUserInterface {
         return (new Scanner(System.in)).nextLine().replace(" ", "").trim();
     }
 
-    @Override
     public String[] getPublicMessageFromUser() {
         System.out.println("Enter global chat message to send");
         return new String[] {(new Scanner(System.in)).nextLine().trim()};
     }
 
-    @Override
     public String[] getPrivateMessageFromUser() {
         System.out.println("Enter recipient username");
         String recipient = (new Scanner(System.in)).nextLine().replace(" ", "").trim();
@@ -93,7 +94,6 @@ public class CommandLineUI implements AbstractUserInterface {
         return (new Scanner(System.in)).nextLine().replace(" ", "").trim();
     }
 
-    @Override
     public String[] getMoveFromUser() {
         System.out.println("Enter from x (0-7)");
         String fromx =  (new Scanner(System.in)).nextLine().replace(" ", "").trim();

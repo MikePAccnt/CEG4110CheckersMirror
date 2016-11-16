@@ -128,13 +128,4 @@ public interface AbstractUserInterface {
      * it will be with defined constants for certian error types
      */
     void updateError(String errorConst);    
-
-    /*
-     * These methods are a few of the old ones that are still used
-     * in the commandline interface so they needed to stay to
-     * prevent crashing
-     */
-    String[] getPrivateMessageFromUser();
-    String[] getPublicMessageFromUser();
-    String[] getMoveFromUser();
 }
