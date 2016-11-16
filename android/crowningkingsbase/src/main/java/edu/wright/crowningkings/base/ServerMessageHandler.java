@@ -32,7 +32,7 @@ public class ServerMessageHandler {
                 break;
             case 202 :
                 System.out.println("\t202 : NEW_TBL – a new table has been created with id <1>.");
-                break;
+                return new NewTable(message);
             case 203 :
                 System.out.println("\t203 : GAME_START – the game being played at the table you are sitting at as a player has begun.");
                 break;
@@ -62,7 +62,7 @@ public class ServerMessageHandler {
                 break;
             case 216 :
                 System.out.println("\t216 : TBL_LIST – the current tables on the server are <1> <2>, ..., <n>. This only gives the table ids, not status.");
-                break;
+                return new TableList(message);
             case 217 :
                 System.out.println("\t217 : NOW_LEFT_LOBBY – client <1> has left the lobby.");
                 break;

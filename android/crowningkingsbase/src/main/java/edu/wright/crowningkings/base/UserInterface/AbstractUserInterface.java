@@ -120,7 +120,16 @@ public interface AbstractUserInterface {
      * it will be with defined constants for certian error types
      */
     void updateError(String errorConst);
-    
+
+
+
+
+
+
+    void updateTablesList(final String[] tables);
+
+    void addTable(final String table);
+
 
     /*
      * These methods are a few of the old ones that are still used

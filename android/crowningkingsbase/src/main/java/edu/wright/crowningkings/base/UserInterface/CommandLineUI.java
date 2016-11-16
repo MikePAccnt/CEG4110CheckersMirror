@@ -138,4 +138,20 @@ public class CommandLineUI implements AbstractUserInterface {
     public void removeUser(String oldUser){}    
     @Override
     public void updateError(String errorConst){}
+
+    @Override
+    public void updateTablesList(String[] tables) {
+        System.out.println("");
+        System.out.println("TABLES:");
+        for (String table : tables){
+            System.out.println(table);
+        }
+
+    }
+
+    
+    @Override
+    public void addTable(String table) {
+        System.out.println("New Table: " + table);
+    }
 }

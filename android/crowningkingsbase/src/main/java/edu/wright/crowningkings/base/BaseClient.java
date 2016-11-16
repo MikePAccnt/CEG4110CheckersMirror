@@ -69,11 +69,9 @@ public class BaseClient {
     }
 
 
-    public void setUsername() {
-        String username = ui.getUsernameFromUser();
+    public void setUsername(String username) {
         server.sendServerMessage(new SendUsername(username));
     }
-
 
     public void sendPublicMessage() {
         String[] publicMessage = ui.getPublicMessageFromUser();
@@ -124,5 +122,20 @@ public class BaseClient {
     public void move() {
         String[] move = ui.getMoveFromUser();
         server.sendServerMessage(new Move(move[0], move[1], move[2], move[3]));
+    }
+
+    public void updateTableList(String[] tables) {
+        ui.updateTablesList(tables);
+    }
+
+    public void addTable(String table) {
+        ui.addTable(table);
+    }
+
+
+    //Only here to keep the commandlineui functional
+    public void setUsername() {
+        String username = ui.getUsernameFromUser();
+        server.sendServerMessage(new SendUsername(username));
     }
 }
