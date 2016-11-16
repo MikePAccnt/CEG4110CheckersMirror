@@ -35,9 +35,15 @@ public interface AbstractUserInterface {
     
     /*
      * This method is used to tell the server that
-     * the client wants to join a table
+     * the client wants to join and play on a table
      */
-    void sendJoinTable();
+    void sendJoinPlayTable(String tableID);
+
+    /*
+     * This method is used to tell the server that
+     * the client wants to join and obsever a table
+     */
+    void sendJoinObserveTable(String tableID);
     
     
     /*
@@ -47,9 +53,11 @@ public interface AbstractUserInterface {
      * 
      * String type is to specify if the client is a "player" or a "observer"
      */
-    void setJoinTable(String tableID, String type, String oponent);
+    void setJoinPlayTable(String tableID, String oponent);
     
     
+    void setJoinObserveTable(String tableID,String user1,String user2);
+
     /*
      * This method is used to send a public message
      * to the server
