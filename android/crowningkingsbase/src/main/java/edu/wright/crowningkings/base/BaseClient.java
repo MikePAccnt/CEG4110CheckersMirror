@@ -26,7 +26,7 @@ public class BaseClient {
      * Constructor methods
      */
     public BaseClient(AbstractUserInterface ui) {
-        String serverAddress = "130.108.236.123";
+        String serverAddress = "192.168.122.1";
 
         client = this;
         setServer(serverAddress, PORT_NUMBER);
@@ -136,5 +136,13 @@ public class BaseClient {
 
     public void nowInLobby(String newClientUsername) {
         ui.nowInLobby(newClientUsername);
+    }
+
+    public void whoInLobby(String[] users) {
+        ui.whoInLobby(users);
+    }
+
+    public void nowLeftLobby(String user) {
+        ui.nowLeftLobby(user);
     }
 }

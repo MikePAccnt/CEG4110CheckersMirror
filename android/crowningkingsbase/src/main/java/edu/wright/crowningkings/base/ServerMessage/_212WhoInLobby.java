@@ -18,6 +18,6 @@ public class _212WhoInLobby extends AbstractServerMessage{
         for (int i = 0; i < clients.length; i ++) {
             clients[i] = params[i+1];
         }
-        //client.updateClientList(clients);
+        client.whoInLobby(clients);
     }
 }

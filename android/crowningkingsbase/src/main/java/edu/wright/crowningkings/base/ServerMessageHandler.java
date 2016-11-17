@@ -53,7 +53,7 @@ public class ServerMessageHandler {
                 break;
             case 212 :
                 System.out.println("\t212 : WHO_IN_LOBBY – clients <1>, <2>, ..., <n> are in the lobby.");
-                break;
+                return new _212WhoInLobby(message);
             case 213 :
                 System.out.println("\t213 : OUT_LOBBY – the client has left the lobby.");
                 break;
@@ -65,7 +65,7 @@ public class ServerMessageHandler {
                 return new _216TableList(message);
             case 217 :
                 System.out.println("\t217 : NOW_LEFT_LOBBY – client <1> has left the lobby.");
-                break;
+                return new _217NowLeftLobby(message);
             case 218 :
                 System.out.println("\t218 : IN_LOBBY – the client has joined the game lobby.");
                 break;

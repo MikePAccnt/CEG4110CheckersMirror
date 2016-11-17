@@ -13,6 +13,6 @@ public class _217NowLeftLobby extends AbstractServerMessage {
 
     public void run(BaseClient client) {
 		System.out.println("_217NowLeftLobby.run(BaseClient)");
-		//do something
+		client.nowLeftLobby(getParameters()[1]);
     }
 }

@@ -34,8 +34,6 @@ public class Lobby extends AppCompatActivity
 
     private ListView tablesListView;
     private TablesListArrayAdapter tablesListArrayAdapter;
-//    private ListView privateMessagesListView;
-//    private TablesListArrayAdapter privateMessagesListArrayAdapter;
     private Menu navPrivateMessagesMenu;
     private BaseClient client;
 
@@ -64,7 +62,6 @@ public class Lobby extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        navigationView.getMenu().add("New Message");
         navigationView.getMenu().add("Public Messages");
         navPrivateMessagesMenu = navigationView.getMenu().addSubMenu("Private");
 
@@ -186,8 +183,13 @@ public class Lobby extends AppCompatActivity
     }
 
     @Override
-    public void nowLeftLobby(String user) {
-
+    public void nowLeftLobby(final String user) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                navPrivateMessagesMenu.removeItem(user.hashCode());
+            }
+        });
     }
 
     @Override
@@ -195,7 +197,7 @@ public class Lobby extends AppCompatActivity
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                navPrivateMessagesMenu.add(user);
+                navPrivateMessagesMenu.add(Menu.NONE, user.hashCode(), Menu.NONE, user);
             }
         });
     }
@@ -254,7 +256,12 @@ public class Lobby extends AppCompatActivity
 
     @Override
     public void message(String message, String from, boolean privateMessage) {
-
+        if (privateMessage) {
+            ///private message stuff
+        }
+        else {
+            //public message stuff
+        }
     }
 
     @Override
@@ -310,14 +317,13 @@ public class Lobby extends AppCompatActivity
 
     @Override
     public void whoInLobby(String[] users) {
-
+        for (String user : users) {
+            nowInLobby(user);
+        }
     }
 
     @Override
     public void outLobby() {
 
     }
-
-
-
 }
