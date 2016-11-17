@@ -51,6 +51,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	private String username = "";
 	private CheckersGameUI currentGame;
 	private BaseClient client;
+	private String color = "";
 	//private DesktopUIFactory factory;
 	private Image im = new ImageIcon("desktop\\checkerboard.jpg").getImage();
 	private Image im2 = new ImageIcon("desktop\\checkerboardFake.jpg").getImage();
@@ -100,6 +101,14 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		JPanel invis = DesktopUIFactory.makeNextGamePanel(im2);
 		invis.setBounds(gamePanelx, gamePanely, 250, 250);
 		invis.setVisible(true);
+		JButton create = (JButton)invis.getComponents()[0];
+		create.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				
+				sendWantTable();
+				
+			}
+		});
 		lobbyPanel.add(invis);
 		gamePanelx += 300;
 		gamePanels++;
@@ -177,8 +186,18 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 			gamePanelx = 12;
 		}
 		JPanel invis = DesktopUIFactory.makeNextGamePanel(im2);
+		Component[] compss = invis.getComponents();
+		System.out.println(compss.length);
 		invis.setBounds(gamePanelx, gamePanely, 250, 250);
 		invis.setVisible(true);
+		JButton create = (JButton)invis.getComponents()[0];
+		create.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				
+				sendWantTable();
+				
+			}
+		});	
 		lobbyPanel.add(invis);
 		gamePanelx += 300;
 		gamePanels++;
@@ -194,15 +213,6 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	public void makeClientVisable(){
 		lobby.setVisible(true);
 	
-	}
-	//Old DO NOT USE
-	public void sendPrivateChatMessage(String message, String to, String from){
-
-	}
-	
-	//OLD DO NOT USE
-	public String getMessageFromUser(String message){
-		return message;
 	}
 	
 	//Not sure about these right now are NOT part of the Interface
@@ -233,27 +243,6 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	}
 
 
-	//Old DO NOT USE
-	public String[] getMoveFromUser() {
-		
-		return null;
-	}
-
-
-	//Old DO NOT USE
-	public String[] getPublicMessageFromUser() {
-		String[] message = {messageTextField.getText()};
-		lobbyChat.setText((lobbyChat.getText() + "\n" + messageTextField.getText()));
-		messageTextField.setText("");
-		return message;
-	}
-
-
-	//Old DO NOT USE
-	public String[] getPrivateMessageFromUser() {
-			return null;
-	}
-
 
 	//ALL Methods bewllow this point should be form the Interface
 	//There are a few above this that are also from the Interface
@@ -269,15 +258,20 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
 	
 	public void sendWantTable() {
-		// TODO Auto-generated method stub
+		
+		System.out.println("Clocked");
+		client.makeTable();
 		
 	}
 
+	public void setColor(String c){
+		color = c;
+	}
 
-	
 	public void makeTable(String tableID) {
 		
 		makeNewGamePanel(tableID);
+		setJoinPlayTable(tableID, "");
 		
 	}
 
@@ -290,20 +284,12 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		
 	}
 
-	
-	public void sendJoinPlayTable(String tableID) {
-		
-	}
-
-	public void sendJoinObserveTable(String tableID) {
-		
-	}
-
 
 	public void setJoinPlayTable(String tableID, String oponentName) {
 
 		currentGame = (CheckersGameUI) DesktopUIFactory.makeGameLobby(username, oponentName, tableID);
 		currentGame.setVisible(true);
+		applyButtonActions(new Component[] {CheckersGameUI.readyButton, CheckersGameUI.quitButton});
 		gameBoard = (JPanel)currentGame.checkerBoard;
 
 		//Add the action listiner to the game board so the player can move the pieces
@@ -315,6 +301,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
 		currentGame = (CheckersGameUI) DesktopUIFactory.makeGameLobby(user1, user2, tableID);
 		currentGame.setVisible(true);
+		applyButtonActions(new Component[] {CheckersGameUI.readyButton, CheckersGameUI.quitButton});
 		gameBoard = (JPanel)currentGame.checkerBoard;
 		
 		
@@ -382,12 +369,98 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	}
 
 
+    // public void sendJoinPlayTable(String tableID){}
+   
+    // public void sendJoinObserveTable(String tableID){}
+  
+    // public void setJoinPlayTable(String tableID, String oponent){}
+  
+    // public void setJoinObserveTable(String tableID, String user1,String user2){}
+  
+    // public void sendPublicMessage(){}
+  
+    // public void sendPrivateMessage(){}
+ 
+    // public void sendMoveToServer(){}
+   
+    // public void updateBoard(String[][] board){}
+
+    // public void updateLobbyChat(String newMessage){}
+  
+    // public void addUser(String newUser){}
+    
+    // public void removeUser(String oldUser){}    
+    
+    // public void updateError(String errorConst){}
+
+    
+
+    public void connectionOK(){}
+
+    public void message(String message, String from, boolean privateMessage){}
+
+    public void newtable(String tableID){}
+
+    public void gameStart(){}
+
+    public void colorBlack(){}
+
+    public void colorRed(){}
+
+    public void opponentMove(String[] from, String[] to){}
+
+    public void boardState(String[][] boardState){}
+
+    public void gameWon(){}
+
+    public void gameLose(){}
+
+    public void tableJoined(String tableID){}
+
+    public void whoInLobby(String[] users){}
+
+    public void outLobby(){}
+
+    public void nowInLobby(String user){}
+
+    public void tableList(String[] tableIDs){}
+
+    public void nowLeftLobby(String user){}
+
+    public void inLobby(){}
+
+    public void whoOnTable(String userOne, String userTwo,String tableID, String userOneColor,String userTwoColor){}
+
+    public void opponentLeftTable(){}
+
+    public void yourTurn(){}
+
+    public void tableLeft(String tableID){}
+
+    public void nowObserving(String tableID){}
+
+    public void stoppedObserving(String tableID){} 
+
+
 	
-	public void updateError(String errorConst) {
-		// TODO Auto-generated method stub
+	private void applyButtonActions(Component[] components){
+		JButton readyBtn = (JButton)components[0];
+		JButton quitBtn = (JButton)components[1];
 		
+		readyBtn.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				//Tell the server you are ready to play
+			}
+		});
+		
+		quitBtn.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				currentGame.dispose();
+				//Tell the server client left the game
+			}
+		});
 	}
-	
+
     /*
      * This is the listiner that is added to the gameBoard if the
      * client it actually playing in that game
