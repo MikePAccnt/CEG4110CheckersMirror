@@ -78,36 +78,36 @@ public class BaseClient {
 
 
     public void quit() {
-        server.sendServerMessage(new Quit());
+        server.sendServerMessage(new _108Quit());
         serverMessageThread.interrupt();
     }
 
 
     public void makeTable() {
-        server.sendServerMessage(new MakeTable());
+        server.sendServerMessage(new _103MakeTable());
     }
 
 
     public void leaveTable() {
-        server.sendServerMessage(new LeaveTable());
+        server.sendServerMessage(new _107LeaveTable());
     }
 
 
     public void ready() {
-        server.sendServerMessage(new Ready());
+        server.sendServerMessage(new _105Ready());
     }
 
 
     public void sendPublicMessage(String message) {
-        server.sendServerMessage(new MessageAll(message));
+        server.sendServerMessage(new _101MessageAll(message));
     }
 
     public void sendClientMessage(String recipient, String message) {
-        server.sendServerMessage(new MessageClient(message, recipient));
+        server.sendServerMessage(new _102MessageClient(message, recipient));
     }
 
     public void movePiece(String fromx, String fromy, String tox, String toy){
-        server.sendServerMessage(new Move(fromx, fromy, tox, toy));
+        server.sendServerMessage(new _106Move(fromx, fromy, tox, toy));
     }
 
     /**
@@ -130,18 +130,18 @@ public class BaseClient {
      */
     public void joinTableObserver() {
         String tableId = ui.getTableIdFromUser();
-        server.sendServerMessage(new JoinTableObserver(tableId));
+        server.sendServerMessage(new _110ObserveTable(tableId));
     }
 
 
     public void joinTable() {
         String tableId = ui.getTableIdFromUser();
-        server.sendServerMessage(new JoinTable(tableId));
+        server.sendServerMessage(new _104JoinTable(tableId));
     }
 
 
     public void status() {
         String table = ui.getTableIdFromUser();
-        server.sendServerMessage(new Status(table));
+        server.sendServerMessage(new _109AskTableStatus(table));
     }
 }
