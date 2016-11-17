@@ -10,122 +10,50 @@ import edu.wright.crowningkings.base.BaseClient;
  */
 
 public interface AbstractUserInterface {
-    /*
-     * This method is used for providing the username
-     * of the client
-     */
-    String getUsernameFromUser();
+    
+    void connectionOK();
 
-    
-    /*
-     * This method is used to tell the server that
-     * the client wants to create a new table
-     */
-    void sendWantTable();
-    
-    
-    /*
-     * If the server message is that there is a new table
-     * or when initializing the UI this method is used
-     * to update the UI to show all of the current tables 
-     */
-    void makeTable(String tableID);
-    void makeTable(String[] tableID);
-    
-    
-    /*
-     * This method is used to tell the server that
-     * the client wants to join and play on a table
-     */
-    void sendJoinPlayTable(String tableID);
+    void message(String message, String from, boolean private);
 
-    /*
-     * This method is used to tell the server that
-     * the client wants to join and obsever a table
-     */
-    void sendJoinObserveTable(String tableID);
-    
-    
-    /*
-     * If the server message is that the client can join
-     * a table then this method is called to update
-     * the UI to show the client that table
-     * 
-     * String type is to specify if the client is a "player" or a "observer"
-     */
-    void setJoinPlayTable(String tableID, String oponent);
-    
-    
-    void setJoinObserveTable(String tableID,String user1,String user2);
+    void newtable(String tableID);
 
-    /*
-     * This method is used to send a public message
-     * to the server
-     */
-    void sendPublicMessage();
+    void gameStart();
 
-    
-    /*
-     * This method is used to send a private message
-     * to the server
-     */
-    void sendPrivateMessage();
+    void colorBlack();
 
-    
-    /*
-     * This method is used if some part of the client
-     * or the server needs the current tableID
-     * of the client right now
-     */
-    String getTableIdFromUser();
+    void colorRed();
 
-    
-    /*
-     * This method is used to send the wanted move to the server
-     * from the client
-     */
-    void sendMoveToServer();
-    
-    
-    /*
-     * If the server says the move that was sent was valid
-     * this method needs to be called with the current state
-     * of the board so the client can update its board
-     */
-    void updateBoard(String[][] board);
-    
-    
-    /*
-     * ***This method might need to be changed/updated***
-     * 
-     * If the server sends a message that contains a new message,
-     * public or private, call this method to update the lobby
-     * chat.
-     */
-    void updateLobbyChat(String newMessage);
-    
-    
-    /*
-     * If the server sends a message that a new user has joined
-     * call this method with the username so the UI can be updated
-     */
-    void addUser(String newUser);
+    void opponentMove(String[] from, String[] to);
 
-    /*
-     * If the server sends a message that a new user has left
-     * call this method with the username so the UI can be updated
-     */
-    void removeUser(String oldUser);
-    
-    /*
-     * If the message the server sent back was an error
-     * call this method and the client will update according
-     * to what the error was
-     */
-    
-    /*
-     * Undecided on how to implement this yet, most likely
-     * it will be with defined constants for certian error types
-     */
-    void updateError(String errorConst);    
+    void boardState(String[][] boardState);
+
+    void gameWon();
+
+    void gameLose();
+
+    void tableJoined(String tableID);
+
+    void whoInLobby(String[] users);
+
+    void outLobby();
+
+    void nowInLobby(String user);
+
+    void tableList(String[] tableIDs);
+
+    void nowLeftLobby(String user);
+
+    void inLobby();
+
+    void whoOnTable(String userOne, String userTwo,String tableID, String userOneColor,String userTwoColor);
+
+    void opponentLeftTable();
+
+    void yourTurn();
+
+    void tableLeft(String tableID);
+
+    void nowObserving(String tableID);
+
+    void stoppedObserving(String tableID); 
 }
