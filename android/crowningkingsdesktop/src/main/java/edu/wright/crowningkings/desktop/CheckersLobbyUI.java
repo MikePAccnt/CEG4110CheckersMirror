@@ -154,7 +154,7 @@ public class CheckersLobbyUI extends JFrame{
 		messagePanel.setName("MessagePanel");
 		checkersMainPanel.add(messagePanel);
 		
-		messageTextField = new JTextField("username");
+		messageTextField = new JTextField("username: ");
 		messageTextField.setToolTipText("");
 		messageTextField.setHorizontalAlignment(SwingConstants.LEFT);
 		messageTextField.setColumns(107);

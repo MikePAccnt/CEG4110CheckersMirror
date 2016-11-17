@@ -14,6 +14,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 import edu.wright.crowningkings.desktop.DesktopUIFactory.CheckersGameUI;
@@ -75,9 +76,9 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 				if((e.getKeyCode() == KeyEvent.VK_ENTER) && (x.equals("") == false) && !(x.matches("username:[\\w\\W]+"))){
 					if(x.matches("private[(][a-zA-Z0-9]+[)]:[\\w\\W]+")){
 
-						sendPrivateMessage();
+						messageClient("","");
 					} else {
-						sendPublicMessage();
+						messageAll("");
 					}
 				}
 				else if((e.getKeyCode() == KeyEvent.VK_ENTER) && (x.matches("username:[\\w\\W]+"))){
@@ -220,13 +221,11 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	//Better the handle when you call this in the file that
 	//controls server messages
 	public void addUser(String user){
-		currentUsers.setText((currentUsers.getText()) + "\n" + user);
-		updateLobbyChat("Server Message: " + user + " has joined the lobby");
+
 	}
 
 	public void removeUser(String user){
-		currentUsers.setText((currentUsers.getText().replaceAll(user + "\n", "")));
-		updateLobbyChat("Server Message: " + user + " has left the lobby");
+
 	}
 
 	public String getUsernameFromUser() {
@@ -270,20 +269,9 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
 	public void makeTable(String tableID) {
 		
-		makeNewGamePanel(tableID);
-		setJoinPlayTable(tableID, "");
+
 		
 	}
-
-	
-	public void makeTable(String[] tableID) {
-		
-		for(String s : tableID){
-			makeNewGamePanel(s);
-		}
-		
-	}
-
 
 	public void setJoinPlayTable(String tableID, String oponentName) {
 
@@ -306,37 +294,86 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		
 		
 	}
-	
-	public void sendPublicMessage() {
-		String message = messageTextField.getText();
+
+
+    public void sendJoinPlayTable(String tableID){}
+   
+    public void sendJoinObserveTable(String tableID){}
+
+
+    /*
+     * Below this is all outgoing messages that are called
+     * to tell the client to send a server message
+     */
+
+    public void messageAll(String message){
+    	String mess = messageTextField.getText();
 		messageTextField.setText("");
-		client.sendPublicMessage(message);
-	}
+		client.messageAll(mess);
+    }
 
-
-	
-	public void sendPrivateMessage() {
-
-		String[] temp = messageTextField.getText().replace("private","").split(":");
+    public void messageClient(String toUser, String message){
+    	String[] temp = messageTextField.getText().replace("private","").split(":");
 		String user = temp[0].replace("(", "").replace(")", "");
 		String msg = temp[1].trim();
 
-		client.sendClientMessage(user,msg);
+		client.messageClient(user,msg);
 		messageTextField.setText("");
+    }
 
-	}
+    public void makeTable(){}
+
+    public void joinTable(String talbeID){}
+
+    public void ready(){}
+
+    public void move(String fromx ,String fromy, String tox, String toy){}
+
+    public void leaveTable(){}
+
+    public void quit(){}
+
+    public void askTableStatus(String tableID){}
+
+    public void observeTable(String talbeID){}
 
 
-	
-	public void sendMoveToServer() {
-		
-		//message = new Move(fromx,fromy,tox,toy);
-		
-	}
+    /*
+     * Bellow this is handling all incoming messages that
+     * the client can recieve from the server
+     */
 
-	public void updateBoard(String[][] board) {
-		
-		//Later on update this so it draws the board differently depending on the players color
+    public void sendUsernameRequest(){}
+
+    public void connectionOK(){}
+
+    public void message(String message, String from, boolean privateMessage){}
+
+    public void newtable(String tableID){
+    	makeNewGamePanel(tableID);
+		//setJoinPlayTable(tableID, "");
+    }
+
+    public void gameStart(){}
+
+    public void colorBlack(){
+    	this.color = "Black";
+    }
+
+    public void colorRed(){
+    	this.color = "Red";
+    }
+
+    public void opponentMove(String[] from, String[] to){
+    	int fx = (Integer.parseInt(from[0]) * 62) + 2;
+    	int fy = (Integer.parseInt(from[1]) * 62) + 2;
+    	int tx = (Integer.parseInt(to[0]) * 62) + 2;
+    	int ty = (Integer.parseInt(to[1]) * 62) + 2;
+    	gameBoard.getComponentAt(fx,fy).setBounds(tx,ty,62,62);
+    }
+
+    public void boardState(String[][] board){
+    	//Later on update this so it draws the board differently depending on the players color
 		
 		//clear the entire board
 		for(Component c : gameBoard.getComponents()){
@@ -366,82 +403,89 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 			
 		}
 		gameBoard.repaint();
-	}
+    }
 
+    public void gameWon(){
+    	makeEndGameMessage("You Win!!!");
+    }
 
-    // public void sendJoinPlayTable(String tableID){}
-   
-    // public void sendJoinObserveTable(String tableID){}
-  
-    // public void setJoinPlayTable(String tableID, String oponent){}
-  
-    // public void setJoinObserveTable(String tableID, String user1,String user2){}
-  
-    // public void sendPublicMessage(){}
-  
-    // public void sendPrivateMessage(){}
- 
-    // public void sendMoveToServer(){}
-   
-    // public void updateBoard(String[][] board){}
+    public void gameLose(){
+    	makeEndGameMessage("You Lose!!!");
+    }
 
-    // public void updateLobbyChat(String newMessage){}
-  
-    // public void addUser(String newUser){}
-    
-    // public void removeUser(String oldUser){}    
-    
-    // public void updateError(String errorConst){}
+    public void tableJoined(String tableID){
+    	setJoinPlayTable(tableID,""); 
+    }
 
-    
+    public void whoInLobby(String[] users){
 
-    public void connectionOK(){}
+    	for(String s : users){
+    		currentUsers.setText((currentUsers.getText()) + "\n" + s);
+		
+    	}
+    }
 
-    public void message(String message, String from, boolean privateMessage){}
+    public void outLobby(){
 
-    public void newtable(String tableID){}
+    }
 
-    public void gameStart(){}
+    public void nowInLobby(String user){
 
-    public void colorBlack(){}
+    	currentUsers.setText((currentUsers.getText()) + "\n" + user);
+    	updateLobbyChat("Server Message: " + user + " has joined the lobby");
+    }
 
-    public void colorRed(){}
+    public void tableList(String[] tableIDs){
 
-    public void opponentMove(String[] from, String[] to){}
+    	for(String s : tableIDs){
+			makeNewGamePanel(s);
+		}
+    }
 
-    public void boardState(String[][] boardState){}
-
-    public void gameWon(){}
-
-    public void gameLose(){}
-
-    public void tableJoined(String tableID){}
-
-    public void whoInLobby(String[] users){}
-
-    public void outLobby(){}
-
-    public void nowInLobby(String user){}
-
-    public void tableList(String[] tableIDs){}
-
-    public void nowLeftLobby(String user){}
+    public void nowLeftLobby(String user){
+    	currentUsers.setText((currentUsers.getText().replaceAll(user + "\n", "")));
+		updateLobbyChat("Server Message: " + user + " has left the lobby");
+    }
 
     public void inLobby(){}
 
-    public void whoOnTable(String userOne, String userTwo,String tableID, String userOneColor,String userTwoColor){}
+    public void whoOnTable(String userOne, String userTwo,String tableID, String userOneColor,String userTwoColor){
 
-    public void opponentLeftTable(){}
+    }
 
-    public void yourTurn(){}
+    public void opponentLeftTable(){
+    	gameWon();
+    }
 
-    public void tableLeft(String tableID){}
+    public void yourTurn(){
+    	//Add UI stuff to gameBoard to show this.
+    }
 
-    public void nowObserving(String tableID){}
+    public void tableLeft(String tableID){
+    	currentGame.dispose();
+    	//Set variables that apply to the game to null / empty
+    }
 
-    public void stoppedObserving(String tableID){} 
+    public void nowObserving(String tableID){
+    	setJoinObserveTable(tableID, "User1", "User2");
+    }
+
+    public void stoppedObserving(String tableID){
+    	currentGame.dispose();
+    } 
 
 
+
+    private void makeEndGameMessage(String message){
+    	JFrame tempF = new JFrame();
+    	tempF.setResizable(false);
+    	tempF.setBounds(0,0,250,100);
+    	tempF.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+    	JLabel outCome = new JLabel(message);
+    	outCome.setBounds(250/4,250/4,50,50);
+    	tempF.add(outCome);
+    }
 	
 	private void applyButtonActions(Component[] components){
 		JButton readyBtn = (JButton)components[0];

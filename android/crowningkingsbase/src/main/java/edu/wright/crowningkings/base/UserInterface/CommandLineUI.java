@@ -32,7 +32,7 @@ public class CommandLineUI implements AbstractUserInterface {
             String command = keyboard.nextLine();
             switch (command.toLowerCase()) {
                 case "sendpublicmessage" :
-                    client.sendPublicMessage(getPublicMessageFromUser()[0]);
+                    client.messageAll(getPublicMessageFromUser()[0]);
                     break;
                 case "setusername" :
                     String username = getUsernameFromUser();
@@ -40,7 +40,7 @@ public class CommandLineUI implements AbstractUserInterface {
                     break;
                 case "sendprivatemessage" :
                     String[] msg = getPrivateMessageFromUser();
-                    client.sendClientMessage(msg[0], msg[1]);
+                    client.messageClient(msg[0], msg[1]);
                     break;
                 case "quit" :
                     client.quit();
@@ -60,7 +60,7 @@ public class CommandLineUI implements AbstractUserInterface {
                     break;
                 case "move" :
                     String[] move = getMoveFromUser();
-                    client.movePiece(move[0], move[1], move[2], move[3]);
+                    client.move(move[0], move[1], move[2], move[3]);
                     break;
                 default :
                     System.out.println("default switch");

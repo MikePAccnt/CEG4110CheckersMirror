@@ -98,21 +98,25 @@ public class BaseClient {
     }
 
 
-    public void sendPublicMessage(String message) {
+    public void messageAll(String message) {
         server.sendServerMessage(new _101MessageAll(message));
     }
 
-    public void sendClientMessage(String recipient, String message) {
+    public void messageClient(String recipient, String message) {
         server.sendServerMessage(new _102MessageClient(message, recipient));
     }
 
-    public void movePiece(String fromx, String fromy, String tox, String toy){
+    public void move(String fromx, String fromy, String tox, String toy){
         server.sendServerMessage(new _106Move(fromx, fromy, tox, toy));
     }
 
     public void joinTable(String tableId) {
         server.sendServerMessage(new _104JoinTable(tableId));
     }
+
+    public void askTableStatus(String tableID){}
+
+    public void observeTable(String talbeID){}
     /**
      * Methods to be called FROM the server (i.e. from an AbstractServerMessage's run method)
      * These methods will be used for updating the UI based on information given from server
