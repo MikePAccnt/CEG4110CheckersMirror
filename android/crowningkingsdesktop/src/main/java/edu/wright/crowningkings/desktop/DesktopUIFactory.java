@@ -18,6 +18,7 @@ import javax.swing.SwingConstants;
 //user-interface objects easier
 public class DesktopUIFactory {
 
+
 	private static int tables = 1;
 	private static Image board = new ImageIcon("desktop\\RealCheckerBoard.jpg").getImage();
 	private static ImageIcon piece_black = new ImageIcon("desktop\\checkerspiece_black.png");
@@ -54,7 +55,7 @@ public class DesktopUIFactory {
 		//gameLobby.pack();
 		return gameLobby;
 	}
-	
+
 	public static JPanel makeNextGamePanel(Image im){
 		JPanel panel = new ImagePanel(im);
 		panel.setLayout(null);
@@ -83,7 +84,9 @@ public static class ImagePanel extends JPanel{
 public static class CheckersGameUI extends JFrame{
 	
 	public static JPanel checkerBoard;
-	
+	public static JButton readyButton;
+	public static JButton quitButton;
+
 	public CheckersGameUI(){
 		
 		setName("Name");
@@ -112,7 +115,13 @@ public static class CheckersGameUI extends JFrame{
 //		});
 		
 		gameLobby.add(checkerBoard);
+		readyButton = new JButton("Ready");
+		readyButton.setBounds(10, 11, 89, 23);
+		gameLobby.add(readyButton);
 		
+		quitButton = new JButton("Quit");
+		quitButton.setBounds(10, 45, 89, 23);
+		gameLobby.add(quitButton);
 		fillBoard(checkerBoard);
 		
 		//pack();
