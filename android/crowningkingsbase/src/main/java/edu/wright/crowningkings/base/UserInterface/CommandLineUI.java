@@ -113,6 +113,11 @@ public class CommandLineUI implements AbstractUserInterface {
     //Test client to still compile
 
     @Override
+    public void sendUsernameRequest() {
+
+    }
+
+    @Override
     public void connectionOK() {
 
     }

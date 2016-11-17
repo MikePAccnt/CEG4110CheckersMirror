@@ -110,38 +110,27 @@ public class BaseClient {
         server.sendServerMessage(new _106Move(fromx, fromy, tox, toy));
     }
 
+    public void joinTable(String tableId) {
+        server.sendServerMessage(new _104JoinTable(tableId));
+    }
     /**
      * Methods to be called FROM the server (i.e. from an AbstractServerMessage's run method)
      * These methods will be used for updating the UI based on information given from server
      */
     public void updateTableList(String[] tables) {
-        ui.makeTable(tables);
+        ui.tableList(tables);
     }
 
 
     public void addTable(String table) {
-        ui.makeTable(table);
+        ui.newtable(table);
     }
 
-
-
-    /**
-     * Only here to keep the commandlineui functional
-     */
-    public void joinTableObserver() {
-        String tableId = ui.getTableIdFromUser();
-        server.sendServerMessage(new _110ObserveTable(tableId));
+    public void sendUsernameRequest() {
+        ui.sendUsernameRequest();
     }
 
-
-    public void joinTable() {
-        String tableId = ui.getTableIdFromUser();
-        server.sendServerMessage(new _104JoinTable(tableId));
-    }
-
-
-    public void status() {
-        String table = ui.getTableIdFromUser();
-        server.sendServerMessage(new _109AskTableStatus(table));
+    public void nowInLobby(String newClientUsername) {
+        ui.nowInLobby(newClientUsername);
     }
 }

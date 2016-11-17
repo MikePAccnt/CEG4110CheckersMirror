@@ -59,7 +59,7 @@ public class ServerMessageHandler {
                 break;
             case 214 :
                 System.out.println("\t214 : NOW_IN_LOBBY- client <1> has joined the lobby.");
-                break;
+                return new _214NowInLobby(message);
             case 216 :
                 System.out.println("\t216 : TBL_LIST – the current tables on the server are <1> <2>, ..., <n>. This only gives the table ids, not status.");
                 return new _216TableList(message);
@@ -83,6 +83,7 @@ public class ServerMessageHandler {
             default:
                 if (message.equals("Send username:")) {
                     System.out.println("\t000 : SEND_USERNAME – Send username to server");
+                    return new SendUsernameRequest(message);
                 }
                 else if (message.equals("ping")) {
                     System.out.println("\t000 : PING – server sent ping message");
