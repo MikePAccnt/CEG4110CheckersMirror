@@ -49,9 +49,9 @@ public class CommandLineUI implements AbstractUserInterface {
                 case "maketable" :
                     client.makeTable();
                     break;
-//                case "jointable" :
-//                    client.();
-//                    break;
+                case "jointable" :
+                    client.joinTable(getTableIdFromUser());
+                    break;
                 case "leavetable" :
                     client.leaveTable();
                     break;
