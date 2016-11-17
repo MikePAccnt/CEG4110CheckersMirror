@@ -329,13 +329,13 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
 	
 	public void sendPrivateMessage() {
-		
-		//Not implemented yet
 
-		// String[] temp = messageTextField.getText().replace("private","").split(":");
-		// String user = temp[0].replace("(", "").replace(")", "");
-		// String msg = temp[1].trim();
-		// message = new MessageAll(messageTextField.getText().trim());
+		String[] temp = messageTextField.getText().replace("private","").split(":");
+		String user = temp[0].replace("(", "").replace(")", "");
+		String msg = temp[1].trim();
+
+		client.sendClientMessage(user,msg);
+		messageTextField.setText("");
 
 	}
 

@@ -132,6 +132,7 @@ public class CheckersLobbyUI extends JFrame{
 		lobbyChatPanel.setName("LobbyChatPanel");
 		
 		checkersMainPanel.add(lobbyChatPanel);
+		lobbyChatPanel.setLayout(null);
 		
 		lobbyChatTextArea = new JTextArea();
 		lobbyChatTextArea.setEditable(false);
@@ -143,6 +144,7 @@ public class CheckersLobbyUI extends JFrame{
 		
 		
 		JScrollPane lobbyChatScrollPane = new JScrollPane(lobbyChatTextArea);
+		lobbyChatScrollPane.setBounds(10, 7, 1173, 192);
 		lobbyChatPanel.add(lobbyChatScrollPane);
 		
 		
