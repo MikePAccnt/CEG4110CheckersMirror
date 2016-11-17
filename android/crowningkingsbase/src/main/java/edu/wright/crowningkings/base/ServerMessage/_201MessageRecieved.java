@@ -16,7 +16,7 @@ public class _201MessageRecieved extends AbstractServerMessage {
 		for (int i = 3; i < param.length; i++) {
 			msg = msg + " " + param[i];
 		}
-		String[] fullParams = {msgID, from, Private, msg};
+		String[] fullParams = {msgID, from, privateMessage, msg};
 		setParameters(fullParams);
     }
 

@@ -10,10 +10,12 @@ import edu.wright.crowningkings.base.BaseClient;
  */
 
 public interface AbstractUserInterface {
+
+    void sendUsernameRequest();
     
     void connectionOK();
 
-    void message(String message, String from, boolean private);
+    void message(String message, String from, boolean privateMessage);
 
     void newtable(String tableID);
 

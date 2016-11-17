@@ -49,9 +49,9 @@ public class CommandLineUI implements AbstractUserInterface {
                 case "maketable" :
                     client.makeTable();
                     break;
-                case "jointable" :
-                    client.joinTable();
-                    break;
+//                case "jointable" :
+//                    client.();
+//                    break;
                 case "leavetable" :
                     client.leaveTable();
                     break;
@@ -88,7 +88,6 @@ public class CommandLineUI implements AbstractUserInterface {
         return new String[] {recipient, message};
     }
 
-    @Override
     public String getTableIdFromUser() {
         System.out.println("Enter table ID");
         return (new Scanner(System.in)).nextLine().replace(" ", "").trim();
@@ -112,42 +111,124 @@ public class CommandLineUI implements AbstractUserInterface {
 
     //From the updated AbstractUserInterface class added to allow the
     //Test client to still compile
+
     @Override
-    public void sendWantTable(){}
+    public void connectionOK() {
+
+    }
+
     @Override
-    public void makeTable(String tableID){
+    public void message(String message, String from, boolean privateMessage) {
+
+    }
+
+    @Override
+    public void newtable(String tableID){
         System.out.println("New Table: " + tableID);
     }
+
     @Override
-    public void makeTable(String[] tableID){
+    public void gameStart() {
+
+    }
+
+    @Override
+    public void colorBlack() {
+
+    }
+
+    @Override
+    public void colorRed() {
+
+    }
+
+    @Override
+    public void opponentMove(String[] from, String[] to) {
+
+    }
+
+    @Override
+    public void boardState(String[][] boardState) {
+
+    }
+
+    @Override
+    public void gameWon() {
+
+    }
+
+    @Override
+    public void gameLose() {
+
+    }
+
+    @Override
+    public void tableJoined(String tableID) {
+
+    }
+
+    @Override
+    public void whoInLobby(String[] users) {
+
+    }
+
+    @Override
+    public void outLobby() {
+
+    }
+
+    @Override
+    public void nowInLobby(String user) {
+
+    }
+
+    @Override
+    public void tableList(String[] tableID){
         System.out.println("");
         System.out.println("TABLES:");
         for (String table : tableID){
             System.out.println(table);
         }
     }
+
     @Override
-    public void sendJoinPlayTable(String tableID){}
+    public void nowLeftLobby(String user) {
+
+    }
+
     @Override
-    public void sendJoinObserveTable(String tableID){}
+    public void inLobby() {
+
+    }
+
     @Override
-    public void setJoinPlayTable(String tableID, String oponent){}
+    public void whoOnTable(String userOne, String userTwo, String tableID, String userOneColor, String userTwoColor) {
+
+    }
+
     @Override
-    public void setJoinObserveTable(String tableID, String user1,String user2){}
+    public void opponentLeftTable() {
+
+    }
+
     @Override
-    public void sendPublicMessage(){}
+    public void yourTurn() {
+
+    }
+
     @Override
-    public void sendPrivateMessage(){}
+    public void tableLeft(String tableID) {
+
+    }
+
     @Override
-    public void sendMoveToServer(){}
+    public void nowObserving(String tableID) {
+
+    }
+
     @Override
-    public void updateBoard(String[][] board){}
-    @Override
-    public void updateLobbyChat(String newMessage){}
-    @Override
-    public void addUser(String newUser){}
-    @Override
-    public void removeUser(String oldUser){}    
-    @Override
-    public void updateError(String errorConst){}
+    public void stoppedObserving(String tableID) {
+
+    }
+
 }
