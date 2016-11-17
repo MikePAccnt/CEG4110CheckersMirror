@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CrowningKings</string>
+    <string name="username_hint">Username</string>
 </resources>
