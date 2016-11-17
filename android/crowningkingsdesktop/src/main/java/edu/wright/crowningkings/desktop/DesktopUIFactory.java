@@ -19,9 +19,9 @@ import javax.swing.SwingConstants;
 public class DesktopUIFactory {
 
 	private static int tables = 1;
-	private static Image board = new ImageIcon("C:\\Users\\Michael\\Pictures\\GameImages\\RealCheckerBoard.jpg").getImage();
-	private static ImageIcon piece_black = new ImageIcon("C:\\Users\\Michael\\Pictures\\GameImages\\checkerspiece_black.png");
-	private static ImageIcon piece_red = new ImageIcon("C:\\Users\\Michael\\Pictures\\GameImages\\checkerspiece_red.png");
+	private static Image board = new ImageIcon("desktop\\RealCheckerBoard.jpg").getImage();
+	private static ImageIcon piece_black = new ImageIcon("desktop\\checkerspiece_black.png");
+	private static ImageIcon piece_red = new ImageIcon("desktop\\checkerspiece_red.png");
 	
 	public static JPanel makeGamePanel(String tableID, Image im, LayoutManager layout){
 		JPanel panel = new ImagePanel(im);
@@ -55,6 +55,17 @@ public class DesktopUIFactory {
 		return gameLobby;
 	}
 	
+	public static JPanel makeNextGamePanel(Image im){
+		JPanel panel = new ImagePanel(im);
+		panel.setLayout(null);
+		panel.setName("NewTable");
+		
+		JButton makeButton = new JButton("Make Table");
+		makeButton.setBounds(70,110, 110, 25);
+		panel.add(makeButton);
+		return panel;
+		
+	}
 	
 public static class ImagePanel extends JPanel{
 	 Image im;

@@ -1,6 +1,7 @@
 package edu.wright.crowningkings.desktop;
 
 import edu.wright.crowningkings.base.UserInterface.AbstractUserInterface;
+import edu.wright.crowningkings.base.BaseClient;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -49,17 +50,22 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	private int gamePanels = 0;
 	private String username = "";
 	private CheckersGameUI currentGame;
+	private BaseClient client;
 	//private DesktopUIFactory factory;
-	private Image im = new ImageIcon("C:\\Users\\Michael\\Pictures\\GameImages\\checkerboard.jpg").getImage();
+	private Image im = new ImageIcon("desktop\\checkerboard.jpg").getImage();
+	private Image im2 = new ImageIcon("desktop\\checkerboardFake.jpg").getImage();
 	//private Graphics g;
 	
 	public CheckersLobbyUIController(){
+		client = new BaseClient(this);
 		lobby = new CheckersLobbyUI(); //The whole game lobby
 		messageTextField = lobby.getMessageTextField(); //The area that messages are typed. Public / Private
 		lobbyPanel = lobby.getLobbyPanel(); //The area that shows all of the tables that are avilable
 		currentUsers = lobby.getCurrentUsers(); //The area that shows all of the current users in the lobby
 		lobbyChat = lobby.getLobbyChatTextArea(); //The area that shows all of the lobby chat that has happend since being in the server	
-		
+		makeClientVisable();
+		initBlankTable();
+
 		//Creating the key listener for the messageTextField to send messages though (Can move the key listener to its own class)
 		//This is still very messy and needs to be cleaned up at some point
 		messageTextField.addKeyListener(new KeyAdapter() {
@@ -77,6 +83,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 					if(username.equals("")){
 						username = messageTextField.getText().replace("username:", "").trim();
 						messageTextField.setText("");
+						sendName(username);
 					} else {
 						lobbyChat.setText((lobbyChat.getText() + "\n" + "ERROR: You already set your username!"));
 						messageTextField.setText("");
@@ -89,8 +96,42 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		});
 	}
 
+	public void initBlankTable(){
+		JPanel invis = DesktopUIFactory.makeNextGamePanel(im2);
+		invis.setBounds(gamePanelx, gamePanely, 250, 250);
+		invis.setVisible(true);
+		lobbyPanel.add(invis);
+		gamePanelx += 300;
+		gamePanels++;
+		if(gamePanels % 4 == 0){
+			gamePanely += 300;
+			gamePanelx = 12;
+		}
+		lobby.repaint();
+	}
+
 	//This adds a new table to the lobbyPanel for viewing
 	public void makeNewGamePanel(final String tableID){
+		if(lobbyPanel.getComponents().length > 0){
+			lobbyPanel.remove(lobbyPanel.getComponents()[lobbyPanel.getComponents().length - 1]);
+			gamePanelx = 12;
+			gamePanely = 13;
+			gamePanels = 0;
+			for(Component c : lobbyPanel.getComponents()){
+				lobbyPanel.remove(c);
+				c.setBounds(gamePanelx, gamePanely, 250, 250);
+				c.setVisible(true);
+				lobbyPanel.add(c);
+				gamePanelx += 300;
+				gamePanels++;
+				if(gamePanels % 4 == 0){
+					gamePanely += 300;
+					gamePanelx = 12;
+				}
+			}
+			lobbyPanel.repaint();
+		}		
+
 		JPanel p = DesktopUIFactory.makeGamePanel(tableID,im, null);
 		Component[] comp = p.getComponents(); 
 		final int[] cords = {-1,-1};
@@ -135,6 +176,16 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 			gamePanely += 300;
 			gamePanelx = 12;
 		}
+		JPanel invis = DesktopUIFactory.makeNextGamePanel(im2);
+		invis.setBounds(gamePanelx, gamePanely, 250, 250);
+		invis.setVisible(true);
+		lobbyPanel.add(invis);
+		gamePanelx += 300;
+		gamePanels++;
+		if(gamePanels % 4 == 0){
+			gamePanely += 300;
+			gamePanelx = 12;
+		}		
 		lobby.repaint();
 		
 	}
@@ -169,9 +220,13 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	}
 
 	public String getUsernameFromUser() {
+		
 		return username;
 	}
 
+	public void sendName(String name){
+		client.setUsername(name);
+	}
 	
 	public String getTableIdFromUser() {
 		return lobbyPanel.getComponents()[0].getName();
@@ -266,7 +321,9 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	}
 	
 	public void sendPublicMessage() {
-		//Not implemented yet
+		String message = messageTextField.getText();
+		messageTextField.setText("");
+		client.sendPublicMessage(message);
 	}
 
 

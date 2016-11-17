@@ -3,6 +3,7 @@ package edu.wright.crowningkings.base;
 import edu.wright.crowningkings.base.ServerMessage.*;
 import edu.wright.crowningkings.base.UserInterface.*;
 
+
 /**
  * Created by csmith on 11/1/16.
  * <p>
@@ -25,7 +26,7 @@ public class BaseClient {
      * Constructor methods
      */
     public BaseClient(AbstractUserInterface ui) {
-        String serverAddress = "192.168.122.1";
+        String serverAddress = "130.108.236.123";
 
         client = this;
         setServer(serverAddress, PORT_NUMBER);
