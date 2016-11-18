@@ -44,7 +44,7 @@ public class ServerMessageHandler {
                 break;
             case 207 :
                 System.out.println("\t207 : BOARD_STATE – the current board state on table <1> is <2>. <2> is a string encoding of the board");
-                break;
+                return new _207BoardState(message);
             case 221 :
                 System.out.println("\t221 : YOUR_TURN – it’s your turn to play.");
                 return new _221YourTurn(message);

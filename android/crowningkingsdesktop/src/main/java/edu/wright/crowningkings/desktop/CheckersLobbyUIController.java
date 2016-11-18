@@ -55,6 +55,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	private String color = "";
 	private boolean play = false;
 	private boolean turn = false;
+	private int[] cords = {-1,-1};
 	//private DesktopUIFactory factory;
 	private Image im = new ImageIcon("desktop\\checkerboard.jpg").getImage();
 	private Image im2 = new ImageIcon("desktop\\checkerboardFake.jpg").getImage();
@@ -146,7 +147,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
 		JPanel p = DesktopUIFactory.makeGamePanel(tableID,im, null);
 		Component[] comp = p.getComponents(); 
-		final int[] cords = {-1,-1};
+		cords = new int[] {-1,-1};
 		//These two buttons are known from the DeskTopUIFactory 
 		JButton playButton = (JButton) comp[0];
 		JButton observeButton = (JButton) comp[1];
@@ -320,6 +321,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		String msg = temp[1].trim();
 
 		client.messageClient(user,msg);
+		updateLobbyChat("Msg Sent to: " + user + " " + msg);
 		messageTextField.setText("");
     }
 
@@ -336,13 +338,16 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
     	client.ready();
     }
 
-    public void move(String fromx ,String fromy, String tox, String toy){}
+    public void move(String fromx ,String fromy, String tox, String toy){
+    	client.move(fromx,fromy,tox,toy);
+    }
 
     public void leaveTable(){
     	client.leaveTable();
     }
 
     public void quit(){
+    	currentGame.dispose();
     	client.quit();
     }
 
@@ -365,7 +370,11 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
     public void connectionOK(){}
 
     public void message(String message, String from, boolean privateMessage){
-    	updateLobbyChat(from + ": " + message);
+    	if(privateMessage == true){
+    		updateLobbyChat("Private (" + from + ": " + message + ")");
+    	} else {
+    		updateLobbyChat(from + ": " + message);
+    	}
     }
 
     public void newtable(String tableID){
@@ -404,7 +413,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		//Re-populate the board with the current board state from the server
 		for (int x = 0;x<board.length;x++ ) {
 			for(int y = 0;y<board[x].length;y++){
-				int cx = (x*62)+2;
+				int cx = (y*62)+2;
 				int cy = (x*62)+2;
 
 				if(board[x][y] == "B"){
@@ -557,20 +566,21 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 			}
 			else {
 				JLabel temp2 = (JLabel)pan.getComponentAt(cords[0],cords[1]);
-				String tX = Integer.toString(((e.getX()/62) * 62) + 2);
-				String tY = Integer.toString(((e.getY()/62) * 62) + 2);
+				String tX = Integer.toString((e.getX()/62));
+				String tY = Integer.toString((e.getY()/62));
 
-				String fx = Integer.toString(cords[0]);
-				String fy = Integer.toString(cords[1]);
-
+				String fx = Integer.toString(cords[0] / 62);
+				String fy = Integer.toString(cords[1] / 62);
+				CheckersGameUI.grabbedLbl.setVisible(false);
+				turn = false;
+				cords[0] = -1;
+				cords[1] = -1;
 				move(fx,fy,tX,tY);
 
 				//temp2.setBounds(tX,tY,62,62);
 				//pan.remove(temp2);
 				//pan.add(DesktopUIFactory.makePiece("Red")).setBounds(tX,tY,62,62);
-				turn = false;
-				cords[0] = -1;
-				cords[1] = -1;
+
 				//pan.repaint();
 				//System.out.println("released");
 			}

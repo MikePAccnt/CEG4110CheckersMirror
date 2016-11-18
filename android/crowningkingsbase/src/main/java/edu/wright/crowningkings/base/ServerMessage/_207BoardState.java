@@ -18,6 +18,23 @@ public class _207BoardState extends AbstractServerMessage {
 
     public void run(BaseClient client) {
 		System.out.println("_207BoardState.run(BaseClient)");
-		//do something
-    }
+		String[] p = getParameters();
+		String[][] board = new String[8][8];
+		int counter = 0;
+		for(int x = 0; x < 8;x++){
+			for(int y = 0;y<8;y++){
+				System.out.println(p[2]);
+				if(p[2].charAt(counter)=='1'){
+					board[x][y] = "B";
+				}
+				else if(p[2].charAt(counter)=='2'){
+					board[x][y] = "R";
+				} else {}
+				counter++;
+			}
+			
+		}
+
+		client.boardState(board);
+	}
 }
