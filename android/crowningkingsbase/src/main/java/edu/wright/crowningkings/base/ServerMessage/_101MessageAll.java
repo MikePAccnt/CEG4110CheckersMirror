@@ -15,6 +15,7 @@ public class _101MessageAll extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-        //do something
+        String[] p = getParameters();
+		client.messageAll(p[1]);
     }
 }

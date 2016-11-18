@@ -15,6 +15,7 @@ public class _200ConnectionOkay extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-        //do something
+        //System.out.println("_200ConnectionOkay.run(BaseClient)");
+		client.connectionOk();
     }
 }
