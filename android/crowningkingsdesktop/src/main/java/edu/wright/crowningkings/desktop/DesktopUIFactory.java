@@ -86,6 +86,7 @@ public static class CheckersGameUI extends JFrame{
 	public static JPanel checkerBoard;
 	public static JButton readyButton;
 	public static JButton quitButton;
+	public static JLabel grabbedLbl;
 
 	public CheckersGameUI(){
 		
@@ -124,6 +125,13 @@ public static class CheckersGameUI extends JFrame{
 		gameLobby.add(quitButton);
 		fillBoard(checkerBoard);
 		
+		grabbedLbl = new JLabel("Piece In Hand");
+		grabbedLbl.setFont(new Font("Arial", Font.PLAIN, 20));
+		grabbedLbl.setBackground(new Color(255, 0, 0));
+		grabbedLbl.setHorizontalAlignment(SwingConstants.CENTER);
+		grabbedLbl.setBounds(75, 704, 165, 46);
+		grabbedLbl.setVisible(false);
+		gameLobby.add(grabbedLbl);
 		//pack();
 		
 	}

@@ -53,6 +53,8 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	private CheckersGameUI currentGame;
 	private BaseClient client;
 	private String color = "";
+	private boolean play = false;
+	private boolean turn = false;
 	//private DesktopUIFactory factory;
 	private Image im = new ImageIcon("desktop\\checkerboard.jpg").getImage();
 	private Image im2 = new ImageIcon("desktop\\checkerboardFake.jpg").getImage();
@@ -160,7 +162,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 					updateLobbyChat("Server Message: " + "You are already in a game! You must quit this game to join another.");
 				} else {
 					//Send message that the client wants to join this table
-					sendJoinPlayTable(tableID);
+					joinTable(tableID);
 				}
 				
 			}
@@ -172,7 +174,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		 */
 		observeButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				sendJoinObserveTable(tableID);
+				observeTable(tableID);
 			}
 		});
 		
@@ -321,21 +323,36 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		messageTextField.setText("");
     }
 
-    public void makeTable(){}
+    public void makeTable(){
+    	client.makeTable();
+    }
 
-    public void joinTable(String talbeID){}
+    public void joinTable(String tableID){
+    	client.joinTable(tableID);
+    	setJoinPlayTable(tableID,"");
+    }
 
-    public void ready(){}
+    public void ready(){
+    	client.ready();
+    }
 
     public void move(String fromx ,String fromy, String tox, String toy){}
 
-    public void leaveTable(){}
+    public void leaveTable(){
+    	client.leaveTable();
+    }
 
-    public void quit(){}
+    public void quit(){
+    	client.quit();
+    }
 
-    public void askTableStatus(String tableID){}
+    public void askTableStatus(String tableID){
+    	client.askTableStatus(tableID);
+    }
 
-    public void observeTable(String talbeID){}
+    public void observeTable(String tableID){
+    	client.observeTable(tableID);
+    }
 
 
     /*
@@ -347,14 +364,18 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
     public void connectionOK(){}
 
-    public void message(String message, String from, boolean privateMessage){}
+    public void message(String message, String from, boolean privateMessage){
+    	updateLobbyChat(from + ": " + message);
+    }
 
     public void newtable(String tableID){
     	makeNewGamePanel(tableID);
-		//setJoinPlayTable(tableID, "");
+		setJoinPlayTable(tableID, "");
     }
 
-    public void gameStart(){}
+    public void gameStart(){
+    	play = true;
+    }
 
     public void colorBlack(){
     	this.color = "Black";
@@ -459,6 +480,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
     public void yourTurn(){
     	//Add UI stuff to gameBoard to show this.
+    	turn = true;
     }
 
     public void tableLeft(String tableID){
@@ -494,6 +516,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		readyBtn.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				//Tell the server you are ready to play
+				ready();
 			}
 		});
 		
@@ -501,6 +524,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 			public void actionPerformed(ActionEvent arg0) {
 				currentGame.dispose();
 				//Tell the server client left the game
+				leaveTable();
 			}
 		});
 	}
@@ -520,26 +544,35 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		}
 		
 		public void mouseClicked(MouseEvent e){
-			System.out.println("Test");
-			if(cords[0] == -1 && cords[1] == -1){
+			System.out.println("Here!");
+			if(cords[0] == -1 && cords[1] == -1 && (play == true && turn == true)){
 				JLabel temp = pan.getComponentAt(e.getX(), e.getY()) instanceof JLabel ? (JLabel)pan.getComponentAt(e.getX(), e.getY()):null;
-				if(temp != null && temp.getIcon() != null && temp instanceof JLabel){	
+				if(temp != null && temp.getIcon() != null && temp instanceof JLabel){
 					cords[0] = e.getX();
 					cords[1] = e.getY();
-					System.out.println("grabbed");
+					System.out.println("Pickup");
+					CheckersGameUI.grabbedLbl.setVisible(true);
+					
 				} else {}
 			}
 			else {
-				JLabel temp2 = (JLabel)pan.getComponentAt((int)cords[0],(int)cords[1]);
-				int tX = ((e.getX()/62) * 62) + 2;
-				int tY = ((e.getY()/62) * 62) + 2;
-				temp2.setBounds(tX,tY,62,62);
+				JLabel temp2 = (JLabel)pan.getComponentAt(cords[0],cords[1]);
+				String tX = Integer.toString(((e.getX()/62) * 62) + 2);
+				String tY = Integer.toString(((e.getY()/62) * 62) + 2);
+
+				String fx = Integer.toString(cords[0]);
+				String fy = Integer.toString(cords[1]);
+
+				move(fx,fy,tX,tY);
+
+				//temp2.setBounds(tX,tY,62,62);
 				//pan.remove(temp2);
 				//pan.add(DesktopUIFactory.makePiece("Red")).setBounds(tX,tY,62,62);
+				turn = false;
 				cords[0] = -1;
 				cords[1] = -1;
-				pan.repaint();
-				System.out.println("released");
+				//pan.repaint();
+				//System.out.println("released");
 			}
 		}
 	}

@@ -29,7 +29,7 @@ public class ServerMessageHandler {
             // messages from the server to the client.
             case 201 :
                 System.out.println("\t201 : MSG – client received message <3> from client <1>. If <2> = 1, the message is private.");
-                break;
+                return new _201MessageRecieved(message);
             case 202 :
                 System.out.println("\t202 : NEW_TBL – a new table has been created with id <1>.");
                 return new _202NewTable(message);
