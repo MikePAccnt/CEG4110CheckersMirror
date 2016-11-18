@@ -35,7 +35,7 @@ public class ServerMessageHandler {
                 return new _202NewTable(message);
             case 203 :
                 System.out.println("\t203 : GAME_START – the game being played at the table you are sitting at as a player has begun.");
-                break;
+                return new _203GameStart(message);
             case 204 :
                 System.out.println("\t204 : COLOR_BLACK – you are playing as black.");
                 break;
@@ -47,7 +47,7 @@ public class ServerMessageHandler {
                 break;
             case 221 :
                 System.out.println("\t221 : YOUR_TURN – it’s your turn to play.");
-                break;
+                return new _221YourTurn(message);
             case 210 :
                 System.out.println("\t210 : TBL_JOINED – the client has joined table <1>.");
                 break;

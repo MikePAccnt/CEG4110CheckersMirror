@@ -16,6 +16,6 @@ public class _221YourTurn extends AbstractServerMessage {
 
     public void run(BaseClient client) {
 		System.out.println("_221YourTurn.run(BaseClient)");
-		//do something
+		client.yourTurn();
     }
 }

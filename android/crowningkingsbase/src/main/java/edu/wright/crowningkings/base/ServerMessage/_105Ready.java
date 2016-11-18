@@ -14,6 +14,6 @@ public class _105Ready extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-        //do something
+        client.yourTurn();
     }
 }
