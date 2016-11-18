@@ -12,7 +12,7 @@ public class _202NewTable extends AbstractServerMessage{
     }
 
     public void run(BaseClient client) {
-		System.out.println("_202NewTable.run(BaseClient)");
+		//System.out.println("_202NewTable.run(BaseClient)");
 		client.addTable(getParameters()[1]);
     }
 }

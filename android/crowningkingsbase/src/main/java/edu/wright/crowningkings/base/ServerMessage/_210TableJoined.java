@@ -16,7 +16,8 @@ public class _210TableJoined extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-		System.out.println("_210TableJoined.run(BaseClient)");
-		//do something
+		//System.out.println("_210TableJoined.run(BaseClient)");
+		String[] p = getParameters();
+		client.tableJoined(p[1]);
     }
 }

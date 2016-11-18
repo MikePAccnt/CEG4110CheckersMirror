@@ -16,7 +16,8 @@ public class _230NowObserving extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-		System.out.println("_230NowObserving.run(BaseClient)");
-		//do something
+		//System.out.println("_230NowObserving.run(BaseClient)");
+		String[] p = getParameters();
+		client.nowObserving(p[1]);
     }
 }

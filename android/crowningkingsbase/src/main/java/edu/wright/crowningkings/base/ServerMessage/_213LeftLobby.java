@@ -16,6 +16,6 @@ public class _213LeftLobby extends AbstractServerMessage {
 
     public void run(BaseClient client) {
 		System.out.println("_213LeftLobby.run(BaseClient)");
-		//do something
+		client.outLobby();
     }
 }
