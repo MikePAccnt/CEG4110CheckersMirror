@@ -26,7 +26,7 @@ public class BaseClient {
      * Constructor methods
      */
     public BaseClient(AbstractUserInterface ui) {
-        String serverAddress = "192.168.122.1";
+        String serverAddress = "192.168.75.1";
 
         client = this;
         setServer(serverAddress, PORT_NUMBER);
@@ -125,7 +125,6 @@ public class BaseClient {
         ui.tableList(tables);
     }
 
-
     public void addTable(String table) {
         ui.newtable(table);
     }
@@ -144,5 +143,81 @@ public class BaseClient {
 
     public void nowLeftLobby(String user) {
         ui.nowLeftLobby(user);
+    }
+
+    public void connectionOk(){
+        ui.connectionOK();
+    }
+
+    public void message(String message, String from, boolean privateMessage){
+        ui.message(message,from,privateMessage);
+    }
+
+    public void newTable(String tableID){
+        ui.newtable(tableID);
+    }
+
+    public void gameStart(){
+        ui.gameStart();
+    }
+
+    public void colorBlack(){
+        ui.colorBlack();
+    }
+
+    public void colorRed(){
+        ui.colorRed();
+    }
+
+    public void opponentMove(String[] from, String[] to){
+        ui.opponentMove(from,to);
+    }
+
+    public void boardState(String[][] boardState){
+        ui.boardState(boardState);
+    }
+
+    public void gameWon(){
+        ui.gameWon();
+    }
+
+    public void gameLose(){
+        ui.gameLose();
+    }
+
+    public void tableJoined(String tableID){
+        ui.tableJoined(tableID);
+    }
+
+    public void outLobby(){
+        ui.outLobby();
+    }
+
+    public void inLobby(){
+        ui.inLobby();
+    }
+
+    public void whoOnTable(String userOne, String userTwo,String tableID, String userOneColor,String userTwoColor){
+        ui.whoOnTable(userOne,userTwo,tableID,userOneColor,userTwoColor);
+    }
+
+    public void opponentLeftTable(){
+        ui.opponentLeftTable();
+    }
+
+    public void yourTurn(){
+        ui.yourTurn();
+    }
+
+    public void tableLeft(String tableID){
+        ui.tableLeft(tableID);
+    }
+
+    public void nowObserving(String tableID){
+        ui.nowObserving(tableID);
+    }
+
+    public void stoppedObserving(String tableID){
+        ui.stoppedObserving(tableID);
     }
 }
