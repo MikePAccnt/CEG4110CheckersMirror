@@ -1,6 +1,7 @@
 package edu.wright.crowningkings.android;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -28,14 +29,13 @@ import edu.wright.crowningkings.base.UserInterface.AbstractUserInterface;
 public class Lobby extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, AbstractUserInterface {
     private final String TAG = "Lobby";
-    private String[] mPlanetTitles = new String[]{"one", "2", "THREEEEE"};
-    private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
 
     private ListView tablesListView;
     private TablesListArrayAdapter tablesListArrayAdapter;
     private Menu navPrivateMessagesMenu;
     private BaseClient client;
+    private String username;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +81,12 @@ public class Lobby extends AppCompatActivity
     }
 
     @Override
+    protected void onDestroy() {
+        quit();
+        super.onDestroy();
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -115,20 +121,17 @@ public class Lobby extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        switch ((String) item.getTitle()) {
-            case "Foo" :
-                System.out.println("FOO");
-                break;
+        System.out.println(item.getTitle() + " nav item pressed ");
 
-        }
+        Intent messageIntent = new Intent(Lobby.this, MessageActivity.class);
+        messageIntent.putExtra(Constants.chatROWID, (long) 12);
+        messageIntent.putExtra(Constants.chatHandlesString, item.getTitle());
+        startActivity(messageIntent);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-
-
 
 
 
@@ -148,10 +151,17 @@ public class Lobby extends AppCompatActivity
         joinTable(tableId);
     }
 
-    private void joinTable(String tableId) {
-        client.joinTable(tableId);
+    //@Override
+    private void joinTable(final String tableId) {
+        new AsyncTask<Void, Void, Void>() {
+            protected Void doInBackground(Void... voids){
+                client.joinTable(tableId);
+                return null;
+            }
+        }.execute();
     }
 
+    //@Override
     private void makeTable() {
         new AsyncTask<Void, Void, Void>() {
             protected Void doInBackground(Void... voids){
@@ -187,7 +197,7 @@ public class Lobby extends AppCompatActivity
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                navPrivateMessagesMenu.removeItem(user.hashCode());
+                //not when leaving lobby... navPrivateMessagesMenu.removeItem(user.hashCode());
             }
         });
     }
@@ -197,7 +207,9 @@ public class Lobby extends AppCompatActivity
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                navPrivateMessagesMenu.add(Menu.NONE, user.hashCode(), Menu.NONE, user);
+                if (navPrivateMessagesMenu.findItem(user.hashCode()) == null && !user.equals(username)) {
+                    navPrivateMessagesMenu.add(Menu.NONE, user.hashCode(), Menu.NONE, user);
+                }
             }
         });
     }
@@ -240,7 +252,7 @@ public class Lobby extends AppCompatActivity
     @Override
     public void sendUsernameRequest() {
         Log.d(TAG, "setUsername");
-        final String username = "AndroidBob";
+        username = "AndroidBob";
         new AsyncTask<Void, Void, Void>() {
             protected Void doInBackground(Void... voids){
                 client.setUsername(username);
@@ -325,5 +337,10 @@ public class Lobby extends AppCompatActivity
     @Override
     public void outLobby() {
 
+    }
+
+    //@Override
+    public void quit() {
+        client.quit();
     }
 }
