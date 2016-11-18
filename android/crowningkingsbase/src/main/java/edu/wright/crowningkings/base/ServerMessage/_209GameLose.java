@@ -8,7 +8,10 @@ import edu.wright.crowningkings.base.BaseClient;
 
 public class _209GameLose extends AbstractServerMessage {
     public _209GameLose(String message) {
-        setParameters(message.split(" "));
+        String[] param = message.split(" ");
+		String msgID = param[0];
+		String[] fullParam = {msgID};
+        setParameters(fullParam);
     }
 
     public void run(BaseClient client) {

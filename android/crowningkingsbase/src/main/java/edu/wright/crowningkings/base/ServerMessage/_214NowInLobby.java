@@ -8,7 +8,11 @@ import edu.wright.crowningkings.base.BaseClient;
 
 public class _214NowInLobby extends AbstractServerMessage {
     public _214NowInLobby(String message) {
-        setParameters(message.split(" "));
+        String[] param = message.split(" ");
+		String msgID = param[0];
+		String client = param[1];
+		String[] fullParam = {msgID, client};
+        setParameters(fullParam);
     }
 
     public void run(BaseClient client) {

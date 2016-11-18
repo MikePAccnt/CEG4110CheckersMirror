@@ -8,7 +8,11 @@ import edu.wright.crowningkings.base.BaseClient;
 
 public class _230NowObserving extends AbstractServerMessage {
     public _230NowObserving(String message) {
-        setParameters(message.split(" "));
+		String[] param = message.split(" ");
+		String msgID = param[0];
+		String table = param[1];
+		String[] fullParam = {msgID, table};
+        setParameters(fullParam);
     }
 
     public void run(BaseClient client) {

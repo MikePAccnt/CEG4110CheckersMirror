@@ -8,7 +8,10 @@ import edu.wright.crowningkings.base.BaseClient;
 
 public class _220OpponentLeft extends AbstractServerMessage {
     public _220OpponentLeft(String message) {
-        setParameters(message.split(" "));
+        String[] param = message.split(" ");
+		String msgID = param[0];
+		String[] fullParam = {msgID};
+        setParameters(fullParam);
     }
 
     public void run(BaseClient client) {
