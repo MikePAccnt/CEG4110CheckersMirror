@@ -26,7 +26,7 @@ public class BaseClient {
      * Constructor methods
      */
     public BaseClient(AbstractUserInterface ui) {
-        String serverAddress = "192.168.75.1";
+        String serverAddress = "192.168.122.1";
 
         client = this;
         setServer(serverAddress, PORT_NUMBER);
@@ -76,28 +76,6 @@ public class BaseClient {
         server.sendServerMessage(new SendUsername(username));
     }
 
-
-    public void quit() {
-        server.sendServerMessage(new _108Quit());
-        serverMessageThread.interrupt();
-    }
-
-
-    public void makeTable() {
-        server.sendServerMessage(new _103MakeTable());
-    }
-
-
-    public void leaveTable() {
-        server.sendServerMessage(new _107LeaveTable());
-    }
-
-
-    public void ready() {
-        server.sendServerMessage(new _105Ready());
-    }
-
-
     public void messageAll(String message) {
         server.sendServerMessage(new _101MessageAll(message));
     }
@@ -106,43 +84,47 @@ public class BaseClient {
         server.sendServerMessage(new _102MessageClient(message, recipient));
     }
 
-    public void move(String fromx, String fromy, String tox, String toy){
-        server.sendServerMessage(new _106Move(fromx, fromy, tox, toy));
+    public void makeTable() {
+        server.sendServerMessage(new _103MakeTable());
     }
 
     public void joinTable(String tableId) {
         server.sendServerMessage(new _104JoinTable(tableId));
     }
 
-    public void askTableStatus(String tableID){}
+    public void ready() {
+        server.sendServerMessage(new _105Ready());
+    }
 
-    public void observeTable(String talbeID){}
+    public void move(String fromx, String fromy, String tox, String toy){
+        server.sendServerMessage(new _106Move(fromx, fromy, tox, toy));
+    }
+
+    public void leaveTable() {
+        server.sendServerMessage(new _107LeaveTable());
+    }
+
+    public void quit() {
+        server.sendServerMessage(new _108Quit());
+        serverMessageThread.interrupt();
+    }
+
+    public void askTableStatus(String tableID){
+        server.sendServerMessage(new _109AskTableStatus(tableID));
+    }
+
+    public void observeTable(String tableID){
+        server.sendServerMessage(new _110ObserveTable(tableID));
+    }
+
+
+
     /**
      * Methods to be called FROM the server (i.e. from an AbstractServerMessage's run method)
      * These methods will be used for updating the UI based on information given from server
      */
-    public void updateTableList(String[] tables) {
-        ui.tableList(tables);
-    }
-
-    public void addTable(String table) {
-        ui.newtable(table);
-    }
-
     public void sendUsernameRequest() {
         ui.sendUsernameRequest();
-    }
-
-    public void nowInLobby(String newClientUsername) {
-        ui.nowInLobby(newClientUsername);
-    }
-
-    public void whoInLobby(String[] users) {
-        ui.whoInLobby(users);
-    }
-
-    public void nowLeftLobby(String user) {
-        ui.nowLeftLobby(user);
     }
 
     public void connectionOk(){
@@ -189,8 +171,24 @@ public class BaseClient {
         ui.tableJoined(tableID);
     }
 
+    public void whoInLobby(String[] users) {
+        ui.whoInLobby(users);
+    }
+
     public void outLobby(){
         ui.outLobby();
+    }
+
+    public void nowInLobby(String newClientUsername) {
+        ui.nowInLobby(newClientUsername);
+    }
+
+    public void tableList(String[] tables) {
+        ui.tableList(tables);
+    }
+
+    public void nowLeftLobby(String user) {
+        ui.nowLeftLobby(user);
     }
 
     public void inLobby(){

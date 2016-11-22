@@ -18,6 +18,6 @@ public class _216TableList extends AbstractServerMessage{
         for (int i = 0; i < tables.length; i ++) {
             tables[i] = params[i+1];
         }
-        client.updateTableList(tables);
+        client.tableList(tables);
     }
 }

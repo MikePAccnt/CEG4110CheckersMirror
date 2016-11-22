@@ -29,7 +29,6 @@ public abstract class AbstractServerMessage {
             message = message + param + " " ;
         }
         message = message + EOM;
-        System.out.println("\ttoServerMessage() message=" + message);
         return message;
     }
 
