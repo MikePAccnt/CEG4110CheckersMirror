@@ -6,4 +6,10 @@ package edu.wright.crowningkings.android;
 public class Constants {
     public static final String chatROWID = "chat_rowid";
     public static final String chatHandlesString = "chatHandlesString";
+
+    public static final String JOIN_AS = "join_table_as";
+    public static final String OBSERVER = "observer";
+    public static final String PLAYER = "player";
+    public static final String TABLE_ID = "table_name";
+
 }

@@ -2,14 +2,19 @@
     <string name="app_name">CrowningKings</string>
     <string name="username_hint">Username</string>
     <string name="title_activity_lobby">Lobby</string>
+    <string name="message_activity">Message</string>
+    <string name="table_activity">Table</string>
+
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
 
-
-
+    <string name="status_dialog_title">Table %1$s Status</string>
+    <string name="status_dialog_message">Black:\t%1$s\nRed:\t\t%2$s</string>
+    <string name="status_dialog_join_button">Join table</string>
+    <string name="status_dialog_observe_button">Observe table</string>
 
 
 

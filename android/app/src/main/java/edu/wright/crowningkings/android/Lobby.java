@@ -1,11 +1,18 @@
 package edu.wright.crowningkings.android;
 
+import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.SubMenu;
@@ -39,6 +46,7 @@ public class Lobby extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate(Bundle)");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -62,12 +70,13 @@ public class Lobby extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        navigationView.getMenu().add("New Messages");
         navigationView.getMenu().add("Public Messages");
         navPrivateMessagesMenu = navigationView.getMenu().addSubMenu("Private");
 
-        ArrayList test = new ArrayList<>();
+        ArrayList<String> test = new ArrayList<>();
         test.add("Test");
-        tablesListArrayAdapter = new TablesListArrayAdapter<String>(this,
+        tablesListArrayAdapter = new TablesListArrayAdapter<>(this,
                 R.layout.lobby_table_item, R.id.table_number, test);
         tablesListView = (ListView) findViewById(R.id.lobby_tables_list);
         tablesListView.setAdapter(tablesListArrayAdapter);
@@ -81,7 +90,14 @@ public class Lobby extends AppCompatActivity
     }
 
     @Override
+    protected void onStop() {
+        Log.d(TAG, "onStop()");
+        super.onStop();
+    }
+
+    @Override
     protected void onDestroy() {
+        Log.d(TAG, "onDestroy()");
         quit();
         super.onDestroy();
     }
@@ -121,10 +137,10 @@ public class Lobby extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        System.out.println(item.getTitle() + " nav item pressed ");
+        System.out.println("nav item " + item.getTitle() + " was pressed ");
 
         Intent messageIntent = new Intent(Lobby.this, MessageActivity.class);
-        messageIntent.putExtra(Constants.chatROWID, (long) 12);
+        messageIntent.putExtra(Constants.chatROWID, Long.valueOf(item.getTitle().hashCode()));
         messageIntent.putExtra(Constants.chatHandlesString, item.getTitle());
         startActivity(messageIntent);
 
@@ -133,25 +149,31 @@ public class Lobby extends AppCompatActivity
         return true;
     }
 
+    public void quit() {
+        new AsyncTask<Void, Void, Void>() {
+            protected Void doInBackground(Void... voids){
+                client.quit();
+                return null;
+            }
+        }.execute();
+    }
 
-
-
-
-
-
+    public void joinTable(View tableView) {//askTableStatus should be method name, but onclick isn't working
+        TextView tv = (TextView) tableView.findViewById(R.id.table_number);
+        final String tableId = tv.getText().toString();
+        System.out.println("tableId=" + tableId);
+        new AsyncTask<String, Void, Void>() {
+            protected Void doInBackground(String... tables){
+                client.askTableStatus(tableId);
+                return null;
+            }
+        }.execute();
+    }
 
 
     /**
      * CROWNING KINGS METHODS
      */
-    public void joinTable(View tableView) {
-        TextView tv = (TextView) tableView.findViewById(R.id.table_number);
-        String tableId = tv.getText().toString();
-        System.out.println("tableId=" + tableId);
-        joinTable(tableId);
-    }
-
-    //@Override
     private void joinTable(final String tableId) {
         new AsyncTask<Void, Void, Void>() {
             protected Void doInBackground(Void... voids){
@@ -170,6 +192,17 @@ public class Lobby extends AppCompatActivity
             }
         }.execute();
     }
+
+    public void observeTable(final String tableId) {
+        new AsyncTask<Void, Void, Void>() {
+            protected Void doInBackground(Void... voids){
+                client.observeTable(tableId);
+                return null;
+            }
+        }.execute();
+    }
+
+
 
 
     @Override
@@ -220,8 +253,51 @@ public class Lobby extends AppCompatActivity
     }
 
     @Override
-    public void whoOnTable(String userOne, String userTwo, String tableID, String userOneColor, String userTwoColor) {
+    public void whoOnTable(final String userOne, final String userTwo, final String tableID, String userOneColor, String userTwoColor) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "whoOnTable(...) run()");
+                AlertDialog.Builder builder = null;
+                if (userOne.equals("-1") || userTwo.equals("-1")){
+                    builder = new AlertDialog.Builder(Lobby.this)
+                            .setTitle(String.format(getResources().getString(R.string.status_dialog_title), tableID))
+                            .setMessage(String.format(getResources().getString(R.string.status_dialog_message), userOne, userTwo))
+                            .setPositiveButton(R.string.status_dialog_join_button, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    joinTable(tableID);
+                                }
+                            })
+                            .setNegativeButton(R.string.status_dialog_observe_button, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    observeTable(tableID);
+                                }
+                            })
+                            .setNeutralButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // continue with delete
+                                }
+                            });
+                } else {
+                    builder = new AlertDialog.Builder(Lobby.this)
+                            .setTitle(String.format(getResources().getString(R.string.status_dialog_title), tableID))
+                            .setMessage(String.format(getResources().getString(R.string.status_dialog_message), userOne, userTwo))
+                            .setNegativeButton(R.string.status_dialog_observe_button, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // do nothing
+                                }
+                            })
+                            .setNeutralButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // continue with delete
+                                }
+                            });
+                }
 
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
     }
 
     @Override
@@ -268,13 +344,57 @@ public class Lobby extends AppCompatActivity
 
     @Override
     public void message(String message, String from, boolean privateMessage) {
+        postNotification(from, message, from.hashCode());
         if (privateMessage) {
             ///private message stuff
+
         }
         else {
             //public message stuff
         }
     }
+
+    private void postNotification(String handleID, String message, long cROWID) {
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle(handleID)
+                        .setContentText(message)
+                        .setTicker("New message from " + handleID + " - \n" + message)
+                        .setPriority(Notification.PRIORITY_HIGH)
+                        .setDefaults(Notification.DEFAULT_VIBRATE);
+
+        // Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(this, MessageActivity.class);
+        resultIntent.putExtra(Constants.chatROWID, cROWID);
+        resultIntent.putExtra(Constants.chatHandlesString, handleID);
+
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(MessageActivity.class);
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        mBuilder.setAutoCancel(true);   // this removes notification on tap
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+// mId allows you to update the notification later on.
+        Notification notification = mBuilder.build();
+        mNotificationManager.notify(0, notification);
+    }
+
+
+
+
 
     @Override
     public void newtable(final String tableID) {
@@ -324,7 +444,10 @@ public class Lobby extends AppCompatActivity
 
     @Override
     public void tableJoined(String tableID) {
-
+        Intent tableIntent = new Intent(Lobby.this, TableActivity.class);
+        tableIntent.putExtra(Constants.JOIN_AS, Constants.PLAYER);
+        tableIntent.putExtra(Constants.TABLE_ID, tableID);
+        startActivity(tableIntent);
     }
 
     @Override
@@ -335,12 +458,5 @@ public class Lobby extends AppCompatActivity
     }
 
     @Override
-    public void outLobby() {
-
-    }
-
-    //@Override
-    public void quit() {
-        client.quit();
-    }
+    public void outLobby() {}
 }
