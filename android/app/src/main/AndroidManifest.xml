@@ -13,7 +13,6 @@
         <activity android:name=".Lobby">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -25,6 +24,9 @@
             android:name=".TableActivity"
             android:label="@string/table_activity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <service
+            android:name=".AndroidUIService"
+            android:label="AndroidUIService" />
     </application>
 
 </manifest>

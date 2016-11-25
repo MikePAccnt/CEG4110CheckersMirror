@@ -16,6 +16,13 @@
     <string name="status_dialog_join_button">Join table</string>
     <string name="status_dialog_observe_button">Observe table</string>
 
+    <string name="username_request_dialog_title">Enter Username</string>
+    <string name="username_request_dialog_message">Enter Username message</string>
+
+
+    <string name="public_message_group_name">Public Group Message</string>
+    <string name="make_new_message">New Message</string>
+    <string name="private_messages_menu_name">Private Messages</string>
 
 
 

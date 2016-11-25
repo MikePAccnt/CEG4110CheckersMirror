@@ -1,9 +1,11 @@
 package edu.wright.crowningkings.android;
 
 import android.annotation.TargetApi;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
@@ -43,7 +45,7 @@ public class MessageActivity extends AppCompatActivity /*implements ReceiveMessa
     ArrayList<Message> arrayOfMessages;
     MessagesAdapter adapter;
     Button btnSend;
-//    ReceiveMessagesService receiveMessagesService;
+    MessageActivityBroadcastReceiver messageActivityBroadcastReceiver;
     private boolean boundReceiveService = false;
     private long chatROWID = -1;
     String targetString;
@@ -61,7 +63,7 @@ public class MessageActivity extends AppCompatActivity /*implements ReceiveMessa
 
         if (getIntent() != null) {
             chatROWID = getIntent().getLongExtra(Constants.chatROWID, -1);
-            if (chatROWID != -1) {
+            if (chatROWID != -1 && !getIntent().getStringExtra(Constants.chatHandlesString).equals(getResources().getString(R.string.make_new_message))) {
                 isNewChat = false;
             }
         }
@@ -100,14 +102,22 @@ public class MessageActivity extends AppCompatActivity /*implements ReceiveMessa
                 updateTargetValue();
                 if (hasSetTargetNumber()) {
                     // if has number, send msg
-                    String targetPhoneNumber = tvTarget.getText().toString().trim();
+                    String targetName = tvTarget.getText().toString().trim();
                     String message = etMessage.getText().toString().trim();
 
                     etMessage.setText(message);
 
                     if (message.length() > 0) {
                         addSentMessageToListView();
-//                        new SendMessageTask(MessageActivity.this, targetPhoneNumber, message).execute();
+                        if (targetName.equals(getResources().getString(R.string.public_message_group_name))) {
+                            sendBroadcast(new Intent(Constants.MESSAGE_ALL_INTENT)
+                                    .putExtra(Constants.MESSAGE_EXTRA, message));
+                        } else {
+                            sendBroadcast(new Intent(Constants.MESSAGE_CLIENT_INTENT)
+                                    .putExtra(Constants.MESSAGE_EXTRA, message)
+                                    .putExtra(Constants.USERNAME_EXTRA, targetName));
+                        }
+
                         showBackButton();
                     } else {
                         Log.i(TAG, "Message text has no length");
@@ -278,21 +288,22 @@ public class MessageActivity extends AppCompatActivity /*implements ReceiveMessa
 
     @Override
     protected void onDestroy() {
-        Log.i(TAG, "Destroying activity");
+        Log.i(TAG, "onDestroy");
 //        unbindToReceiveService();
         super.onDestroy();
     }
 
     @Override
     protected void onResume() {
-//        bindToReceiveService();
+        messageActivityBroadcastReceiver = new MessageActivityBroadcastReceiver();
+        registerReceiver(messageActivityBroadcastReceiver, new IntentFilter(Constants.NEW_MESSAGE_INTENT));
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        Log.i(TAG, "Pausing activity");
-//        unbindToReceiveService();
+        Log.i(TAG, "onPause");
+        unregisterReceiver(messageActivityBroadcastReceiver);
         super.onPause();
     }
 
@@ -334,37 +345,14 @@ public class MessageActivity extends AppCompatActivity /*implements ReceiveMessa
     };
 
 //    @Override
-    public void onReceivedMessages(final String receiveMessagesJsonString) {//:_:
-        Log.i(TAG, "JSON received message - " + receiveMessagesJsonString);
+    public void onReceivedMessages(final String username, final String message, final boolean isPrivate, final long date) {//final String receiveMessagesJsonString) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                JSONObject receivedMessagesJSON = null;
-                JSONArray foundMessagesJSON = null;
-                try {
-                    receivedMessagesJSON = new JSONObject(receiveMessagesJsonString);
-
-                    foundMessagesJSON = receivedMessagesJSON.getJSONArray("incomingMessages");
-
-                    for (int i = 0; i < foundMessagesJSON.length(); i++) {
-                        JSONObject foundMessageJSON = (JSONObject) foundMessagesJSON.get(i);
-
-                        printFoundMessages(foundMessageJSON);   // todo testing
-
-                        String messageText = foundMessageJSON.getString("text");
-                        String handleID = foundMessageJSON.getString("h.id");
-                        long curChatROWID = foundMessageJSON.getLong("c.ROWID");
-                        int is_from_me = foundMessageJSON.getInt("is_from_me");
-                        long date = foundMessageJSON.getLong("date");
-                        Log.i(TAG, messageText);
-
-                        // If message belongs to this chat & is not from me
-                        if (curChatROWID == MessageActivity.this.chatROWID && is_from_me == 0) {   // TODO need better way to detect if chat
-                            addReceivedMessageToListView(messageText, handleID, date);
-                        }
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                long curChatROWID = username.hashCode();
+                if ((curChatROWID == MessageActivity.this.chatROWID && isPrivate)
+                        || (getResources().getString(R.string.public_message_group_name).hashCode() == MessageActivity.this.chatROWID && !isPrivate)) {
+                    addReceivedMessageToListView(message, username, date);
                 }
             }
         });
@@ -412,6 +400,21 @@ public class MessageActivity extends AppCompatActivity /*implements ReceiveMessa
             String key = foundMessageJSON.names().getString(i);
             String value = foundMessageJSON.get(key).toString();
             Log.i(TAG, key + " - " + value);
+        }
+    }
+
+    private class MessageActivityBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case Constants.NEW_MESSAGE_INTENT :
+                    onReceivedMessages(
+                            intent.getStringExtra(Constants.USERNAME_EXTRA),
+                            intent.getStringExtra(Constants.MESSAGE_EXTRA),
+                            intent.getBooleanExtra(Constants.PRIVATE_MESSAGE_EXTRA, true),
+                            intent.getLongExtra(Constants.DATE_EXTRA, 0));
+                    break;
+            }
         }
     }
 }

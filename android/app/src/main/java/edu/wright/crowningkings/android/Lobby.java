@@ -4,9 +4,11 @@ import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -30,18 +32,16 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import edu.wright.crowningkings.base.BaseClient;
-import edu.wright.crowningkings.base.UserInterface.AbstractUserInterface;
-
-public class Lobby extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AbstractUserInterface {
+public class Lobby extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private final String TAG = "Lobby";
 
     private ListView tablesListView;
     private TablesListArrayAdapter tablesListArrayAdapter;
     private Menu navPrivateMessagesMenu;
-    private BaseClient client;
     private String username;
+    private BroadcastReceiver lobbyBroadcastReceiver = new LobbyBroadcastReceiver();
+    private IntentFilter lobbyIntentFilter = new IntentFilter();
+    private Intent androidUIService;
 
 
     @Override
@@ -70,9 +70,9 @@ public class Lobby extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        navigationView.getMenu().add("New Messages");
-        navigationView.getMenu().add("Public Messages");
-        navPrivateMessagesMenu = navigationView.getMenu().addSubMenu("Private");
+        navigationView.getMenu().add(getResources().getString(R.string.make_new_message));
+        navigationView.getMenu().add(getResources().getString(R.string.public_message_group_name));
+        navPrivateMessagesMenu = navigationView.getMenu().addSubMenu(getResources().getString(R.string.private_messages_menu_name));
 
         ArrayList<String> test = new ArrayList<>();
         test.add("Test");
@@ -81,26 +81,43 @@ public class Lobby extends AppCompatActivity
         tablesListView = (ListView) findViewById(R.id.lobby_tables_list);
         tablesListView.setAdapter(tablesListArrayAdapter);
 
-        new AsyncTask<AbstractUserInterface, Void, Void>() {
-            protected Void doInBackground(AbstractUserInterface... voids){
-                client = new BaseClient(voids[0]);
-                return null;
-            }
-        }.execute(this);
+        Log.d(TAG, "About to start the androiduiservice");
+        androidUIService = new Intent(this, AndroidUIService.class);
+        startService(androidUIService);
+
+        lobbyIntentFilter.addAction(Constants.USERNAME_REQUEST_INTENT);
+        lobbyIntentFilter.addAction(Constants.NEW_TABLE_INTENT);
+        lobbyIntentFilter.addAction(Constants.WHO_IN_LOBBY_INTENT);
+        lobbyIntentFilter.addAction(Constants.WHO_ON_TABLE);
+        lobbyIntentFilter.addAction(Constants.TABLE_LIST_INTENT);
+        lobbyIntentFilter.addAction(Constants.NOW_IN_LOBBY_INTENT);
     }
+
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume()");
+        super.onResume();
+        registerReceiver(lobbyBroadcastReceiver, lobbyIntentFilter);
+    }
+
 
     @Override
     protected void onStop() {
         Log.d(TAG, "onStop()");
         super.onStop();
+        unregisterReceiver(lobbyBroadcastReceiver);
     }
+
 
     @Override
     protected void onDestroy() {
         Log.d(TAG, "onDestroy()");
         quit();
+        stopService(androidUIService);
         super.onDestroy();
     }
+
 
     @Override
     public void onBackPressed() {
@@ -112,12 +129,14 @@ public class Lobby extends AppCompatActivity
         }
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.lobby, menu);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -134,6 +153,7 @@ public class Lobby extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -141,7 +161,14 @@ public class Lobby extends AppCompatActivity
 
         Intent messageIntent = new Intent(Lobby.this, MessageActivity.class);
         messageIntent.putExtra(Constants.chatROWID, Long.valueOf(item.getTitle().hashCode()));
-        messageIntent.putExtra(Constants.chatHandlesString, item.getTitle());
+        if (item.getTitle().equals(R.string.public_message_group_name)) {
+            messageIntent.putExtra(Constants.chatHandlesString, item.getTitle());
+        } else if (item.getTitle().equals(R.string.make_new_message)) {
+            messageIntent.putExtra(Constants.chatHandlesString, item.getTitle());
+        } else {
+            messageIntent.putExtra(Constants.chatHandlesString, item.getTitle());
+        }
+
         startActivity(messageIntent);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -149,70 +176,29 @@ public class Lobby extends AppCompatActivity
         return true;
     }
 
-    public void quit() {
-        new AsyncTask<Void, Void, Void>() {
-            protected Void doInBackground(Void... voids){
-                client.quit();
-                return null;
-            }
-        }.execute();
-    }
 
-    public void joinTable(View tableView) {//askTableStatus should be method name, but onclick isn't working
-        TextView tv = (TextView) tableView.findViewById(R.id.table_number);
-        final String tableId = tv.getText().toString();
-        System.out.println("tableId=" + tableId);
-        new AsyncTask<String, Void, Void>() {
-            protected Void doInBackground(String... tables){
-                client.askTableStatus(tableId);
-                return null;
-            }
-        }.execute();
-    }
-
-
+    
     /**
      * CROWNING KINGS METHODS
      */
     private void joinTable(final String tableId) {
-        new AsyncTask<Void, Void, Void>() {
-            protected Void doInBackground(Void... voids){
-                client.joinTable(tableId);
-                return null;
-            }
-        }.execute();
+        sendBroadcast(new Intent(Constants.JOIN_TABLE_INTNENT)
+                .putExtra(Constants.TABLE_ID_EXTRA, tableId));
     }
 
-    //@Override
+
     private void makeTable() {
-        new AsyncTask<Void, Void, Void>() {
-            protected Void doInBackground(Void... voids){
-                client.makeTable();
-                return null;
-            }
-        }.execute();
+        sendBroadcast(new Intent(Constants.MAKE_TABLE_INTNENT));
     }
+
 
     public void observeTable(final String tableId) {
-        new AsyncTask<Void, Void, Void>() {
-            protected Void doInBackground(Void... voids){
-                client.observeTable(tableId);
-                return null;
-            }
-        }.execute();
+        sendBroadcast(new Intent(Constants.OBSERVE_TABLE_INTENT)
+                .putExtra(Constants.TABLE_ID_EXTRA, tableId));
     }
 
 
-
-
-    @Override
-    public void tableList(final String[] tableID) {
-        System.out.println("UI updateTableList(String[])");
-        System.out.println("tables.length=" + tableID.length);
-        for (String table : tableID){
-            System.out.println(table);
-        }
-
+    public void addNewTables(final String[] tableID) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -225,17 +211,7 @@ public class Lobby extends AppCompatActivity
         });
     }
 
-    @Override
-    public void nowLeftLobby(final String user) {
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                //not when leaving lobby... navPrivateMessagesMenu.removeItem(user.hashCode());
-            }
-        });
-    }
 
-    @Override
     public void nowInLobby(final String user) {
         this.runOnUiThread(new Runnable() {
             @Override
@@ -247,19 +223,13 @@ public class Lobby extends AppCompatActivity
         });
     }
 
-    @Override
-    public void inLobby() {
 
-    }
-
-    @Override
-    public void whoOnTable(final String userOne, final String userTwo, final String tableID, String userOneColor, String userTwoColor) {
+    public void whoOnTable(final String userOne, final String userTwo, final String tableID) {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "whoOnTable(...) run()");
-                AlertDialog.Builder builder = null;
-                if (userOne.equals("-1") || userTwo.equals("-1")){
+                AlertDialog.Builder builder;
+                if (userOne.equals("-1") || userTwo.equals("-1")) {
                     builder = new AlertDialog.Builder(Lobby.this)
                             .setTitle(String.format(getResources().getString(R.string.status_dialog_title), tableID))
                             .setMessage(String.format(getResources().getString(R.string.status_dialog_message), userOne, userTwo))
@@ -275,7 +245,7 @@ public class Lobby extends AppCompatActivity
                             })
                             .setNeutralButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    // continue with delete
+                                    // cancel
                                 }
                             });
                 } else {
@@ -284,179 +254,92 @@ public class Lobby extends AppCompatActivity
                             .setMessage(String.format(getResources().getString(R.string.status_dialog_message), userOne, userTwo))
                             .setNegativeButton(R.string.status_dialog_observe_button, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    // do nothing
+                                    observeTable(tableID);
                                 }
                             })
                             .setNeutralButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    // continue with delete
+                                    // cancel
                                 }
                             });
                 }
-
                 AlertDialog dialog = builder.create();
                 dialog.show();
             }
         });
     }
 
-    @Override
-    public void opponentLeftTable() {
 
-    }
-
-    @Override
-    public void yourTurn() {
-
-    }
-
-    @Override
-    public void tableLeft(String tableID) {
-
-    }
-
-    @Override
-    public void nowObserving(String tableID) {
-
-    }
-
-    @Override
-    public void stoppedObserving(String tableID) {
-
-    }
-
-    @Override
     public void sendUsernameRequest() {
-        Log.d(TAG, "setUsername");
-        username = "AndroidBob";
-        new AsyncTask<Void, Void, Void>() {
-            protected Void doInBackground(Void... voids){
-                client.setUsername(username);
-                return null;
-            }
-        }.execute();
-    }
-
-    @Override
-    public void connectionOK() {
-
-    }
-
-    @Override
-    public void message(String message, String from, boolean privateMessage) {
-        postNotification(from, message, from.hashCode());
-        if (privateMessage) {
-            ///private message stuff
-
-        }
-        else {
-            //public message stuff
-        }
-    }
-
-    private void postNotification(String handleID, String message, long cROWID) {
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle(handleID)
-                        .setContentText(message)
-                        .setTicker("New message from " + handleID + " - \n" + message)
-                        .setPriority(Notification.PRIORITY_HIGH)
-                        .setDefaults(Notification.DEFAULT_VIBRATE);
-
-        // Creates an explicit intent for an Activity in your app
-        Intent resultIntent = new Intent(this, MessageActivity.class);
-        resultIntent.putExtra(Constants.chatROWID, cROWID);
-        resultIntent.putExtra(Constants.chatHandlesString, handleID);
-
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(MessageActivity.class);
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-        mBuilder.setContentIntent(resultPendingIntent);
-        mBuilder.setAutoCancel(true);   // this removes notification on tap
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-// mId allows you to update the notification later on.
-        Notification notification = mBuilder.build();
-        mNotificationManager.notify(0, notification);
+        AlertDialog.Builder builder;
+            builder = new AlertDialog.Builder(Lobby.this)
+                    .setTitle(getResources().getString(R.string.username_request_dialog_title))
+                    .setMessage(getResources().getString(R.string.username_request_dialog_message))
+                    .setCancelable(false)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            username = "AndroidBob";
+                            sendUsernameReply(username);
+                        }
+                    });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 
-
-
-
-    @Override
-    public void newtable(final String tableID) {
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                tablesListArrayAdapter.addTable(tableID);
-            }
-        });
-
+    public void sendUsernameReply (final String username) {
+        sendBroadcast(new Intent(Constants.SEND_USERNAME_REPLY_INTENT).putExtra(Constants.USERNAME_EXTRA, username));
     }
 
-    @Override
-    public void gameStart() {
 
-    }
-
-    @Override
-    public void colorBlack() {
-
-    }
-
-    @Override
-    public void colorRed() {
-
-    }
-
-    @Override
-    public void opponentMove(String[] from, String[] to) {
-
-    }
-
-    @Override
-    public void boardState(String[][] boardState) {
-
-    }
-
-    @Override
-    public void gameWon() {
-
-    }
-
-    @Override
-    public void gameLose() {
-
-    }
-
-    @Override
-    public void tableJoined(String tableID) {
-        Intent tableIntent = new Intent(Lobby.this, TableActivity.class);
-        tableIntent.putExtra(Constants.JOIN_AS, Constants.PLAYER);
-        tableIntent.putExtra(Constants.TABLE_ID, tableID);
-        startActivity(tableIntent);
-    }
-
-    @Override
     public void whoInLobby(String[] users) {
         for (String user : users) {
             nowInLobby(user);
         }
     }
 
-    @Override
-    public void outLobby() {}
+
+    public void quit() {
+        sendBroadcast(new Intent(Constants.QUIT_INTENT));
+    }
+
+
+    public void joinTable(View tableView) {//askTableStatus should be method name, but onclick isn't working
+        TextView tv = (TextView) tableView.findViewById(R.id.table_number);
+        final String tableId = tv.getText().toString();
+        sendBroadcast(new Intent(Constants.ASK_TABLE_STATUS_INTENT)
+                .putExtra(Constants.TABLE_ID_EXTRA, tableId));
+    }
+
+
+
+    private class LobbyBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch(intent.getAction()) {
+                case Constants.USERNAME_REQUEST_INTENT :
+                    Log.d(TAG, "USERNAME_REQUEST_INTENT");
+                    sendUsernameRequest();
+                    break;
+                case Constants.TABLE_LIST_INTENT :
+                case Constants.NEW_TABLE_INTENT :
+                    addNewTables(intent.getStringArrayExtra(Constants.TABLE_ID_ARRAY_EXTRA));
+                    break;
+                case Constants.WHO_IN_LOBBY_INTENT :
+                    Log.d(TAG, "WHO_IN_LOBBY_INTENT");
+                    whoInLobby(intent.getStringArrayExtra(Constants.USERS_ARRAY_EXTRA));
+                    break;
+                case Constants.WHO_ON_TABLE :
+                    Log.d(TAG, "WHO_ON_TABLE");
+                    String userOne = intent.getStringExtra(Constants.USER_ONE_EXTRA);
+                    String userTwo = intent.getStringExtra(Constants.USER_TWO_EXTRA);
+                    String tableId = intent.getStringExtra(Constants.TABLE_ID_EXTRA);
+                    whoOnTable(userOne, userTwo, tableId);
+                    break;
+                case Constants.NOW_IN_LOBBY_INTENT :
+                    nowInLobby(intent.getStringExtra(Constants.USERNAME_EXTRA));
+                    break;
+            }
+        }
+    }
 }
