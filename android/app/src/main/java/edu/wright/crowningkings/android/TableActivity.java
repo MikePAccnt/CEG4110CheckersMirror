@@ -1,30 +1,87 @@
 package edu.wright.crowningkings.android;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 
 /**
  * Created by csmith on 11/22/16.
  */
 
-public class TableActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class TableActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private final String TAG = "TableActivity";
+    BroadcastReceiver tableActivityBroadcastReceiver;
+    IntentFilter tableActivityIntentFilter;
+    private Menu navPrivateMessagesMenu;
+    private String tableId;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate(Bundle)");
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_table);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.getMenu().add(getResources().getString(R.string.make_new_message));
+        navigationView.getMenu().add(getResources().getString(R.string.public_message_group_name));
+        navPrivateMessagesMenu = navigationView.getMenu().addSubMenu(getResources().getString(R.string.private_messages_menu_name));
+
+        this.tableId = getIntent().getStringExtra(Constants.TABLE_ID_EXTRA);
+
+        tableActivityBroadcastReceiver = new TableActivityBroadcastReceiver();
+        tableActivityIntentFilter = new IntentFilter();
+        tableActivityIntentFilter.addAction(Constants.GAME_START_INTENT);
+        tableActivityIntentFilter.addAction(Constants.NEW_TABLE_INTENT);
+        tableActivityIntentFilter.addAction(Constants.COLOR_BLACK_INTENT);
+        tableActivityIntentFilter.addAction(Constants.COLOR_RED_INTENT);
+        tableActivityIntentFilter.addAction(Constants.OPPONENT_MOVE_INTENT);
+        tableActivityIntentFilter.addAction(Constants.BOARD_STATE_INTENT);
+        tableActivityIntentFilter.addAction(Constants.GAME_WIN_INTENT);
+        tableActivityIntentFilter.addAction(Constants.GAME_LOSE_INTENT);
+        tableActivityIntentFilter.addAction(Constants.WHO_ON_TABLE);
+        tableActivityIntentFilter.addAction(Constants.OPPONENT_LEFT_TABLE_INTENT);
+        tableActivityIntentFilter.addAction(Constants.YOUR_TURN_INTENT);
+        tableActivityIntentFilter.addAction(Constants.TABLE_LEFT_INTENT);
+        tableActivityIntentFilter.addAction(Constants.NOW_OBSERVING_INTENT);
+        tableActivityIntentFilter.addAction(Constants.STOPPED_OBSERVING_INTENT);
+    }
+
+
+    @Override
+    public void onResume() {
+        Log.d(TAG, "onResume()");
+        super.onResume();
+        registerReceiver(tableActivityBroadcastReceiver, tableActivityIntentFilter);
+    }
+
+    @Override
+    public void onPause() {
+        Log.d(TAG, "onPause()");
+        super.onPause();
+        unregisterReceiver(tableActivityBroadcastReceiver);
     }
 
     @Override
@@ -51,5 +108,82 @@ public class TableActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+
+    public void whoOnTable(final String userOne, final String userTwo, final String tableID) {
+        if (tableID.equals(this.tableId)) {
+            this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (!userOne.equals("-1") && !userTwo.equals("-1")) {
+                        AlertDialog.Builder builder;
+                        builder = new AlertDialog.Builder(TableActivity.this)
+                                .setTitle(String.format(getResources().getString(R.string.status_dialog_title), tableID))
+                                .setMessage(String.format(getResources().getString(R.string.status_dialog_message), userOne, userTwo) + "\n" +
+                                        getResources().getString(R.string.table_dialog_ready_message))
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Log.d(TAG, "I'M READY!");
+                                    }
+                                });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    }
+                }
+            });
+        }
+    }
+
+
+    private class TableActivityBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case Constants.GAME_START_INTENT:
+                    Log.d(TAG, "GAME_START_INTENT");
+                    break;
+                case Constants.COLOR_BLACK_INTENT:
+                    Log.d(TAG, "COLOR_BLACK_INTENT");
+                    break;
+                case Constants.COLOR_RED_INTENT:
+                    Log.d(TAG, "COLOR_RED_INTENT");
+                    break;
+                case Constants.OPPONENT_MOVE_INTENT:
+                    Log.d(TAG, "OPPONENT_MOVE_INTENT");
+                    break;
+                case Constants.BOARD_STATE_INTENT:
+                    Log.d(TAG, "BOARD_STATE_INTENT");
+                    break;
+                case Constants.GAME_WIN_INTENT:
+                    Log.d(TAG, "GAME_WIN_INTENT");
+                    break;
+                case Constants.GAME_LOSE_INTENT:
+                    Log.d(TAG, "GAME_LOSE_INTENT");
+                    break;
+                case Constants.WHO_ON_TABLE:
+                    Log.d(TAG, "WHO_ON_TABLE");
+                    String userOne = intent.getStringExtra(Constants.USER_ONE_EXTRA);
+                    String userTwo = intent.getStringExtra(Constants.USER_TWO_EXTRA);
+                    String tableId = intent.getStringExtra(Constants.TABLE_ID_EXTRA);
+                    whoOnTable(userOne, userTwo, tableId);
+                    break;
+                case Constants.OPPONENT_LEFT_TABLE_INTENT:
+                    Log.d(TAG, "OPPONENT_LEFT_TABLE_INTENT");
+                    break;
+                case Constants.YOUR_TURN_INTENT:
+                    Log.d(TAG, "YOUR_TURN_INTENT");
+                    break;
+                case Constants.TABLE_LEFT_INTENT:
+                    Log.d(TAG, "TABLE_LEFT_INTENT");
+                    break;
+                case Constants.NOW_OBSERVING_INTENT:
+                    Log.d(TAG, "NOW_OBSERVING_INTENT");
+                    break;
+                case Constants.STOPPED_OBSERVING_INTENT:
+                    Log.d(TAG, "STOPPED_OBSERVING_INTENT");
+                    break;
+            }
+        }
     }
 }

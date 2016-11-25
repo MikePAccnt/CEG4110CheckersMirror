@@ -19,11 +19,22 @@
     <string name="username_request_dialog_title">Enter Username</string>
     <string name="username_request_dialog_message">Enter Username message</string>
 
+    <string name="table_dialog_ready_message">Are you ready to play?</string>
+
 
     <string name="public_message_group_name">Public Group Message</string>
     <string name="make_new_message">New Message</string>
     <string name="private_messages_menu_name">Private Messages</string>
 
+    <string name="default_text_board">     0 1 2 3 4 5 6 7\n
+                                        0 |_|B|_|B|_|B|_|B|\n
+                                        1 |B|_|B|_|B|_|B|_|\n
+                                        2 |_|B|_|B|_|B|_|B|\n
+                                        3 |_|_|_|_|_|_|_|_|\n
+                                        4 |_|_|_|_|_|_|_|_|\n
+                                        5 |R|_|R|_|R|_|R|_|\n
+                                        6 |_|R|_|R|_|R|_|R|\n
+                                        7 |R|_|R|_|R|_|R|_|</string>
 
 
     <string name="insert_number"><![CDATA[<Insert Number>]]></string>

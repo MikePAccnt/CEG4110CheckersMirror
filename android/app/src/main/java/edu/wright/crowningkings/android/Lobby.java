@@ -1,23 +1,15 @@
 package edu.wright.crowningkings.android;
 
-import android.app.Application;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.view.SubMenu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -91,6 +83,7 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
         lobbyIntentFilter.addAction(Constants.WHO_ON_TABLE);
         lobbyIntentFilter.addAction(Constants.TABLE_LIST_INTENT);
         lobbyIntentFilter.addAction(Constants.NOW_IN_LOBBY_INTENT);
+        lobbyIntentFilter.addAction(Constants.TABLE_JOINED_INTENT);
     }
 
 
@@ -103,10 +96,16 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
 
 
     @Override
+    protected void onPause() {
+        Log.d(TAG, "onPause()");
+        super.onPause();
+        unregisterReceiver(lobbyBroadcastReceiver);
+    }
+
+    @Override
     protected void onStop() {
         Log.d(TAG, "onStop()");
         super.onStop();
-        unregisterReceiver(lobbyBroadcastReceiver);
     }
 
 
@@ -177,7 +176,6 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
     }
 
 
-    
     /**
      * CROWNING KINGS METHODS
      */
@@ -272,22 +270,22 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
 
     public void sendUsernameRequest() {
         AlertDialog.Builder builder;
-            builder = new AlertDialog.Builder(Lobby.this)
-                    .setTitle(getResources().getString(R.string.username_request_dialog_title))
-                    .setMessage(getResources().getString(R.string.username_request_dialog_message))
-                    .setCancelable(false)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            username = "AndroidBob";
-                            sendUsernameReply(username);
-                        }
-                    });
+        builder = new AlertDialog.Builder(Lobby.this)
+                .setTitle(getResources().getString(R.string.username_request_dialog_title))
+                .setMessage(getResources().getString(R.string.username_request_dialog_message))
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        username = "AndroidBob";
+                        sendUsernameReply(username);
+                    }
+                });
         AlertDialog dialog = builder.create();
         dialog.show();
     }
 
 
-    public void sendUsernameReply (final String username) {
+    public void sendUsernameReply(final String username) {
         sendBroadcast(new Intent(Constants.SEND_USERNAME_REPLY_INTENT).putExtra(Constants.USERNAME_EXTRA, username));
     }
 
@@ -312,32 +310,42 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
     }
 
 
+    private void tableJoined(String tableId) {
+        Intent tableIntent = new Intent(this, TableActivity.class);
+        tableIntent.putExtra(Constants.JOIN_AS, Constants.PLAYER);
+        tableIntent.putExtra(Constants.TABLE_ID_EXTRA, tableId);
+        startActivity(tableIntent);
+    }
+
 
     private class LobbyBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            switch(intent.getAction()) {
-                case Constants.USERNAME_REQUEST_INTENT :
+            switch (intent.getAction()) {
+                case Constants.USERNAME_REQUEST_INTENT:
                     Log.d(TAG, "USERNAME_REQUEST_INTENT");
                     sendUsernameRequest();
                     break;
-                case Constants.TABLE_LIST_INTENT :
-                case Constants.NEW_TABLE_INTENT :
+                case Constants.TABLE_LIST_INTENT:
+                case Constants.NEW_TABLE_INTENT:
                     addNewTables(intent.getStringArrayExtra(Constants.TABLE_ID_ARRAY_EXTRA));
                     break;
-                case Constants.WHO_IN_LOBBY_INTENT :
+                case Constants.WHO_IN_LOBBY_INTENT:
                     Log.d(TAG, "WHO_IN_LOBBY_INTENT");
                     whoInLobby(intent.getStringArrayExtra(Constants.USERS_ARRAY_EXTRA));
                     break;
-                case Constants.WHO_ON_TABLE :
+                case Constants.WHO_ON_TABLE:
                     Log.d(TAG, "WHO_ON_TABLE");
                     String userOne = intent.getStringExtra(Constants.USER_ONE_EXTRA);
                     String userTwo = intent.getStringExtra(Constants.USER_TWO_EXTRA);
                     String tableId = intent.getStringExtra(Constants.TABLE_ID_EXTRA);
                     whoOnTable(userOne, userTwo, tableId);
                     break;
-                case Constants.NOW_IN_LOBBY_INTENT :
+                case Constants.NOW_IN_LOBBY_INTENT:
                     nowInLobby(intent.getStringExtra(Constants.USERNAME_EXTRA));
+                    break;
+                case Constants.TABLE_JOINED_INTENT:
+                    tableJoined(intent.getStringExtra(Constants.TABLE_ID_EXTRA));
                     break;
             }
         }

@@ -8,7 +8,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.icu.text.SimpleDateFormat;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -33,8 +32,8 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
     private BroadcastReceiver androidUIBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, final Intent intent) {
-            switch(intent.getAction()) {
-                case Constants.SEND_USERNAME_REPLY_INTENT :
+            switch (intent.getAction()) {
+                case Constants.SEND_USERNAME_REPLY_INTENT:
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -43,7 +42,7 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
                         }
                     }).start();
                     break;
-                case Constants.MESSAGE_ALL_INTENT :
+                case Constants.MESSAGE_ALL_INTENT:
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -51,7 +50,7 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
                         }
                     }).start();
                     break;
-                case Constants.MESSAGE_CLIENT_INTENT :
+                case Constants.MESSAGE_CLIENT_INTENT:
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -61,7 +60,7 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
                         }
                     }).start();
                     break;
-                case Constants.MAKE_TABLE_INTNENT :
+                case Constants.MAKE_TABLE_INTNENT:
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -69,7 +68,7 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
                         }
                     }).start();
                     break;
-                case Constants.JOIN_TABLE_INTNENT :
+                case Constants.JOIN_TABLE_INTNENT:
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -77,7 +76,7 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
                         }
                     }).start();
                     break;
-                case Constants.READY_INTENT :
+                case Constants.READY_INTENT:
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -85,7 +84,7 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
                         }
                     }).start();
                     break;
-                case Constants.MOVE_INTENT :
+                case Constants.MOVE_INTENT:
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -97,7 +96,7 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
                         }
                     }).start();
                     break;
-                case Constants.LEAVE_TABLE_INTNENT :
+                case Constants.LEAVE_TABLE_INTNENT:
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -105,7 +104,7 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
                         }
                     }).start();
                     break;
-                case Constants.QUIT_INTENT :
+                case Constants.QUIT_INTENT:
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -113,7 +112,7 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
                         }
                     }).start();
                     break;
-                case Constants.ASK_TABLE_STATUS_INTENT :
+                case Constants.ASK_TABLE_STATUS_INTENT:
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -121,7 +120,7 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
                         }
                     }).start();
                     break;
-                case Constants.OBSERVE_TABLE_INTENT :
+                case Constants.OBSERVE_TABLE_INTENT:
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -141,7 +140,7 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
         super.onCreate();
 
         new AsyncTask<AbstractUserInterface, Void, Void>() {
-            protected Void doInBackground(AbstractUserInterface... voids){
+            protected Void doInBackground(AbstractUserInterface... voids) {
                 client = new BaseClient(voids[0]);
                 return null;
             }
@@ -189,7 +188,7 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
     @Override
     public void newtable(String tableID) {
         sendBroadcast(new Intent(Constants.NEW_TABLE_INTENT)
-                .putExtra(Constants.TABLE_ID_ARRAY_EXTRA, new String[]{ tableID }));
+                .putExtra(Constants.TABLE_ID_ARRAY_EXTRA, new String[]{tableID}));
     }
 
     @Override
@@ -232,13 +231,8 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
 
     @Override
     public void tableJoined(String tableID) {
-//        sendBroadcast(new Intent(Constants.TABLE_JOINED_INTENT)
-//                .putExtra(Constants.TABLE_ID_EXTRA, tableID));
-
-        Intent tableIntent = new Intent(this, TableActivity.class);
-        tableIntent.putExtra(Constants.JOIN_AS, Constants.PLAYER);
-        tableIntent.putExtra(Constants.TABLE_ID_EXTRA, tableID);
-        startActivity(tableIntent);
+        sendBroadcast(new Intent(Constants.TABLE_JOINED_INTENT)
+                .putExtra(Constants.TABLE_ID_EXTRA, tableID));
     }
 
     @Override
@@ -312,7 +306,6 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
     public IBinder onBind(Intent intent) {
         return null;
     }
-
 
 
     private void postNotification(String fromUsername, String message, long cROWID, boolean privateMessage) {
