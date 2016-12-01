@@ -1,6 +1,9 @@
 package edu.wright.crowningkings.android;
 
 import android.annotation.TargetApi;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -10,6 +13,8 @@ import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -32,13 +37,12 @@ import java.util.ArrayList;
 /**
  * Created by csmith on 11/17/16. Based off of ericchee's PieMessage
  */
-public class MessageActivity extends AppCompatActivity /*implements ReceiveMessagesService.Callbacks*/ {
+public class MessageActivity extends AppCompatActivity {
     public static final String TAG = MessageActivity.class.getSimpleName();
     TextView tvTarget;
     EditText etTarget;
     EditText etMessage;
     ImageButton ibCheckmark;
-//    ClientSocketTask asyncTask;
     ArrayList<Socket> listOfSockets;
     ListView lvMessages;
     ArrayList<Message> arrayOfMessages;
@@ -46,8 +50,8 @@ public class MessageActivity extends AppCompatActivity /*implements ReceiveMessa
     Button btnSend;
     MessageActivityBroadcastReceiver messageActivityBroadcastReceiver;
     private boolean boundReceiveService = false;
-    private long chatROWID = -1;
     String targetString;
+    String targetUsername;
     boolean isNewChat = true;
 
     @Override
@@ -60,14 +64,12 @@ public class MessageActivity extends AppCompatActivity /*implements ReceiveMessa
 
         Log.i(TAG, "Creating activity");
 
-        if (getIntent() != null) {
-            chatROWID = getIntent().getLongExtra(Constants.chatROWID, -1);
-            if (chatROWID != -1 && !getIntent().getStringExtra(Constants.chatHandlesString).equals(getResources().getString(R.string.make_new_message))) {
-                isNewChat = false;
-            }
+//        targetUsername = getIntent().getStringExtra(Constants.chatHandlesString);
+        targetUsername = getIntent().getStringExtra(Constants.USERNAME_EXTRA);
+
+        if (getIntent() != null && !targetUsername.equals(getResources().getString(R.string.make_new_message))) {
+            isNewChat = false;
         }
-        Log.d(TAG, "chatROWID=" + getIntent().getLongExtra(Constants.chatROWID, -1));
-        Log.d(TAG, "chatHandlesString=" + getIntent().getStringExtra(Constants.chatHandlesString));
 
         tvTarget = (TextView) findViewById(R.id.tvTarget);
         etTarget = (EditText) findViewById(R.id.etTarget);
@@ -87,9 +89,6 @@ public class MessageActivity extends AppCompatActivity /*implements ReceiveMessa
 
         setSendOnClickListener();
         setBackButtonListener();
-
-        // bind ReceiveMessages
-//        bindToReceiveService();
     }
 
     private void setSendOnClickListener() {
@@ -122,7 +121,6 @@ public class MessageActivity extends AppCompatActivity /*implements ReceiveMessa
                         Log.i(TAG, "Message text has no length");
                     }
                 } else {
-                    // Hasn't set target value
                     Log.d(TAG, "Has not set target value");
                 }
             }
@@ -170,11 +168,6 @@ public class MessageActivity extends AppCompatActivity /*implements ReceiveMessa
             long date = messageStatusJSON.getLong("date");
             sentMessage.setDate(date);
             adapter.notifyDataSetChanged();
-
-            if (chatROWID == -1) {
-                chatROWID = messageStatusJSON.getLong("cROWID");
-                Log.i(TAG, "Setting chatROWID = " + chatROWID);
-            }
         } else {
             Log.e(TAG, "Could not find sent message that matched sent response JSON");
         }
@@ -183,7 +176,8 @@ public class MessageActivity extends AppCompatActivity /*implements ReceiveMessa
     private void setTvTargetListener() {
         if (!isNewChat) {
             // If previous chat, Set the Handle ID
-            targetString = getIntent().getStringExtra(Constants.chatHandlesString);
+//            targetString = getIntent().getStringExtra(Constants.chatHandlesString);
+            targetString = getIntent().getStringExtra(Constants.USERNAME_EXTRA);
             tvTarget.setText(targetString);
             etTarget.setText(targetString);
 
@@ -287,23 +281,24 @@ public class MessageActivity extends AppCompatActivity /*implements ReceiveMessa
 
     @Override
     protected void onDestroy() {
-        Log.i(TAG, "onDestroy");
-//        unbindToReceiveService();
+        Log.i(TAG, "onDestroy()");
         super.onDestroy();
     }
 
     @Override
     protected void onResume() {
+        Log.d(TAG, "onResume()");
+        super.onResume();
         messageActivityBroadcastReceiver = new MessageActivityBroadcastReceiver();
         registerReceiver(messageActivityBroadcastReceiver, new IntentFilter(Constants.NEW_MESSAGE_INTENT));
-        super.onResume();
+
     }
 
     @Override
     protected void onPause() {
-        Log.i(TAG, "onPause");
-        unregisterReceiver(messageActivityBroadcastReceiver);
+        Log.i(TAG, "onPause()");
         super.onPause();
+        unregisterReceiver(messageActivityBroadcastReceiver);
     }
 
     @Override
@@ -343,19 +338,25 @@ public class MessageActivity extends AppCompatActivity /*implements ReceiveMessa
         }
     };
 
-//    @Override
-    public void onReceivedMessages(final String username, final String message, final boolean isPrivate, final long date) {//final String receiveMessagesJsonString) {
+
+    public void onReceivedMessages(final String username, final String message, final boolean isPrivate, final long date) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                long curChatROWID = username.hashCode();
-                if ((curChatROWID == MessageActivity.this.chatROWID && isPrivate)
-                        || (getResources().getString(R.string.public_message_group_name).hashCode() == MessageActivity.this.chatROWID && !isPrivate)) {
+                if ((targetUsername.equals(username) && isPrivate) || (targetUsername.equals(getResources().getString(R.string.public_message_group_name)) && !isPrivate)) {
+                    //incoming message belongs to this activity
                     addReceivedMessageToListView(message, username, date);
+                } else {
+                    postNotification(username, message, isPrivate);
+                    Log.d(TAG, "Something went weird with onReceivedMessages");
+                    Log.d(TAG, "username=" + username);
+                    Log.d(TAG, "targetUsername=" + targetUsername);
+                    Log.d(TAG, "isPrivate=" + isPrivate);
                 }
             }
         });
     }
+
 
     private void setBackButtonListener() {
         ImageButton ibMABackArrow = (ImageButton) findViewById(R.id.ibMABackArrow);
@@ -367,6 +368,7 @@ public class MessageActivity extends AppCompatActivity /*implements ReceiveMessa
             }
         });
     }
+
 
     private void showBackButton() {
         TextView tvTo = (TextView) findViewById(R.id.tvTo);
@@ -401,6 +403,52 @@ public class MessageActivity extends AppCompatActivity /*implements ReceiveMessa
             Log.i(TAG, key + " - " + value);
         }
     }
+
+
+    private void postNotification(String fromUsername, String message, boolean privateMessage) {
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle(fromUsername)
+                        .setContentText(message)
+                        .setTicker("New message from " + fromUsername + " - \n" + message)
+                        .setPriority(Notification.PRIORITY_HIGH)
+                        .setDefaults(Notification.DEFAULT_VIBRATE);
+
+        // Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(MessageActivity.this, MessageActivity.class);
+        if (privateMessage) {
+//            resultIntent.putExtra(Constants.chatHandlesString, fromUsername);
+            resultIntent.putExtra(Constants.USERNAME_EXTRA, fromUsername);
+        } else {
+//            resultIntent.putExtra(Constants.chatHandlesString, getResources().getString(R.string.public_message_group_name));
+            resultIntent.putExtra(Constants.USERNAME_EXTRA, getResources().getString(R.string.public_message_group_name));
+        }
+
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(MessageActivity.class);
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        mBuilder.setAutoCancel(true);   // this removes notification on tap
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        // mId allows you to update the notification later on.
+        Notification notification = mBuilder.build();
+        mNotificationManager.notify(0, notification);
+    }
+
+
 
     private class MessageActivityBroadcastReceiver extends BroadcastReceiver {
         @Override

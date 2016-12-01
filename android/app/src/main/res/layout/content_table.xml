@@ -13,10 +13,23 @@
     tools:context="edu.wright.crowningkings.android.TableActivity"
     tools:showIn="@layout/app_bar_table">
 
-    <TextView
-        android:text="@string/default_text_board"
+    <!--<TextView-->
+        <!--android:text="@string/default_text_board"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/textView"-->
+        <!--android:gravity="center_horizontal" />-->
+
+    <edu.wright.crowningkings.android.BoardView
+        android:id="@+id/board_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView"
-        android:gravity="center_horizontal" />
+        android:layout_height="match_parent" />
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/table_frame_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="edu.wright.crowningkings.android.TableActivity"
+        tools:ignore="MergeRootFrame" />
 </RelativeLayout>

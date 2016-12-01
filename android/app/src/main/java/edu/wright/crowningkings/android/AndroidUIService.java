@@ -162,6 +162,13 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
 
 
     @Override
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy()");
+        super.onDestroy();
+        unregisterReceiver(androidUIBroadcastReceiver);
+    }
+
+    @Override
     public void sendUsernameRequest() {
         Log.d(TAG, "sendUsernameRequest()");
         sendBroadcast(new Intent(Constants.USERNAME_REQUEST_INTENT));
@@ -180,8 +187,6 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
                     .putExtra(Constants.USERNAME_EXTRA, from)
                     .putExtra(Constants.PRIVATE_MESSAGE_EXTRA, privateMessage)
                     .putExtra(Constants.DATE_EXTRA, (new Date()).getTime()));
-
-            postNotification(from, message, from.hashCode(), privateMessage);
         }
     }
 
@@ -308,46 +313,6 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
     }
 
 
-    private void postNotification(String fromUsername, String message, long cROWID, boolean privateMessage) {
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle(fromUsername)
-                        .setContentText(message)
-                        .setTicker("New message from " + fromUsername + " - \n" + message)
-                        .setPriority(Notification.PRIORITY_HIGH)
-                        .setDefaults(Notification.DEFAULT_VIBRATE);
-
-        // Creates an explicit intent for an Activity in your app
-        Intent resultIntent = new Intent(this, MessageActivity.class);
-        if (privateMessage) {
-            resultIntent.putExtra(Constants.chatHandlesString, fromUsername);
-        } else {
-            resultIntent.putExtra(Constants.chatHandlesString, R.string.public_message_group_name);
-        }
-
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(MessageActivity.class);
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-        mBuilder.setContentIntent(resultPendingIntent);
-        mBuilder.setAutoCancel(true);   // this removes notification on tap
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        // mId allows you to update the notification later on.
-        Notification notification = mBuilder.build();
-        mNotificationManager.notify(0, notification);
-    }
 
 
 }

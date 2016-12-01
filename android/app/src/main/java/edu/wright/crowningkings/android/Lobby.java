@@ -1,5 +1,8 @@
 package edu.wright.crowningkings.android;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,6 +11,8 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
@@ -78,12 +83,14 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
         startService(androidUIService);
 
         lobbyIntentFilter.addAction(Constants.USERNAME_REQUEST_INTENT);
+        lobbyIntentFilter.addAction(Constants.SEND_USERNAME_REPLY_INTENT);
         lobbyIntentFilter.addAction(Constants.NEW_TABLE_INTENT);
         lobbyIntentFilter.addAction(Constants.WHO_IN_LOBBY_INTENT);
         lobbyIntentFilter.addAction(Constants.WHO_ON_TABLE);
         lobbyIntentFilter.addAction(Constants.TABLE_LIST_INTENT);
         lobbyIntentFilter.addAction(Constants.NOW_IN_LOBBY_INTENT);
         lobbyIntentFilter.addAction(Constants.TABLE_JOINED_INTENT);
+        lobbyIntentFilter.addAction(Constants.NEW_MESSAGE_INTENT);
     }
 
 
@@ -159,14 +166,8 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
         System.out.println("nav item " + item.getTitle() + " was pressed ");
 
         Intent messageIntent = new Intent(Lobby.this, MessageActivity.class);
-        messageIntent.putExtra(Constants.chatROWID, Long.valueOf(item.getTitle().hashCode()));
-        if (item.getTitle().equals(R.string.public_message_group_name)) {
-            messageIntent.putExtra(Constants.chatHandlesString, item.getTitle());
-        } else if (item.getTitle().equals(R.string.make_new_message)) {
-            messageIntent.putExtra(Constants.chatHandlesString, item.getTitle());
-        } else {
-            messageIntent.putExtra(Constants.chatHandlesString, item.getTitle());
-        }
+//        messageIntent.putExtra(Constants.chatHandlesString, item.getTitle());
+        messageIntent.putExtra(Constants.USERNAME_EXTRA, item.getTitle());
 
         startActivity(messageIntent);
 
@@ -174,6 +175,18 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    private void addUserToPrivateMessagesMenu(final String user) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (navPrivateMessagesMenu.findItem(user.hashCode()) == null && !user.equals(username)) {
+                    navPrivateMessagesMenu.add(Menu.NONE, user.hashCode(), Menu.NONE, user);
+                }
+            }
+        });
+    }
+
 
 
     /**
@@ -211,14 +224,7 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
 
 
     public void nowInLobby(final String user) {
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (navPrivateMessagesMenu.findItem(user.hashCode()) == null && !user.equals(username)) {
-                    navPrivateMessagesMenu.add(Menu.NONE, user.hashCode(), Menu.NONE, user);
-                }
-            }
-        });
+//        addUserToPrivateMessagesMenu(user);
     }
 
 
@@ -276,8 +282,7 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
                 .setCancelable(false)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        username = "AndroidBob";
-                        sendUsernameReply(username);
+                        sendUsernameReply("AndroidBob");
                     }
                 });
         AlertDialog dialog = builder.create();
@@ -302,7 +307,7 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
     }
 
 
-    public void joinTable(View tableView) {//askTableStatus should be method name, but onclick isn't working
+    public void onTableClick(View tableView) {
         TextView tv = (TextView) tableView.findViewById(R.id.table_number);
         final String tableId = tv.getText().toString();
         sendBroadcast(new Intent(Constants.ASK_TABLE_STATUS_INTENT)
@@ -314,7 +319,57 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
         Intent tableIntent = new Intent(this, TableActivity.class);
         tableIntent.putExtra(Constants.JOIN_AS, Constants.PLAYER);
         tableIntent.putExtra(Constants.TABLE_ID_EXTRA, tableId);
+        tableIntent.putExtra(Constants.USERNAME_EXTRA, username);
         startActivity(tableIntent);
+
+        Log.d(TAG, "tableJoined(String)");
+    }
+
+
+    private void postNotification(String fromUsername, String message, boolean privateMessage) {
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle(fromUsername)
+                        .setContentText(message)
+                        .setTicker("New message from " + fromUsername + " - \n" + message)
+                        .setPriority(Notification.PRIORITY_HIGH)
+                        .setDefaults(Notification.DEFAULT_VIBRATE);
+
+        // Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(Lobby.this, MessageActivity.class);
+        if (privateMessage) {
+//            resultIntent.putExtra(Constants.chatHandlesString, fromUsername);
+            resultIntent.putExtra(Constants.USERNAME_EXTRA, fromUsername);
+        } else {
+//            resultIntent.putExtra(Constants.chatHandlesString, getResources().getString(R.string.public_message_group_name));
+            resultIntent.putExtra(Constants.USERNAME_EXTRA, getResources().getString(R.string.public_message_group_name));
+        }
+
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        // Adds the back stack for the Intent (but not the Intent itself)
+//        stackBuilder.addParentStack(this);
+        // Adds the Intent that starts the Activity to the top of the stack
+//        stackBuilder.addNextIntent(resultIntent);
+        stackBuilder.addNextIntentWithParentStack(resultIntent);
+//        PendingIntent resultPendingIntent =
+//                stackBuilder.getPendingIntent(
+//                        0,
+//                        PendingIntent.FLAG_UPDATE_CURRENT);
+//        mBuilder.setContentIntent(resultPendingIntent);
+        PendingIntent pendingIntent =
+                PendingIntent.getActivity(Lobby.this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.setContentIntent(pendingIntent);
+        mBuilder.setAutoCancel(true);   // this removes notification on tap
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        // mId allows you to update the notification later on.
+        Notification notification = mBuilder.build();
+        mNotificationManager.notify(0, notification);
     }
 
 
@@ -325,6 +380,10 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
                 case Constants.USERNAME_REQUEST_INTENT:
                     Log.d(TAG, "USERNAME_REQUEST_INTENT");
                     sendUsernameRequest();
+                    break;
+                case Constants.SEND_USERNAME_REPLY_INTENT:
+                    Log.d(TAG, "SEND_USERNAME_REPLY_INTENT");
+                    username = intent.getStringExtra(Constants.USERNAME_EXTRA);
                     break;
                 case Constants.TABLE_LIST_INTENT:
                 case Constants.NEW_TABLE_INTENT:
@@ -346,6 +405,16 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
                     break;
                 case Constants.TABLE_JOINED_INTENT:
                     tableJoined(intent.getStringExtra(Constants.TABLE_ID_EXTRA));
+                    break;
+                case Constants.NEW_MESSAGE_INTENT:
+                    postNotification(
+                            intent.getStringExtra(Constants.USERNAME_EXTRA),
+                            intent.getStringExtra(Constants.MESSAGE_EXTRA),
+                            intent.getBooleanExtra(Constants.PRIVATE_MESSAGE_EXTRA, true));
+
+                    if (intent.getBooleanExtra(Constants.PRIVATE_MESSAGE_EXTRA, true)) {
+                        addUserToPrivateMessagesMenu(intent.getStringExtra(Constants.USERNAME_EXTRA));
+                    }
                     break;
             }
         }

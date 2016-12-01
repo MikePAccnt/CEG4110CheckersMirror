@@ -17,6 +17,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created by csmith on 11/22/16.
  */
@@ -27,15 +30,24 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
     IntentFilter tableActivityIntentFilter;
     private Menu navPrivateMessagesMenu;
     private String tableId;
+    private String username;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate(Bundle)");
         super.onCreate(savedInstanceState);
+
+        this.tableId = getIntent().getStringExtra(Constants.TABLE_ID_EXTRA);
+        this.username = getIntent().getStringExtra(Constants.USERNAME_EXTRA);
+
         setContentView(R.layout.activity_table);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Table " + tableId);
         setSupportActionBar(toolbar);
+
+        final BoardView boardView = (BoardView) findViewById(R.id.board_view);
+        boardView.setGame(new Game(tableId, new Board(8, Board.initializePieces(8)), Team.RED));
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -49,7 +61,6 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
         navigationView.getMenu().add(getResources().getString(R.string.public_message_group_name));
         navPrivateMessagesMenu = navigationView.getMenu().addSubMenu(getResources().getString(R.string.private_messages_menu_name));
 
-        this.tableId = getIntent().getStringExtra(Constants.TABLE_ID_EXTRA);
 
         tableActivityBroadcastReceiver = new TableActivityBroadcastReceiver();
         tableActivityIntentFilter = new IntentFilter();
@@ -67,6 +78,7 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
         tableActivityIntentFilter.addAction(Constants.TABLE_LEFT_INTENT);
         tableActivityIntentFilter.addAction(Constants.NOW_OBSERVING_INTENT);
         tableActivityIntentFilter.addAction(Constants.STOPPED_OBSERVING_INTENT);
+        tableActivityIntentFilter.addAction(Constants.NEW_MESSAGE_INTENT);
     }
 
 
@@ -82,6 +94,13 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
         Log.d(TAG, "onPause()");
         super.onPause();
         unregisterReceiver(tableActivityBroadcastReceiver);
+    }
+
+    @Override
+    public void onStop() {
+        Log.d(TAG, "onStop()");
+        super.onStop();
+        sendBroadcast(new Intent(Constants.LEAVE_TABLE_INTNENT));
     }
 
     @Override
@@ -108,6 +127,17 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void addUserToPrivateMessagesMenu(final String user) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (navPrivateMessagesMenu.findItem(user.hashCode()) == null && !user.equals(username)) {
+                    navPrivateMessagesMenu.add(Menu.NONE, user.hashCode(), Menu.NONE, user);
+                }
+            }
+        });
     }
 
 
@@ -183,6 +213,13 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
                 case Constants.STOPPED_OBSERVING_INTENT:
                     Log.d(TAG, "STOPPED_OBSERVING_INTENT");
                     break;
+                case Constants.NEW_MESSAGE_INTENT:
+                    Log.d(TAG, "NEW_MESSAGE_INTENT");
+                    if (intent.getBooleanExtra(Constants.PRIVATE_MESSAGE_EXTRA, true)) {
+                        addUserToPrivateMessagesMenu(intent.getStringExtra(Constants.USERNAME_EXTRA));
+                    }
+                    break;
+
             }
         }
     }
