@@ -14,16 +14,26 @@
     tools:showIn="@layout/app_bar_table">
 
     <!--<TextView-->
-        <!--android:text="@string/default_text_board"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:id="@+id/textView"-->
-        <!--android:gravity="center_horizontal" />-->
+    <!--android:text="@string/default_text_board"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:id="@+id/textView"-->
+    <!--android:gravity="center_horizontal" />-->
 
     <edu.wright.crowningkings.android.BoardView
         android:id="@+id/board_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:visibility="invisible" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="onReadyClick"
+        android:text="@string/ready_button" />
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"

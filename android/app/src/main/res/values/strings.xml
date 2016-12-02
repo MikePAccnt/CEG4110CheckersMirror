@@ -20,6 +20,7 @@
     <string name="username_request_dialog_message">Enter Username message</string>
 
     <string name="table_dialog_ready_message">Are you ready to play?</string>
+    <string name="ready_button">Start</string>
 
 
     <string name="public_message_group_name">Public Group Message</string>

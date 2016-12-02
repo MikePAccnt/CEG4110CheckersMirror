@@ -16,9 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-
-import java.util.HashSet;
-import java.util.Set;
+import android.view.View;
 
 /**
  * Created by csmith on 11/22/16.
@@ -129,6 +127,24 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
         return true;
     }
 
+    public void onReadyClick(final View view) {
+        System.out.println("onReadyClick");
+        AlertDialog.Builder builder = new AlertDialog.Builder(TableActivity.this)
+                .setMessage(getResources().getString(R.string.table_dialog_ready_message))
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        sendBroadcast(new Intent(Constants.READY_INTENT));
+                        view.setVisibility(View.GONE);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     private void addUserToPrivateMessagesMenu(final String user) {
         this.runOnUiThread(new Runnable() {
             @Override
@@ -172,6 +188,7 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
             switch (intent.getAction()) {
                 case Constants.GAME_START_INTENT:
                     Log.d(TAG, "GAME_START_INTENT");
+                    findViewById(R.id.board_view).setVisibility(View.VISIBLE);
                     break;
                 case Constants.COLOR_BLACK_INTENT:
                     Log.d(TAG, "COLOR_BLACK_INTENT");
