@@ -9,12 +9,14 @@ import edu.wright.crowningkings.base.BaseClient;
 public class _206OpponentMove extends AbstractServerMessage {
     public _206OpponentMove(String message) {
         String[] param = message.split(" ");
-		String msgID = param[0];
-		String fromx = param[1];
-		String fromy = param[2];
-		String tox = param[3];
-		String toy = param[4];
-		String[] fullParam = {msgID, fromx, fromy, tox, toy};
+        String msgID = param[0];
+        String[] from = param[1].split(",");
+        String fromy = from[0];
+        String fromx = from[1];
+        String[] to = param[2].split(",");
+        String toy = to[0];
+        String tox = to[1];
+        String[] fullParam = {msgID, fromx, fromy, tox, toy};
         setParameters(fullParam);
     }
 
