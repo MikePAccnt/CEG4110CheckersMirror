@@ -44,10 +44,10 @@ public class ServerMessageHandler {
                 return new _207BoardState(message);
             case "208" :
                 System.out.println("\t208 : GAME_WIN - the client has won!");
-                return new _208BoardState(message);
+                return new _208GameWin(message);
             case "209" :
                 System.out.println("\t209 : GAME_LOSE - the client has lost their game.");
-                return new _209BoardState(message);
+                return new _209GameLose(message);
             case "210" :
                 System.out.println("\t210 : TBL_JOINED – the client has joined table <1>.");
                 return new _210TableJoined(message);
