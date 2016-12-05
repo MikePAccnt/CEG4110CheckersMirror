@@ -42,12 +42,12 @@ public class ServerMessageHandler {
             case "207" :
                 System.out.println("\t207 : BOARD_STATE – the current board state on table <1> is <2>. <2> is a string encoding of the board");
                 return new _207BoardState(message);
-
-
-
-
-
-
+            case "208" :
+                System.out.println("\t208 : GAME_WIN - the client has won!");
+                return new _208BoardState(message);
+            case "209" :
+                System.out.println("\t209 : GAME_LOSE - the client has lost their game.");
+                return new _209BoardState(message);
             case "210" :
                 System.out.println("\t210 : TBL_JOINED – the client has joined table <1>.");
                 return new _210TableJoined(message);
