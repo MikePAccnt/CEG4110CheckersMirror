@@ -15,7 +15,7 @@ public class _205ColorRed extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-		System.out.println("_205ColorRed.run(BaseClient)");
-		//do something
+		//System.out.println("_205ColorRed.run(BaseClient)");
+	  client.colorRed();
     }
 }

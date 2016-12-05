@@ -33,8 +33,9 @@ public class ServerMessageHandler {
             case "204" :
                 System.out.println("\t204 : COLOR_BLACK – you are playing as black.");
                return new _204ColorBlack(message);
-
-
+            case "205" :
+                System.out.println("\t205 : COLOR_RED - you are playing as red.");
+               return new _205ColorRed(message);
             case "206" :
                 System.out.println("\t206 : OPP_MOVE – your opponent moved a piece from <1> to <2>.");
                 return new _206OpponentMove(message);
