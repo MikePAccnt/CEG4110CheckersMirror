@@ -1,7 +1,45 @@
+
 <project default="compile">
+	
+	<!--
+		To call a specific target from the command line type ant <target_name>
+	 -->
+
     <target name="compile">
         <mkdir dir="."/>
-        <javac srcdir="./base" destdir="."/>
-		<javac srcdir="./desktop" destdir="."/>
+        <javac srcdir="base" destdir="."/>
+		<javac srcdir="desktop" destdir="."/>
     </target>
+
+    <target name="jar">
+    	<mkdir dir="./build/jar"/>
+        <jar destfile="build/jar/CrowningKings.jar" basedir="edu/wright/crowningkings/base">
+			<manifest>
+				<attribute name="Main-Class" value="wright/crowningkings/base/MainTest"/>
+				<!-- 
+					This is is because files in base depend on other files from different jars.
+					Basically because we import things from other places we need this.
+					However READ comment above dependentjars
+				 -->
+				<attribute name="Class-Path" value=". build/jar/desktop.jar build/jar/ui.jar build/jar/sm.jar" />
+			</manifest>
+	   </jar>
+    </target>
+
+	<!--
+		So I think these are wrong because some of the classes these jars were built from
+		also have imports from other classes. So I think we will need to define the class path
+		when making all of these jars as well.
+	 -->
+	<target name="dependentjars">
+		<jar destfile="build/jar/desktop.jar" basedir="edu/wright/crowningkings/desktop"/>
+		<jar destfile="build/jar/ui.jar" basedir="edu/wright/crowningkings/base/UserInterface"/>
+		<jar destfile="build/jar/sm.jar" basedir="edu/wright/crowningkings/base/ServerMessage"/>
+	</target>
+	
+
+    <target name="run" depends="jar">
+	  <java jar="build/jar/CrowningKings.jar" fork="true"/>
+    </target>
+
 </project>
