@@ -11,6 +11,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.BevelBorder;
+import javax.swing.*;
 import javax.swing.SwingConstants;
 
 
@@ -87,35 +89,32 @@ public static class CheckersGameUI extends JFrame{
 	public static JButton readyButton;
 	public static JButton quitButton;
 	public static JLabel grabbedLbl;
+	public static JLabel lblPlayer1;
+	public static JLabel lblPlayer2;
+	public static JLabel lblTurn;
 
 	public CheckersGameUI(){
 		
-		setName("Name");
 		setVisible(true);
 		setResizable(false);
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(0,0,1000,1000);
-		//getContentPane().setLayout(null);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setBounds(0,0,1000,835);
+		getContentPane().setLayout(null);
 		
 		JPanel gameLobby = new JPanel();
-		gameLobby.setName("Lobby");
-		gameLobby.setBackground(new Color(0, 128, 0));
 		gameLobby.setBounds(0, 0, 1000, 1000);
+		gameLobby.setBackground(new Color(0, 128, 0));
 		getContentPane().add(gameLobby);
 		gameLobby.setLayout(null);
 		
+
+		//this.add(jlayer);
 		checkerBoard = new ImagePanel(board);
-		checkerBoard.setName("Board");
-		checkerBoard.setBounds(gameLobby.getWidth() / 4,gameLobby.getHeight() / 4, 500, 500);
+		checkerBoard.setBounds(250, 83, 500, 500);
 		checkerBoard.setLayout(null);
-//		checkerBoard.addMouseListener(new MouseAdapter(){
-//			
-//			public void mouseClicked(MouseEvent e){
-//				System.out.println(checkerBoard.getComponentAt(e.getX(), e.getY()).getName());
-//			}
-//		});
-		
+		fillBoard(checkerBoard);
 		gameLobby.add(checkerBoard);
+		
 		readyButton = new JButton("Ready");
 		readyButton.setBounds(10, 11, 89, 23);
 		gameLobby.add(readyButton);
@@ -123,17 +122,101 @@ public static class CheckersGameUI extends JFrame{
 		quitButton = new JButton("Quit");
 		quitButton.setBounds(10, 45, 89, 23);
 		gameLobby.add(quitButton);
-		fillBoard(checkerBoard);
 		
 		grabbedLbl = new JLabel("Piece In Hand");
+		grabbedLbl.setBounds(41, 537, 165, 46);
 		grabbedLbl.setFont(new Font("Arial", Font.PLAIN, 20));
-		grabbedLbl.setBackground(new Color(255, 0, 0));
+		grabbedLbl.setBackground(new Color(255, 255, 255));
 		grabbedLbl.setHorizontalAlignment(SwingConstants.CENTER);
-		grabbedLbl.setBounds(75, 704, 165, 46);
 		grabbedLbl.setVisible(false);
 		gameLobby.add(grabbedLbl);
-		//pack();
 		
+		JPanel observersPanel = new JPanel();
+		observersPanel.setBounds(10, 83, 230, 443);
+		observersPanel.setVisible(true);
+		
+		lblPlayer1 = new JLabel("Player 1");
+		lblPlayer1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblPlayer1.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		lblPlayer1.setBounds(760, 83, 230, 23);
+		gameLobby.add(lblPlayer1);
+		
+		lblPlayer2 = new JLabel("Player 2");
+		lblPlayer2.setHorizontalAlignment(SwingConstants.CENTER);
+		lblPlayer2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		lblPlayer2.setBounds(760, 302, 230, 23);
+		gameLobby.add(lblPlayer2);
+		gameLobby.add(observersPanel);
+		observersPanel.setLayout(null);
+
+		lblTurn = new JLabel("Your Turn");
+		lblTurn.setHorizontalAlignment(SwingConstants.CENTER);
+		lblTurn.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		lblTurn.setBounds(822, 546, 105, 27);
+		lblTurn.setVisible(false);
+		gameLobby.add(lblTurn);
+		
+		
+		JLabel observersLbl = new JLabel("Observers");
+		observersLbl.setBounds(66, 13, 98, 19);
+		observersPanel.add(observersLbl);
+		observersLbl.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		observersLbl.setHorizontalAlignment(SwingConstants.CENTER);
+		observersLbl.setVisible(true);
+		
+		JScrollPane observersScrollPane = new JScrollPane();
+		observersScrollPane.setBounds(10, 43, 210, 389);
+		observersPanel.add(observersScrollPane);
+		
+		JTextArea textArea = new JTextArea();
+		observersScrollPane.setViewportView(textArea);
+		textArea.setRows(1);
+		textArea.setColumns(1);
+		textArea.setEditable(false);
+		
+		
+		JPanel messagePanel = new JPanel();
+		messagePanel.setBounds(0, 773, 990, 30);
+		gameLobby.add(messagePanel);
+		messagePanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		messagePanel.setName("MessagePanel");
+		
+		JTextField messageTextField = new JTextField("");
+		messageTextField.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		messageTextField.setToolTipText("");
+		messageTextField.setHorizontalAlignment(SwingConstants.LEFT);
+		messageTextField.setColumns(107);
+		messageTextField.setName("MessageTextField");
+		
+		
+		messagePanel.add(messageTextField);
+		
+		
+		JPanel lobbyChatPanel = new JPanel();
+		lobbyChatPanel.setBounds(0, 588, 990, 186);
+		gameLobby.add(lobbyChatPanel);
+		lobbyChatPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		lobbyChatPanel.setName("LobbyChatPanel");
+		lobbyChatPanel.setLayout(null);
+		
+		JScrollPane lobbyChatScrollPane = new JScrollPane();
+		lobbyChatScrollPane.setBounds(0, 0, 990, 186);
+		lobbyChatPanel.add(lobbyChatScrollPane);
+		
+//		JScrollPane scrollPane = new JScrollPane();
+//		scrollPane.setBounds(0, 0, 990, 186);
+//		lobbyChatPanel.add(scrollPane);
+		
+		JTextArea lobbyChatTextArea = new JTextArea();
+		lobbyChatTextArea.setText("a\r\na\r\na\r\na\r\nasd\r\ns\r\nds\r\nds\r\nds\r\nde\r\nd\r\ned\r\ned\r\nef\r\nef\r\nef\r\nt\r\ng\r\ngf\r\ng\r\nt\r\nd\r\ndf\r\ndf\r\nr\r\ng\r\nr\r\ndf\r\ndf\r\n\r\nrf\r\nf\r\nd\r\nfd\r\nf\r\nr\r\nfdf");
+		lobbyChatScrollPane.setViewportView(lobbyChatTextArea);
+		lobbyChatTextArea.setEditable(false);
+		lobbyChatTextArea.setLineWrap(true);
+		lobbyChatTextArea.setColumns(1);
+		lobbyChatTextArea.setWrapStyleWord(true);
+		lobbyChatTextArea.setRows(1);
+		lobbyChatTextArea.setName("LobbyChatTextArea");
+
 	}
 //	
 //	public JPanel getBoard(){

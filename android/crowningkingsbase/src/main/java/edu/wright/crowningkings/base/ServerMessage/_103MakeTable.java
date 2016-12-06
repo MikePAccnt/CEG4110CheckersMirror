@@ -15,6 +15,6 @@ public class _103MakeTable extends AbstractServerMessage {
 
     public void run(BaseClient client) {
         String[] p = getParameters();
-		client.makeTable();
+		// client.makeTable();
     }
 }

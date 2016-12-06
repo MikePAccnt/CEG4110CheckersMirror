@@ -57,6 +57,8 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	private boolean play = false;
 	private boolean turn = false;
 	private int[] cords = {-1,-1};
+	private int[] lastStartMove = {-1,-1};
+	private int[] lastEndMove = {-1,-1};
 	//private DesktopUIFactory factory;
 	private Image im = new ImageIcon("desktop\\checkerboard.jpg").getImage();
 	private Image im2 = new ImageIcon("desktop\\checkerboardFake.jpg").getImage();
@@ -70,7 +72,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		currentUsers = lobby.getCurrentUsers(); //The area that shows all of the current users in the lobby
 		lobbyChat = lobby.getLobbyChatTextArea(); //The area that shows all of the lobby chat that has happend since being in the server	
 		makeClientVisable();
-		initBlankTable();
+		
 
 		//Creating the key listener for the messageTextField to send messages though (Can move the key listener to its own class)
 		//This is still very messy and needs to be cleaned up at some point
@@ -110,7 +112,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		create.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				
-				sendWantTable();
+				makeTable();
 				
 			}
 		});
@@ -204,7 +206,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		create.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				
-				sendWantTable();
+				makeTable();
 				
 			}
 		});	
@@ -225,72 +227,21 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	
 	}
 	
-	//Not sure about these right now are NOT part of the Interface
-	//Update the current users UI when a new user joins
-	//Better the handle when you call this in the file that
-	//controls server messages
-	public void addUser(String user){
-
-	}
-
-	public void removeUser(String user){
-
-	}
-
-	public String getUsernameFromUser() {
-		
-		return username;
-	}
-
-	public void sendName(String name){
+	private void sendName(String name){
 		client.setUsername(name);
 	}
-	
-	public String getTableIdFromUser() {
-		return lobbyPanel.getComponents()[0].getName();
-	}
 
-
-
-	//ALL Methods bewllow this point should be form the Interface
-	//There are a few above this that are also from the Interface
-
-
-	public void updateLobbyChat(String newMessage) {
-		
-		//Whatever calls this method can handle formatting it with the username of who
-		//sent the message and maybe a time-stamp if wanted or that can be implemented here
-		lobbyChat.setText(lobbyChat.getText() + "\n" + newMessage);
-		
-	}
-
-	
-	public void sendWantTable() {
-		
-		System.out.println("Clocked");
-		client.makeTable();
-		
-	}
-
-	public void setColor(String c){
-		color = c;
-	}
-
-	public void makeTable(String tableID) {
-		
-
-		
-	}
 
 	public void setJoinPlayTable(String tableID, String oponentName) {
 
 		currentGame = (CheckersGameUI) DesktopUIFactory.makeGameLobby(username, oponentName, tableID);
 		currentGame.setVisible(true);
+		currentGame.repaint();
 		applyButtonActions(new Component[] {CheckersGameUI.readyButton, CheckersGameUI.quitButton});
 		gameBoard = (JPanel)currentGame.checkerBoard;
 
 		//Add the action listiner to the game board so the player can move the pieces
-		gameBoard.addMouseListener(new gameBoardListener(new int[] {-1,-1},gameBoard));
+		gameBoard.addMouseListener(new gameBoardListener(new int[] {-1,-1},gameBoard,this.color));
 		gameBoard.repaint();
 			
 	}
@@ -305,10 +256,13 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		
 	}
 
-
-    public void sendJoinPlayTable(String tableID){}
-   
-    public void sendJoinObserveTable(String tableID){}
+	public void updateLobbyChat(String newMessage) {
+		
+		//Whatever calls this method can handle formatting it with the username of who
+		//sent the message and maybe a time-stamp if wanted or that can be implemented here
+		lobbyChat.setText(lobbyChat.getText() + "\n" + newMessage);
+		
+	}
 
 
     /*
@@ -387,7 +341,6 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
     public void newtable(String tableID){
     	makeNewGamePanel(tableID);
-		setJoinPlayTable(tableID, "");
     }
 
     public void gameStart(){
@@ -396,10 +349,19 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
     public void colorBlack(){
     	this.color = "Black";
+    	if(gameBoard.getMouseListeners()[0] instanceof gameBoardListener){
+    		gameBoardListener gb = (gameBoardListener)gameBoard.getMouseListeners()[0];
+    		gb.setColor("Black");
+    	}
+    	//(gameBoardListener)gameBoard.getMouseListeners()[0].setColor("Black");
     }
 
     public void colorRed(){
     	this.color = "Red";
+    	if(gameBoard.getMouseListeners()[0] instanceof gameBoardListener){
+    		gameBoardListener gb = (gameBoardListener)gameBoard.getMouseListeners()[0];
+    		gb.setColor("Red");
+    	}
     }
 
     public void opponentMove(String[] from, String[] to){
@@ -457,10 +419,16 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
     public void gameWon(){
     	makeEndGameMessage("You Win!!!");
+    	currentGame.dispose();
+    	currentGame = null;
+    	leaveTable();
     }
 
     public void gameLose(){
     	makeEndGameMessage("You Lose!!!");
+    	currentGame.dispose();
+    	currentGame = null;
+    	leaveTable();
     }
 
     public void tableJoined(String tableID){
@@ -473,11 +441,10 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
     		currentUsers.setText((currentUsers.getText()) + "\n" + s);
 		
     	}
+    	initBlankTable();
     }
 
-    public void outLobby(){
-
-    }
+    public void outLobby(){}
 
     public void nowInLobby(String user){
 
@@ -508,7 +475,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
     }
 
     public void yourTurn(){
-    	//Add UI stuff to gameBoard to show this.
+    	currentGame.lblTurn.setVisible(true);
     	turn = true;
     }
 
@@ -531,9 +498,21 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
     public void nameInUse(){}
 
-    public void illegalMove(){}
+    public void illegalMove(){
+    	turn = true;
+    	currentGame.lblTurn.setVisible(true);
 
-    public void tblFull(){}
+    	JLabel temp2 = (JLabel)gameBoard.getComponentAt(lastEndMove[0],lastEndMove[1]);
+		//temp2.setBounds(lastMove[0],lastMove[1],62,62);
+		gameBoard.remove(temp2);
+		gameBoard.add(DesktopUIFactory.makePiece(this.color)).setBounds(lastStartMove[0],lastStartMove[1],62,62);
+		gameBoard.repaint();
+
+    }
+
+    public void tblFull(){
+    	updateLobbyChat("Server Message: That table is full!");
+    }
 
     public void notInLobby(){}
 
@@ -593,12 +572,18 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		
 		int[] cords;
 		JPanel pan;
+		String color;
 		
-		public gameBoardListener(int[] cords, JPanel pan){
+		public gameBoardListener(int[] cords, JPanel pan,String color){
 			this.cords = cords;
 			this.pan = pan;
+			this.color = color;
 		}
 		
+		public void setColor(String color){
+			this.color = color;
+		}
+
 		public void mouseClicked(MouseEvent e){
 			
 			if(cords[0] == -1 && cords[1] == -1 && (play == true && turn == true)){
@@ -626,16 +611,24 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 				String fy = Integer.toString(cords[1] / 62);
 				CheckersGameUI.grabbedLbl.setVisible(false);
 				turn = false;
+				currentGame.lblTurn.setVisible(false);
+				lastStartMove[0] = ((cords[0]/62)*62)+2;
+				lastStartMove[1] = ((cords[1]/62)*62)+2;
 				cords[0] = -1;
 				cords[1] = -1;
 				move(fx,fy,tX,tY);
 
-				//temp2.setBounds(tX,tY,62,62);
-				//pan.remove(temp2);
-				//pan.add(DesktopUIFactory.makePiece("Red")).setBounds(tX,tY,62,62);
+				
 
-				//pan.repaint();
-				//System.out.println("released");
+				lastEndMove[0] = ((e.getX()/62)*62)+2;
+				lastEndMove[1] = ((e.getY()/62)*62)+2;
+
+				temp2.setBounds(e.getX(),e.getY(),62,62);
+				pan.remove(temp2);
+				pan.add(DesktopUIFactory.makePiece(this.color)).setBounds(((e.getX()/62)*62)+2,((e.getY()/62)*62)+2,62,62);
+
+				pan.repaint();
+				System.out.println("released");
 			}
 		}
 	}
