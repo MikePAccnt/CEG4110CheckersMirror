@@ -13,6 +13,6 @@ public class _406ErrorInLobby extends AbstractServerMessage {
 
     public void run(BaseClient client) {
 		System.out.println("_406ErrorInLobby.run(BaseClient)");
-		//do something
+		client.errorLobby();
     }
 }

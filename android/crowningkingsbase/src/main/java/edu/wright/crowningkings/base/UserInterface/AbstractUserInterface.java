@@ -12,7 +12,7 @@ import edu.wright.crowningkings.base.BaseClient;
 public interface AbstractUserInterface {
 
     void sendUsernameRequest();
-    
+
     void connectionOK();
 
     void message(String message, String from, boolean privateMessage);
@@ -57,5 +57,31 @@ public interface AbstractUserInterface {
 
     void nowObserving(String tableID);
 
-    void stoppedObserving(String tableID); 
+    void stoppedObserving(String tableID);
+
+    void netException();
+
+    void nameInUse();
+
+    void illegalMove();
+
+    void tblFull();
+
+    void notInLobby();
+
+    void badMessage();
+
+    void errorLobby();
+
+    void badName();
+
+    void playerNotReady();
+
+    void notYourTurn();
+
+    void tableNotExist();
+
+    void gameNotCreated();
+
+    void notObserving();
 }

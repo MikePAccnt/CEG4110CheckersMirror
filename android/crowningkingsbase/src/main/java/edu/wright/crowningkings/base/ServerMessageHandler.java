@@ -78,26 +78,69 @@ public class ServerMessageHandler {
             case "219" :
                 System.out.println("\t219 : WHO_ON_TBL – clients <2> and <3> are on table with id <1>. <2> is black. <3> is red. If <2> or <3> = -1, then that seat is open.");
                 return new _219WhoOnTable(message);
-
+            case "220" :
+                System.out.println("\t220 : OPP_LEFT_TABLE - Your opponent has left the table.");
+                return new _220OpponentLeft(message);
 
 
             case "221" :
                 System.out.println("\t221 : YOUR_TURN – it’s your turn to play.");
                 return new _221YourTurn(message);
-
+            case "222" :
+                System.out.println("\t222 : TBL_LEFT – Client has left the table <1>.");
+                return new _222TableLeft(message);
+            case "230" :
+                System.out.println("\t230 : NOW_OBSERVING–you are now observing table <1>");
+                return new _230NowObserving(message);
+            case "235" :
+                System.out.println("\t235 : STOPPED_OBSERVING–you stopped observer table <1>");
+                return new _235StoppedObserving(message);
 
             /**
              * messages indicating an error, from the server to the client.
              */
+            case "400" :
+                System.out.println("\t400 : NET_EXCEPTION– a network exception has occurred. See server console for details");
+                return new _400NetException(message);
+            case "401" :
+                System.out.println("\t401 : NAME_IN_USE - the client name requested is already in use on the server");
+                return new _401NameInUse(message);
+            case "402" :
+                System.out.println("\t402 : ILLEGAL	–	the	move	sent	is	illegal.");
+                return new _402Illegal(message);
+            case "403" :
+                System.out.println("\t403 : TBL_FULL	–	the	table	the	client	tried	to	join	is	full.");
+                return new _403TableFull(message);
+            case "404" :
+                System.out.println("\t404 : NOT_IN_LOBBY - you	tried	to	join	a	table,	but	you	are	not	in	the	lobby.");
+                return new _404NotInLobby(message);
             case "405" :
                 System.out.println("\t405 : BAD_MESSAGE – a TCP message sent to the server is in a bad format.");
                 return new _405BadMessage(message);
-
-
-
+            case "406" :
+                System.out.println("\t406 : ERR_IN_LOBBY	-	the	action	requested	cannot	be	completed	because	you	are	not	in	the
+lobby.");
+                return new _406ErrorInLobby(message);
             case "408" :
                 System.out.println("\t408 : BAD_NAME – the username requested is bad (no whitespace allowed).");
                 return new _408BadName(message);
+            case "409" :
+                System.out.println("\t409 : PLAYERS_NOT_READY - client	sent	a	move	but	the	game	hasn’t	begun	yet.");
+                return new _409PlayersNotReady(message);
+            case "410" :
+                System.out.println("\t410 : NOT_YOUR_TURN	–	client	sent	a	move	but	it	is	not	their	turn	to	move.");
+                return new _410NotYourTurn(message);
+            case "411" :
+                System.out.println("\t411 : TBL_NOT_EXIST	–	table	queried	does	not	exist.");
+                return new _411TableNotExist(message);
+            case "412" :
+                System.out.println("\t412 : GAME_NOT_CREATED	–	client	said	they	are	ready,	but	there	is	no	game	on	the	table	(2
+players	are	not	sitting	on	the	table).");
+                return new _412GameNotCreated(message);
+            case "415" :
+                System.out.println("\t415 : NOT_OBSERVING	–	the	client	is	not	observing	a	table.");
+                return new _415NotObserving(message);
+
 
 
 

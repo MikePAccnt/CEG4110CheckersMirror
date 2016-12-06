@@ -13,6 +13,6 @@ public class _415NotObserving extends AbstractServerMessage {
 
     public void run(BaseClient client) {
 		System.out.println("_415NotObserving.run(BaseClient)");
-		//do something
+		client.notObserving();
     }
 }

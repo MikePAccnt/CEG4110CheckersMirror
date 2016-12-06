@@ -13,6 +13,6 @@ public class _402Illegal extends AbstractServerMessage {
 
     public void run(BaseClient client) {
 		System.out.println("_402Illegal.run(BaseClient)");
-		//do something
+		client.illegalMove();
     }
 }

@@ -13,6 +13,6 @@ public class _400NetException extends AbstractServerMessage {
 
     public void run(BaseClient client) {
 		System.out.println("_400NetException.run(BaseClient)");
-		//do something
+		client.netException();
     }
 }

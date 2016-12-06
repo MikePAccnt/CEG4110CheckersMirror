@@ -13,6 +13,6 @@ public class _411TableNotExist extends AbstractServerMessage {
 
     public void run(BaseClient client) {
 		System.out.println("_411TableNotExist.run(BaseClient)");
-		//do something
+		client.tableNotExist();
     }
 }

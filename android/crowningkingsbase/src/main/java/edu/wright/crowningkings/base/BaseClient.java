@@ -26,7 +26,7 @@ public class BaseClient {
      * Constructor methods
      */
     public BaseClient(AbstractUserInterface ui) {
-        String serverAddress = "192.168.122.1";
+        String serverAddress = "130.108.13.36";
 
         client = this;
         setServer(serverAddress, PORT_NUMBER);
@@ -218,4 +218,47 @@ public class BaseClient {
     public void stoppedObserving(String tableID){
         ui.stoppedObserving(tableID);
     }
+
+
+    public void netException(){
+        ui.netException();
+    }
+    public void nameInUse(){
+        ui.nameInUse();
+    }
+    public void illegalMove(){
+        ui.illegalMove();
+    }
+    public void tblFull(){
+        ui.tblFull();
+    }
+    public void notInLobby(){
+        ui.notInLobby();
+    }
+    public void badMessage(){
+        ui.badMessage();
+    }
+    public void errorLobby(){
+        ui.errorLobby();
+    }
+    public void badName(){
+        ui.badName();
+    }
+    public void playerNotReady(){
+        ui.playerNotReady();
+    }
+    public void notYourTurn(){
+        ui.notYourTurn();
+    }
+    public void tableNotExist(){
+        ui.tableNotExist();
+    }
+    public void gameNotCreated(){
+        ui.gameNotCreated();
+    }
+    public void notObserving(){
+        ui.notObserving();
+    }
+
+
 }

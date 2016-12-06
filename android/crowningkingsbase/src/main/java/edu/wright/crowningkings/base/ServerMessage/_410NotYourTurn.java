@@ -13,6 +13,6 @@ public class _410NotYourTurn extends AbstractServerMessage {
 
     public void run(BaseClient client) {
 		System.out.println("_410NotYourTurn.run(BaseClient)");
-		//do something
+		client.notYourTurn();
     }
 }

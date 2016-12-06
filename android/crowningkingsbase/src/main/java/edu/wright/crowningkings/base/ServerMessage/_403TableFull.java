@@ -13,6 +13,6 @@ public class _403TableFull extends AbstractServerMessage {
 
     public void run(BaseClient client) {
 		System.out.println("_403TableFull.run(BaseClient)");
-		//do something
+		client.tblFull();
     }
 }

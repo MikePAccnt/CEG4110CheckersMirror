@@ -13,6 +13,6 @@ public class _405BadMessage extends AbstractServerMessage {
 
     public void run(BaseClient client) {
 		System.out.println("_405BadMessage.run(BaseClient)");
-		//do something
+		client.badMessage();
     }
 }

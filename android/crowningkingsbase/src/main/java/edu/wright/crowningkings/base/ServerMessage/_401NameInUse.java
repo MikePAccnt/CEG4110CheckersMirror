@@ -13,6 +13,6 @@ public class _401NameInUse extends AbstractServerMessage {
 
     public void run(BaseClient client) {
 		System.out.println("_401NameInUse.run(BaseClient)");
-		//do something
+		client.nameInUse();
     }
 }

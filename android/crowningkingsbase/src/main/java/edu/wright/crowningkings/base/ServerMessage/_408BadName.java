@@ -13,6 +13,6 @@ public class _408BadName extends AbstractServerMessage {
 
     public void run(BaseClient client) {
 		System.out.println("_408BadName.run(BaseClient)");
-		//do something
+		client.badName();
     }
 }

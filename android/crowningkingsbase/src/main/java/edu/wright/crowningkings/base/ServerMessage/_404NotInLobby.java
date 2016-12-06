@@ -13,6 +13,6 @@ public class _404NotInLobby extends AbstractServerMessage {
 
     public void run(BaseClient client) {
 		System.out.println("_404NotInLobby.run(BaseClient)");
-		//do something
+		client.notInLobby();
     }
 }

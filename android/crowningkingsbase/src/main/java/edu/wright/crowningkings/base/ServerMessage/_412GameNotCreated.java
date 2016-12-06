@@ -13,6 +13,6 @@ public class _412GameNotCreated extends AbstractServerMessage {
 
     public void run(BaseClient client) {
 		System.out.println("_412GameNotCreated.run(BaseClient)");
-		//do something
+		client.gameNotCreated();
     }
 }
