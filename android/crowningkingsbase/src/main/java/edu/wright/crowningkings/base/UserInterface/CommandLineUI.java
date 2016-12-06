@@ -236,4 +236,29 @@ public class CommandLineUI implements AbstractUserInterface {
 
     }
 
+    public void netException(){}
+
+    public void nameInUse(){}
+
+    public void illegalMove(){}
+
+    public void tblFull(){}
+
+    public void notInLobby(){}
+
+    public void badMessage(){}
+
+    public void errorLobby(){}
+
+    public void badName(){}
+
+    public void playerNotReady(){}
+
+    public void notYourTurn(){}
+
+    public void tableNotExist(){}
+
+    public void gameNotCreated(){}
+
+    public void notObserving(){}
 }

@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
@@ -121,6 +122,11 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 			gamePanelx = 12;
 		}
 		lobby.repaint();
+		try { 
+		    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
 	}
 
 	//This adds a new table to the lobbyPanel for viewing
@@ -285,6 +291,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
 		//Add the action listiner to the game board so the player can move the pieces
 		gameBoard.addMouseListener(new gameBoardListener(new int[] {-1,-1},gameBoard));
+		gameBoard.repaint();
 			
 	}
 
@@ -331,7 +338,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
     public void joinTable(String tableID){
     	client.joinTable(tableID);
-    	setJoinPlayTable(tableID,"");
+    	//setJoinPlayTable(tableID,"");
     }
 
     public void ready(){
@@ -348,6 +355,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
     public void quit(){
     	currentGame.dispose();
+    	currentGame = null;
     	client.quit();
     }
 
@@ -403,28 +411,40 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
     }
 
     public void boardState(String[][] board){
+    	System.out.println("In boardState");
     	//Later on update this so it draws the board differently depending on the players color
-		
+		if(gameBoard == null){System.out.println("gameBoard is null!!!!!");}
 		//clear the entire board
 		for(Component c : gameBoard.getComponents()){
+			if(c == null){System.out.println("c Was NULL!!!!!!");}
 			gameBoard.remove(c);
 		}
 
 		//Re-populate the board with the current board state from the server
 		for (int x = 0;x<board.length;x++ ) {
 			for(int y = 0;y<board[x].length;y++){
+				System.out.println("Inside the forloop in boardState");
 				int cx = (y*62)+2;
 				int cy = (x*62)+2;
+				System.out.println(board[x][y] == null ? "Yes":"No");
 
-				if(board[x][y] == "B"){
+				if(board[x][y].charAt(0) == 'B'){
+					System.out.println("Making Black Piece");
 					JLabel temp = DesktopUIFactory.makePiece("Black");
+					if(temp == null) {System.out.println("GB: Temp is null!!!");}
 					temp.setName("Black");
-					gameBoard.add(temp).setBounds(cx,cy,62,62);
+					temp.setBounds(cx,cy,62,62);
+					gameBoard.add(temp);
+					System.out.println("Made a Black piece");
 				}
-				else if(board[x][y] == "R"){
+				else if(board[x][y].charAt(0) == 'R'){
+					System.out.println("Making Red Piece");
 					JLabel temp = DesktopUIFactory.makePiece("Red");
+					if(temp == null) {System.out.println("GB: Temp is null!!!");}
 					temp.setName("Red");
-					gameBoard.add(temp).setBounds(cx,cy,62,62);
+					temp.setBounds(cx,cy,62,62);
+					gameBoard.add(temp);
+					System.out.println("Made a Red piece");
 				}
 				else {
 					//Do nothing in the case that there is no piece in that spot.
@@ -505,6 +525,33 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
     	currentGame.dispose();
     } 
 
+    //Bellow this are the mothods for hanlding errors sent from the server
+    
+    public void netException(){}
+
+    public void nameInUse(){}
+
+    public void illegalMove(){}
+
+    public void tblFull(){}
+
+    public void notInLobby(){}
+
+    public void badMessage(){}
+
+    public void errorLobby(){}
+
+    public void badName(){}
+
+    public void playerNotReady(){}
+
+    public void notYourTurn(){}
+
+    public void tableNotExist(){}
+
+    public void gameNotCreated(){}
+
+    public void notObserving(){}
 
 
     private void makeEndGameMessage(String message){
@@ -532,7 +579,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		quitBtn.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				currentGame.dispose();
-				//Tell the server client left the game
+				currentGame = null;
 				leaveTable();
 			}
 		});
@@ -553,15 +600,21 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		}
 		
 		public void mouseClicked(MouseEvent e){
-			System.out.println("Here!");
+			
 			if(cords[0] == -1 && cords[1] == -1 && (play == true && turn == true)){
+				System.out.println("Here2");
+				System.out.println(e.getX() + ", " + e.getY());
 				JLabel temp = pan.getComponentAt(e.getX(), e.getY()) instanceof JLabel ? (JLabel)pan.getComponentAt(e.getX(), e.getY()):null;
-				if(temp != null && temp.getIcon() != null && temp instanceof JLabel){
-					cords[0] = e.getX();
-					cords[1] = e.getY();
-					System.out.println("Pickup");
-					CheckersGameUI.grabbedLbl.setVisible(true);
-					
+				if(temp == null){System.out.println("Temp is null!!!!");}
+				if(temp != null){ //&& temp.getIcon() != null && temp instanceof JLabel){
+					System.out.println("Here3");
+					if(temp.getName().charAt(0) == color.charAt(0)){
+						System.out.println("Here4");
+						cords[0] = e.getX();
+						cords[1] = e.getY();
+						System.out.println("Pickup");
+						CheckersGameUI.grabbedLbl.setVisible(true);
+					}
 				} else {}
 			}
 			else {
