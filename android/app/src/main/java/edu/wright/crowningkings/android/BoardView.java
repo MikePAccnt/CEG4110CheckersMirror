@@ -1,15 +1,12 @@
 package edu.wright.crowningkings.android;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.nfc.Tag;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -62,11 +59,6 @@ public class BoardView extends View {
         setOnTouchListener(new CheckersOnTouchListener(this));
     }
 
-    public void setGame(final Game game) {
-        this.game = game;
-        invalidate();
-    }
-
     public void setSelectedPiece(final Piece piece) {
         this.selectedPiece = piece;
         invalidate();
@@ -79,6 +71,11 @@ public class BoardView extends View {
 
     public Game getGame() {
         return this.game;
+    }
+
+    public void setGame(final Game game) {
+        this.game = game;
+        invalidate();
     }
 
     public int getBoardWidth() {
@@ -225,18 +222,19 @@ public class BoardView extends View {
 
         /**
          * Construct a game listener with a context on which to show errors.
+         *
          * @param context the context on which to show errors
          */
         public GameListener(final Context context) {
             this.context = context;
         }
 
-//        @Override
+        //        @Override
         public void onGame(Game game) {
             setGame(game);
         }
 
-//        @Override
+        //        @Override
         public void onError(Exception exception) {
             final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(context);
             alertBuilder.setTitle("Error");
@@ -249,7 +247,7 @@ public class BoardView extends View {
      * This {@link OnTouchListener} handles touches on the checkers game board.
      */
     private class CheckersOnTouchListener implements OnTouchListener {
-//        private final GameService gameService = GameServiceImpl.getInstance();
+        //        private final GameService gameService = GameServiceImpl.getInstance();
         private final BoardView boardView;
 
         private Piece selectedPiece;
@@ -257,6 +255,7 @@ public class BoardView extends View {
 
         /**
          * Construct a {@link CheckersOnTouchListener} with the provided {@link BoardView}.
+         *
          * @param boardView the {@link BoardView} to operate upon
          */
         public CheckersOnTouchListener(final BoardView boardView) {

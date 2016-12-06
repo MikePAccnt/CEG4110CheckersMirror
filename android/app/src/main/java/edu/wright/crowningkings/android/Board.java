@@ -25,8 +25,32 @@ public class Board {
         this.pieces = pieces;
     }
 
+    public static Set<Piece> initializePieces() {
+        int spacesPerSide = 8;
+        final Set<Piece> pieces = new HashSet<>(spacesPerSide * spacesPerSide / 2 - (2 * spacesPerSide));
+
+        for (int y = 0; y < spacesPerSide / 2 - 1; y++) {
+            for (int x = (y + 1) % 2; x < spacesPerSide; x += 2) {
+                final Location location = new Location(x, y);
+                pieces.add(new Piece(Team.BLACK, location));
+            }
+        }
+
+        for (int y = spacesPerSide - 1; y >= spacesPerSide / 2 + 1; y--) {
+            for (int x = (y + 1) % 2; x < spacesPerSide; x += 2) {
+                final Location location = new Location(x, y);
+                pieces.add(new Piece(Team.RED, location));
+            }
+        }
+        return pieces;
+    }
+
     public Set<Piece> getPieces() {
         return pieces;
+    }
+
+    public void setPieces(final Set<Piece> newPieces) {
+        this.pieces = newPieces;
     }
 
     public int getSpacesPerSide() {
@@ -42,29 +66,5 @@ public class Board {
         }
 
         return null;
-    }
-
-    public static Set<Piece> initializePieces() {
-        int spacesPerSide = 8;
-        final Set<Piece> pieces = new HashSet<>(spacesPerSide * spacesPerSide / 2 - (2 * spacesPerSide));
-
-        for (int y = 0; y < spacesPerSide / 2 - 1; y++) {
-            for (int x = (y+1) % 2; x < spacesPerSide; x += 2) {
-                final Location location = new Location(x, y);
-                pieces.add(new Piece(Team.BLACK, location));
-            }
-        }
-
-        for (int y = spacesPerSide - 1; y >= spacesPerSide / 2 + 1; y--) {
-            for (int x = (y+1) % 2; x < spacesPerSide; x += 2) {
-                final Location location = new Location(x, y);
-                pieces.add(new Piece(Team.RED, location));
-            }
-        }
-        return pieces;
-    }
-
-    public void setPieces(final Set<Piece> newPieces) {
-        this.pieces = newPieces;
     }
 }

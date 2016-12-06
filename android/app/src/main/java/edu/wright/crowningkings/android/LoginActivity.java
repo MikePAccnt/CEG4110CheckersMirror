@@ -7,39 +7,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.app.LoaderManager.LoaderCallbacks;
-
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static android.Manifest.permission.READ_CONTACTS;
 
 /**
  * A login screen that offers login via email/password.
@@ -120,7 +97,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
         registerReceiver(loginBroadcastReceiver, loginIntentFilter);
     }
@@ -182,6 +159,7 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
+            System.out.println("else in loginactivityyy");
             showProgress(true);
             mAuthTask = new UserLoginTask(username);
             mAuthTask.execute((Void) null);
@@ -245,7 +223,6 @@ public class LoginActivity extends AppCompatActivity {
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
-
         private final String username;
 
         UserLoginTask(String username) {
@@ -257,6 +234,7 @@ public class LoginActivity extends AppCompatActivity {
             // TODO: attempt authentication against a network service.
 
             try {
+                System.out.println("doInBackground try");
                 sendBroadcast(new Intent(Constants.SEND_USERNAME_REPLY_INTENT).putExtra(Constants.USERNAME_EXTRA, username));
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
@@ -268,14 +246,6 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
-//            showProgress(false);
-//
-//            if (success) {
-                finish();
-//            } else {
-//                usernameTextView.setError(getString(R.string.error_username_taken));
-//                usernameTextView.requestFocus();
-//            }
         }
 
         @Override
@@ -298,6 +268,8 @@ public class LoginActivity extends AppCompatActivity {
                     break;
                 case Constants.ERROR_NAME_IN_USE_INTENT:
                     Log.d(TAG, "ERROR_NAME_IN_USE_INTENT");
+                    mAuthTask = null;
+                    showProgress(false);
                     usernameTextView.setError(getString(R.string.error_username_taken));
                     usernameTextView.requestFocus();
                     break;
@@ -306,12 +278,15 @@ public class LoginActivity extends AppCompatActivity {
                     break;
                 case Constants.ERROR_BAD_USERNAME_INTENT:
                     Log.d(TAG, "ERROR_BAD_USERNAME_INTENT");
+                    mAuthTask = null;
+                    showProgress(false);
                     usernameTextView.setError(getString(R.string.error_invalid_username));
                     usernameTextView.requestFocus();
                     break;
                 case Constants.IN_LOBBY_INTENT:
                     Log.d(TAG, "IN_LOBBY_INTENT");
                     inLobby();
+                    //finish();
                     break;
             }
         }

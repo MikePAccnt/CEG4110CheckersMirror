@@ -5,14 +5,11 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +31,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+
 /**
  * Created by csmith on 11/17/16. Based off of ericchee's PieMessage
  */
@@ -49,10 +47,13 @@ public class MessageActivity extends AppCompatActivity {
     MessagesAdapter adapter;
     Button btnSend;
     MessageActivityBroadcastReceiver messageActivityBroadcastReceiver;
-    private boolean boundReceiveService = false;
+//    private boolean boundReceiveService = false;
     String targetString;
     String targetUsername = null;
     boolean isNewChat = true;
+//    AndroidUIService mBoundService;
+//    boolean mServiceBound = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +76,10 @@ public class MessageActivity extends AppCompatActivity {
         etTarget = (EditText) findViewById(R.id.etTarget);
         ibCheckmark = (ImageButton) findViewById(R.id.ibCheckmark);
         listOfSockets = new ArrayList<>();
+
+//        Intent intent = new Intent(this, AndroidUIService.class);
+//        startService(intent);
+//        bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
 
         setTvTargetListener();
         setIbCheckmarkListener();
@@ -128,7 +133,7 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     public void addSentMessageToListView() {
-        Message messageInProgress = new Message(etMessage.getText().toString(), MessageType.SENT, MessageStatus.IN_PROGRESS, "Me");
+        Message messageInProgress = new Message(etMessage.getText().toString(), MessageType.SENT, MessageStatus.SUCCESSFUL, "Me");
         messageInProgress.setDate(-1);  // TODO need to set date
         arrayOfMessages.add(messageInProgress);
         etMessage.setText(null);
@@ -238,21 +243,31 @@ public class MessageActivity extends AppCompatActivity {
 
     // Construct data and set in custom adapter
     private void initMessagesListAdapter() {
-        if (!isNewChat) {
-            // grab all messages from chat in sqlite db
-//            PieSQLiteOpenHelper dbHelper =  //.getDbHelper();
-//            arrayOfMessages = dbHelper.getAllMessagesOfChat(chatROWID);
+//        if (!isNewChat) {
+//            // grab all messages from chat in sqlite db
+////            PieSQLiteOpenHelper dbHelper.getDbHelper();
+////            arrayOfMessages = dbHelper.getAllMessagesOfChat(targetUsername);
+//            //arrayOfMessages = mBoundService.getMessages(targetUsername);
+//            arrayOfMessages = getIntent().getParcelableArrayListExtra(Constants.MESSAGES_ARRAY_EXTRA);
+//            System.out.println(":_:_:_:_:_:_: arrayOfMessages=" + arrayOfMessages);
+//            //arrayOfMessages.addAll();///TESTING AS OF 5:03AM
+//        } else {
+//            // If new chat, initiate new array of messages
             arrayOfMessages = new ArrayList<>();
-        } else {
-            // If new chat, initiate new array of messages
-            arrayOfMessages = new ArrayList<>();
-        }
+//        }
         adapter = new MessagesAdapter(this, arrayOfMessages);
 
         // Attach adapter to listView
+        sendBroadcast(new Intent(Constants.REQUEST_CONVERSATION_MESSAGES_INTENT)
+                .putExtra(Constants.USERNAME_EXTRA, targetUsername));
         lvMessages = (ListView) findViewById(R.id.lvMessages);
         lvMessages.setAdapter(adapter);
     }
+
+//    private void setArrayOfMessages(ArrayList<Message> messages) {
+//        //Parcelable[] convo = messages.toArray();
+//        arrayOfMessages = messages;//Arrays.copyOf(convo, convo.length, ArrayList[].class);
+//    }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void setStatusBarColor() {
@@ -280,8 +295,18 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStop() {
+//        if (mServiceBound) {
+////            unbindService(mServiceConnection);
+////            mServiceBound = false;
+//        }
+        super.onStop();
+    }
+
+    @Override
     protected void onDestroy() {
         Log.i(TAG, "onDestroy()");
+//        mBoundService.setMessages(targetUsername, arrayOfMessages);
         super.onDestroy();
     }
 
@@ -291,6 +316,7 @@ public class MessageActivity extends AppCompatActivity {
         super.onResume();
         messageActivityBroadcastReceiver = new MessageActivityBroadcastReceiver();
         registerReceiver(messageActivityBroadcastReceiver, new IntentFilter(Constants.NEW_MESSAGE_INTENT));
+        registerReceiver(messageActivityBroadcastReceiver, new IntentFilter(Constants.CONVERSATION_MESSAGES_INTENT));
 
     }
 
@@ -316,27 +342,27 @@ public class MessageActivity extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
     }
 
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d(TAG, "onServiceConnected called");
-
-            // Ever service has a binder. In service class we created LocalBinder to get service instance
-            // - set our service field equal to the service instance
-//            ReceiveMessagesService.LocalBinder binder = (ReceiveMessagesService.LocalBinder) service;
-//            receiveMessagesService = binder.getServiceInstance();
-
-            // Register this activity to get callbacks
-//            receiveMessagesService.registerActivity(MessageActivity.this);
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Log.d(TAG, "Service has disconnected");
-            boundReceiveService = false;
-        }
-    };
+//    private ServiceConnection mConnection = new ServiceConnection() {
+//        @Override
+//        public void onServiceConnected(ComponentName name, IBinder service) {
+//            Log.d(TAG, "onServiceConnected called");
+//
+//            // Ever service has a binder. In service class we created LocalBinder to get service instance
+//            // - set our service field equal to the service instance
+////            ReceiveMessagesService.LocalBinder binder = (ReceiveMessagesService.LocalBinder) service;
+////            receiveMessagesService = binder.getServiceInstance();
+//
+//            // Register this activity to get callbacks
+////            receiveMessagesService.registerActivity(MessageActivity.this);
+//
+//        }
+//
+//        @Override
+//        public void onServiceDisconnected(ComponentName name) {
+//            Log.d(TAG, "Service has disconnected");
+////            boundReceiveService = false;
+//        }
+//    };
 
 
     public void onReceivedMessages(final String username, final String message, final boolean isPrivate, final long date) {
@@ -348,7 +374,6 @@ public class MessageActivity extends AppCompatActivity {
                     addReceivedMessageToListView(message, username, date);
                 } else {
                     postNotification(username, message, isPrivate);
-                    Log.d(TAG, "Something went weird with onReceivedMessages");
                     Log.d(TAG, "username=" + username);
                     Log.d(TAG, "targetUsername=" + targetUsername);
                     Log.d(TAG, "isPrivate=" + isPrivate);
@@ -461,8 +486,44 @@ public class MessageActivity extends AppCompatActivity {
                             intent.getBooleanExtra(Constants.PRIVATE_MESSAGE_EXTRA, true),
                             intent.getLongExtra(Constants.DATE_EXTRA, 0));
                     break;
+                case Constants.CONVERSATION_MESSAGES_INTENT :
+                    Log.d(TAG, "CONVERSATION_MESSAGES_INTENT");
+                    if (targetUsername.equals(intent.getStringExtra(Constants.USERNAME_EXTRA))) {
+                        Log.d(TAG, "if");
+                        Log.d(TAG, "" + intent.getParcelableArrayListExtra(Constants.MESSAGES_ARRAY_EXTRA));
+                        //for (Message m : intent.getParcelableArrayListExtra(Constants.MESSAGES_ARRAY_EXTRA))
+                        ArrayList<Message> msgs = intent.getParcelableArrayListExtra(Constants.MESSAGES_ARRAY_EXTRA);
+                        for (Message m : msgs) {
+                            System.out.println(m.toString());
+                        }
+                        arrayOfMessages.clear();
+                        arrayOfMessages.addAll(msgs);
+                        adapter.notifyDataSetChanged();
+                        lvMessages.smoothScrollToPosition(adapter.getCount() - 1);
+                    } else {
+                        Log.d(TAG, "else");
+                    }
+                    break;
             }
         }
     }
+
+//    private ServiceConnection mServiceConnection = new ServiceConnection() {
+//
+//        @Override
+//        public void onServiceDisconnected(ComponentName name) {
+//            mServiceBound = false;
+//        }
+//
+//        @Override
+//        public void onServiceConnected(ComponentName name, IBinder service) {
+//            AndroidUIService.AndroidUIBinder myBinder = (AndroidUIService.AndroidUIBinder) service;
+//            mBoundService = myBinder.getService();
+//            mServiceBound = true;
+//            arrayOfMessages.addAll(mBoundService.getMessages(targetUsername));
+//            adapter.notifyDataSetChanged();
+//            lvMessages.smoothScrollToPosition(adapter.getCount() - 1);
+//        }
+//    };
 }
 

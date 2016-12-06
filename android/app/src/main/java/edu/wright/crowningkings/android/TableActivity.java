@@ -1,5 +1,8 @@
 package edu.wright.crowningkings.android;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -7,7 +10,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -127,8 +131,7 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
         System.out.println("nav item " + item.getTitle() + " was pressed ");
 
         Intent messageIntent = new Intent(TableActivity.this, MessageActivity.class);
-        messageIntent.putExtra(Constants.chatROWID, Long.valueOf(item.getTitle().hashCode()));
-        messageIntent.putExtra(Constants.chatHandlesString, item.getTitle());
+        messageIntent.putExtra(Constants.USERNAME_EXTRA, item.getTitle());
         startActivity(messageIntent);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -175,6 +178,7 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
     private void displayYourTurnDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(TableActivity.this)
                 .setMessage(getResources().getString(R.string.your_turn_message))
@@ -231,7 +235,7 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
         }
     }
 
-    private  void opponentMove(int[] from, int[] to) {
+    private void opponentMove(int[] from, int[] to) {
         Location fromLocation = new Location(from[0], from[1]);
         Location toLocation = new Location(to[0], to[1]);
         List<Location> moves = new ArrayList<>();
@@ -239,6 +243,52 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
         Rules.move(game, game.getBoard().getPieceAtLocation(fromLocation), moves);
     }
 
+    private void postNotification(String fromUsername, String message, boolean privateMessage) {
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle(fromUsername)
+                        .setContentText(message)
+                        .setTicker("New message from " + fromUsername + " - \n" + message)
+                        .setPriority(Notification.PRIORITY_HIGH)
+                        .setDefaults(Notification.DEFAULT_VIBRATE);
+
+        // Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(TableActivity.this, MessageActivity.class);
+        //resultIntent.putExtra(Constants.MESSAGES_ARRAY_EXTRA, conversation);
+        if (privateMessage) {
+//            resultIntent.putExtra(Constants.chatHandlesString, fromUsername);
+            resultIntent.putExtra(Constants.USERNAME_EXTRA, fromUsername);
+        } else {
+//            resultIntent.putExtra(Constants.chatHandlesString, getResources().getString(R.string.public_message_group_name));
+            resultIntent.putExtra(Constants.USERNAME_EXTRA, getResources().getString(R.string.public_message_group_name));
+        }
+
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        // Adds the back stack for the Intent (but not the Intent itself)
+//        stackBuilder.addParentStack(this);
+        // Adds the Intent that starts the Activity to the top of the stack
+//        stackBuilder.addNextIntent(resultIntent);
+        stackBuilder.addNextIntentWithParentStack(resultIntent);
+//        PendingIntent resultPendingIntent =
+//                stackBuilder.getPendingIntent(
+//                        0,
+//                        PendingIntent.FLAG_UPDATE_CURRENT);
+//        mBuilder.setContentIntent(resultPendingIntent);
+        PendingIntent pendingIntent =
+                PendingIntent.getActivity(TableActivity.this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.setContentIntent(pendingIntent);
+        mBuilder.setAutoCancel(true);   // this removes notification on tap
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        // mId allows you to update the notification later on.
+        Notification notification = mBuilder.build();
+        mNotificationManager.notify(0, notification);
+    }
 
     private class TableActivityBroadcastReceiver extends BroadcastReceiver {
         @Override
@@ -312,7 +362,11 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
                     Log.d(TAG, "STOPPED_OBSERVING_INTENT");
                     break;
                 case Constants.NEW_MESSAGE_INTENT:
-                    Log.d(TAG, "NEW_MESSAGE_INTENT");
+                    postNotification(
+                            intent.getStringExtra(Constants.USERNAME_EXTRA),
+                            intent.getStringExtra(Constants.MESSAGE_EXTRA),
+                            intent.getBooleanExtra(Constants.PRIVATE_MESSAGE_EXTRA, true));
+
                     if (intent.getBooleanExtra(Constants.PRIVATE_MESSAGE_EXTRA, true)) {
                         addUserToPrivateMessagesMenu(intent.getStringExtra(Constants.USERNAME_EXTRA));
                     }

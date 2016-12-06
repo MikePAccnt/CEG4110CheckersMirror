@@ -36,7 +36,7 @@ public class Chat {
         int i = 0;
         for (String handle : this.handles) {
             handlesString += handle;
-            if (i < this.handles.size() -1) {
+            if (i < this.handles.size() - 1) {
                 handlesString += ", ";
             }
             i++;

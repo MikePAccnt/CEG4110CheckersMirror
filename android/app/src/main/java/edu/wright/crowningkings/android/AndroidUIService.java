@@ -1,8 +1,5 @@
 package edu.wright.crowningkings.android;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,11 +8,11 @@ import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import edu.wright.crowningkings.base.BaseClient;
 import edu.wright.crowningkings.base.UserInterface.AbstractUserInterface;
@@ -28,7 +25,10 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
     private static final String TAG = "AndroidUIService";
     private BaseClient client = null;
     private String username = null;
+    //    private IBinder mBinder = new AndroidUIBinder();
+    private HashMap<String, ArrayList<Message>> allMessages = null;
 
+    private IntentFilter androidUIIntentFilter = new IntentFilter();
     private BroadcastReceiver androidUIBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, final Intent intent) {
@@ -43,20 +43,31 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
                     }).start();
                     break;
                 case Constants.MESSAGE_ALL_INTENT:
+                    final String message = intent.getStringExtra(Constants.MESSAGE_EXTRA);
+                    ArrayList<Message> msgs = getMessages(getResources().getString(R.string.public_message_group_name));
+                    msgs.add(new Message(message, MessageType.SENT, MessageStatus.SUCCESSFUL, username));
+                    setMessages(getResources().getString(R.string.public_message_group_name), msgs);
+
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            client.messageAll(intent.getStringExtra(Constants.MESSAGE_EXTRA));
+                            client.messageAll(message);
                         }
                     }).start();
                     break;
                 case Constants.MESSAGE_CLIENT_INTENT:
+                    final String from = intent.getStringExtra(Constants.USERNAME_EXTRA);
+                    final String privateMessage = intent.getStringExtra(Constants.MESSAGE_EXTRA);
+
+                    ArrayList<Message> pmsgs = getMessages(from);
+                    pmsgs.add(new Message(privateMessage, MessageType.SENT, MessageStatus.SUCCESSFUL, from));
+                    setMessages(from, pmsgs);
+
+
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            client.messageClient(
-                                    intent.getStringExtra(Constants.USERNAME_EXTRA),
-                                    intent.getStringExtra(Constants.MESSAGE_EXTRA));
+                            client.messageClient(from, privateMessage);
                         }
                     }).start();
                     break;
@@ -109,6 +120,7 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
                         @Override
                         public void run() {
                             client.quit();
+                            stopSelf();
                         }
                     }).start();
                     break;
@@ -127,18 +139,22 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
                             client.observeTable(intent.getStringExtra(Constants.TABLE_ID_EXTRA));
                         }
                     }).start();
+                    break;
+                case Constants.REQUEST_CONVERSATION_MESSAGES_INTENT:
+                    String fromtarget = intent.getStringExtra(Constants.USERNAME_EXTRA);
+                    sendBroadcast(new Intent(Constants.CONVERSATION_MESSAGES_INTENT)
+                            .putExtra(Constants.USERNAME_EXTRA, fromtarget)
+                            .putExtra(Constants.MESSAGES_ARRAY_EXTRA, getMessages(fromtarget)));
+                    break;
             }
         }
     };
-
-    private IntentFilter androidUIIntentFilter = new IntentFilter();
-
 
     @Override
     public void onCreate() {
         Log.d(TAG, "onCreate()");
         super.onCreate();
-
+        allMessages = new HashMap<>();
         new AsyncTask<AbstractUserInterface, Void, Void>() {
             protected Void doInBackground(AbstractUserInterface... voids) {
                 client = new BaseClient(voids[0]);
@@ -157,9 +173,9 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
         androidUIIntentFilter.addAction(Constants.QUIT_INTENT);
         androidUIIntentFilter.addAction(Constants.ASK_TABLE_STATUS_INTENT);
         androidUIIntentFilter.addAction(Constants.OBSERVE_TABLE_INTENT);
+        androidUIIntentFilter.addAction(Constants.REQUEST_CONVERSATION_MESSAGES_INTENT);
         registerReceiver(androidUIBroadcastReceiver, androidUIIntentFilter);
     }
-
 
     @Override
     public void onDestroy() {
@@ -182,11 +198,26 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
     @Override
     public void message(String message, String from, boolean privateMessage) {
         if (!from.equals(username)) {
+            System.out.println("good...");
+            ArrayList<Message> msgs;
+            if (privateMessage) {
+                msgs = getMessages(from);
+            } else {
+                msgs = getMessages(getResources().getString(R.string.public_message_group_name));
+            }
+            msgs.add(new Message(message, MessageType.RECEIVED, MessageStatus.UNSUCCESSFUL, from));
+            if (privateMessage) {
+                setMessages(from, msgs);
+            } else {
+                setMessages(getResources().getString(R.string.public_message_group_name), msgs);
+            }
+            System.out.println("sending broadcast from auiservice");
             sendBroadcast(new Intent(Constants.NEW_MESSAGE_INTENT)
                     .putExtra(Constants.MESSAGE_EXTRA, message)
                     .putExtra(Constants.USERNAME_EXTRA, from)
                     .putExtra(Constants.PRIVATE_MESSAGE_EXTRA, privateMessage)
-                    .putExtra(Constants.DATE_EXTRA, (new Date()).getTime()));
+                    .putExtra(Constants.DATE_EXTRA, (new Date()).getTime())
+                    .putExtra(Constants.MESSAGES_ARRAY_EXTRA, msgs));
         }
     }
 
@@ -314,40 +345,94 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
         sendBroadcast(new Intent(Constants.STOPPED_OBSERVING_INTENT));
     }
 
-    public void netException(){}
+    public ArrayList<Message> getMessages(String username) {
+        ArrayList<Message> ret = allMessages.get(username);
+        if (ret == null) {
+            ret = new ArrayList<>();
+            allMessages.put(username, ret);
+        }
+        return ret;
+    }
 
-    public void nameInUse(){}
+    public void setMessages(String username, ArrayList<Message> messages) {
+        allMessages.put(username, messages);
+    }
 
-    public void illegalMove(){}
+    @Override
+    public void netException() {
+        sendBroadcast(new Intent(Constants.ERROR_NET_EXCEPTION_INTENT));
+    }
 
-    public void tblFull(){}
+    @Override
+    public void nameInUse() {
+        sendBroadcast(new Intent(Constants.ERROR_NAME_IN_USE_INTENT));
+    }
 
-    public void notInLobby(){}
+    @Override
+    public void illegalMove() {
+        sendBroadcast(new Intent(Constants.ERROR_ILLEGAL_MOVE_INTENT));
+    }
 
-    public void badMessage(){}
+    @Override
+    public void tblFull() {
+        sendBroadcast(new Intent(Constants.ERROR_TABLE_FULL_INTENT));
+    }
 
-    public void errorLobby(){}
+    @Override
+    public void notInLobby() {
+        sendBroadcast(new Intent(Constants.ERROR_NOT_IN_LOBBY_INTENT));
+    }
 
-    public void badName(){}
+    @Override
+    public void badMessage() {
+        sendBroadcast(new Intent(Constants.ERROR_BAD_MESSAGE_INTENT));
+    }
 
-    public void playerNotReady(){}
+    @Override
+    public void errorLobby() {
+        sendBroadcast(new Intent(Constants.ERROR_IN_LOBBY_INTENT));
+    }
 
-    public void notYourTurn(){}
+    @Override
+    public void badName() {
+        sendBroadcast(new Intent(Constants.ERROR_BAD_USERNAME_INTENT));
+    }
 
-    public void tableNotExist(){}
+    @Override
+    public void playerNotReady() {
+        sendBroadcast(new Intent(Constants.ERROR_PLAYERS_NOT_READY_INTENT));
+    }
 
-    public void gameNotCreated(){}
+    @Override
+    public void notYourTurn() {
+        sendBroadcast(new Intent(Constants.ERROR_NOT_YOUR_TURN_INTENT));
+    }
 
-    public void notObserving(){}
+    @Override
+    public void tableNotExist() {
+        sendBroadcast(new Intent(Constants.ERROR_TABLE_NOT_EXIST_INTENT));
+    }
 
+    @Override
+    public void gameNotCreated() {
+        sendBroadcast(new Intent(Constants.ERROR_GAME_NOT_CREATED_INTENT));
+    }
+
+    @Override
+    public void notObserving() {
+        sendBroadcast(new Intent(Constants.ERROR_NOT_OBSERVING_INTENT));
+    }
+
+
+//    public class AndroidUIBinder extends Binder {
+//        AndroidUIService getService() {
+//            return AndroidUIService.this;
+//        }
+//    }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
-
-
-
-
 }

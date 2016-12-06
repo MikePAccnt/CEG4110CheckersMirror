@@ -11,7 +11,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.GravityCompat;
@@ -38,7 +37,6 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
     private String username;
     private BroadcastReceiver lobbyBroadcastReceiver = new LobbyBroadcastReceiver();
     private IntentFilter lobbyIntentFilter = new IntentFilter();
-    private Intent androidUIService;
 
 
     @Override
@@ -53,8 +51,6 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
                 makeTable();
             }
         });
@@ -71,16 +67,13 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
         navigationView.getMenu().add(getResources().getString(R.string.public_message_group_name));
         navPrivateMessagesMenu = navigationView.getMenu().addSubMenu(getResources().getString(R.string.private_messages_menu_name));
 
+        username = getIntent().getStringExtra(Constants.USERNAME_EXTRA);
+
         ArrayList<String> test = new ArrayList<>();
-        test.add("Test");
         tablesListArrayAdapter = new TablesListArrayAdapter<>(this,
                 R.layout.lobby_table_item, R.id.table_number, test);
         tablesListView = (ListView) findViewById(R.id.lobby_tables_list);
         tablesListView.setAdapter(tablesListArrayAdapter);
-
-        Log.d(TAG, "About to start the androiduiservice");
-        androidUIService = new Intent(this, AndroidUIService.class);
-        startService(androidUIService);
 
         //lobbyIntentFilter.addAction(Constants.USERNAME_REQUEST_INTENT);
         lobbyIntentFilter.addAction(Constants.SEND_USERNAME_REPLY_INTENT);
@@ -91,6 +84,7 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
         lobbyIntentFilter.addAction(Constants.NOW_IN_LOBBY_INTENT);
         lobbyIntentFilter.addAction(Constants.TABLE_JOINED_INTENT);
         lobbyIntentFilter.addAction(Constants.NEW_MESSAGE_INTENT);
+        registerReceiver(lobbyBroadcastReceiver, lobbyIntentFilter);
     }
 
 
@@ -120,7 +114,6 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
     protected void onDestroy() {
         Log.d(TAG, "onDestroy()");
         quit();
-        stopService(androidUIService);
         super.onDestroy();
     }
 
@@ -168,7 +161,7 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
         Intent messageIntent = new Intent(Lobby.this, MessageActivity.class);
 //        messageIntent.putExtra(Constants.chatHandlesString, item.getTitle());
         messageIntent.putExtra(Constants.USERNAME_EXTRA, item.getTitle());
-
+        //messageIntent.putExtra(Constants.MESSAGES_ARRAY_EXTRA, new ArrayList<Parcelable>());
         startActivity(messageIntent);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -198,7 +191,20 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
 
 
     private void makeTable() {
-        sendBroadcast(new Intent(Constants.MAKE_TABLE_INTNENT));
+        AlertDialog.Builder builder = new AlertDialog.Builder(Lobby.this)
+                .setMessage(getResources().getString(R.string.make_table_dialog_message))
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        sendBroadcast(new Intent(Constants.MAKE_TABLE_INTNENT));
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
     }
 
 
@@ -212,9 +218,9 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                tablesListArrayAdapter.clear();
+                //tablesListArrayAdapter.clear();
                 for (String table : tableID) {
-                    tablesListArrayAdapter.add(table);
+                    tablesListArrayAdapter.addTable(table);
                 }
             }
         });
@@ -336,6 +342,7 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
 
         // Creates an explicit intent for an Activity in your app
         Intent resultIntent = new Intent(Lobby.this, MessageActivity.class);
+        //resultIntent.putExtra(Constants.MESSAGES_ARRAY_EXTRA, conversation);
         if (privateMessage) {
 //            resultIntent.putExtra(Constants.chatHandlesString, fromUsername);
             resultIntent.putExtra(Constants.USERNAME_EXTRA, fromUsername);
@@ -384,6 +391,8 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
 //                    username = intent.getStringExtra(Constants.USERNAME_EXTRA);
 //                    break;
                 case Constants.TABLE_LIST_INTENT:
+                    addNewTables(intent.getStringArrayExtra(Constants.TABLE_ID_ARRAY_EXTRA));
+                    break;
                 case Constants.NEW_TABLE_INTENT:
                     addNewTables(intent.getStringArrayExtra(Constants.TABLE_ID_ARRAY_EXTRA));
                     break;

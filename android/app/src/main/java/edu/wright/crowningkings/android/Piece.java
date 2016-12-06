@@ -28,11 +28,11 @@ public class Piece {
         return location;
     }
 
-    void makeKing() {
-        this.king = true;
-    }
-
     void setLocation(final Location location) {
         this.location = location;
+    }
+
+    void makeKing() {
+        this.king = true;
     }
 }

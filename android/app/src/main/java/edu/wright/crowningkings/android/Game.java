@@ -25,15 +25,15 @@ public class Game {
         return turn;
     }
 
+    public void setTurn(Team turn) {
+        this.turn = turn;
+    }
+
     public String getId() {
         return id;
     }
 
     public void clearTurn() {
         this.turn = null;
-    }
-
-    public void setTurn(Team turn) {
-        this.turn = turn;
     }
 }

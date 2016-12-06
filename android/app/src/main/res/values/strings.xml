@@ -20,6 +20,7 @@
     <string name="username_request_dialog_message">Enter Username message</string>
 
     <string name="table_dialog_ready_message">Are you ready to play?</string>
+    <string name="make_table_dialog_message">Make and join new table?</string>
     <string name="ready_button">Start</string>
 
     <string name="win_message">You win!</string>

@@ -63,6 +63,9 @@ public class Constants {
     public static final String ERROR_GAME_NOT_CREATED_INTENT = "ERROR_GAME_NOT_CREATED_INTENT";
     public static final String ERROR_NOT_OBSERVING_INTENT = "ERROR_NOT_OBSERVING_INTENT";
 
+    public static final String CONVERSATION_MESSAGES_INTENT = "CONVERSATION_MESSAGES_INTENT";
+    public static final String REQUEST_CONVERSATION_MESSAGES_INTENT = "REQUEST_CONVERSATION_MESSAGES_INTENT";
+
     public static final String TABLE_ID_ARRAY_EXTRA = "TABLE_ID_ARRAY_EXTRA";
     public static final String USERS_ARRAY_EXTRA = "USERS_ARRAY_EXTRA";
     public static final String USER_ONE_EXTRA = "USER_ONE_EXTRA";
@@ -70,6 +73,7 @@ public class Constants {
     public static final String TABLE_ID_EXTRA = "TABLE_ID_EXTRA";
     public static final String USERNAME_EXTRA = "USERNAME_EXTRA";
     public static final String MESSAGE_EXTRA = "MESSAGE_EXTRA";
+    public static final String MESSAGES_ARRAY_EXTRA = "MESSAGES_ARRAY_EXTRA";
     public static final String PRIVATE_MESSAGE_EXTRA = "PRIVATE_MESSAGE_EXTRA";
     public static final String FROM_LOCATION_EXTRA = "FROM_LOCATION_EXTRA";
     public static final String TO_LOCATION_EXTRA = "TO_LOCATION_EXTRA";
