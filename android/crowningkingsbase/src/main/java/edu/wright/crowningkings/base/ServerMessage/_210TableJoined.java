@@ -2,6 +2,8 @@ package edu.wright.crowningkings.base.ServerMessage;
 
 import edu.wright.crowningkings.base.BaseClient;
 
+import static java.lang.Thread.sleep;
+
 /**
  * Created by csmith on 11/3/16.
  */
@@ -19,5 +21,10 @@ public class _210TableJoined extends AbstractServerMessage {
 		System.out.println("_210TableJoined.run(BaseClient)");
 		String[] p = getParameters();
 		client.tableJoined(p[1]);
+        try {
+            sleep(200);
+        } catch (InterruptedException ie) {
+            System.out.println("InterruptedException : " + ie.getMessage());
+        }
     }
 }

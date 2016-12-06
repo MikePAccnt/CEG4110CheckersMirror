@@ -7,6 +7,8 @@ import java.net.Socket;
 
 import edu.wright.crowningkings.base.ServerMessage.AbstractServerMessage;
 
+import static java.lang.Thread.sleep;
+
 /**
  * Created by csmith on 10/26/16.
  *
@@ -49,8 +51,12 @@ public class ServerConnection {
         try {
             byte[] rawMessage = new byte[512];
             int numberOfBytes = serverInputStream.read(rawMessage);
-            String inMessage = new String(rawMessage, 0, numberOfBytes, "UTF-8");
-            messages = inMessage.split("<EOM>");
+            if (numberOfBytes > -1 && numberOfBytes < 512) {
+                String inMessage = new String(rawMessage, 0, numberOfBytes, "UTF-8");
+                messages = inMessage.split("<EOM>");
+            } else {
+                sleep(1000);
+            }
 
         } catch (Exception e) {
             System.out.println("getServerMessage Exception : " + e.getMessage());
