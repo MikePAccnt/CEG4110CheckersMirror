@@ -15,7 +15,7 @@ public class _209GameLose extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-		//System.out.println("_209GameLose.run(BaseClient)");
+		System.out.println("_209GameLose.run(BaseClient)");
 		client.gameLose();
     }
 }

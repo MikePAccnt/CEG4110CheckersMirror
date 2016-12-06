@@ -16,7 +16,7 @@ public class _235StoppedObserving extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-		//System.out.println("_235StoppedObserving.run(BaseClient)");
+		System.out.println("_235StoppedObserving.run(BaseClient)");
 		String[] p = getParameters();
 		client.stoppedObserving(p[1]);
     }

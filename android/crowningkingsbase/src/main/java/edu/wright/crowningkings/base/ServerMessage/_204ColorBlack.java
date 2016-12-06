@@ -15,7 +15,7 @@ public class _204ColorBlack extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-		//System.out.println("_204ColorBlack.run(BaseClient)");
+		System.out.println("_204ColorBlack.run(BaseClient)");
 		client.colorBlack();
     }
 }

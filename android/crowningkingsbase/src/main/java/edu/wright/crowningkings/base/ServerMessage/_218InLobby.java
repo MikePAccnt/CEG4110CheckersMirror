@@ -15,7 +15,7 @@ public class _218InLobby extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-		//System.out.println("_218InLobby.run(BaseClient)");
+		System.out.println("_218InLobby.run(BaseClient)");
 		client.inLobby();
     }
 }

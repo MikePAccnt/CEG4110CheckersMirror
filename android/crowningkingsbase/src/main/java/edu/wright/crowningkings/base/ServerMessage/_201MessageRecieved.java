@@ -21,7 +21,7 @@ public class _201MessageRecieved extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-		//System.out.println("_201MessageRecieved.run(BaseClient)");
+		System.out.println("_201MessageRecieved.run(BaseClient)");
 		String[] p = getParameters();
 		if(p[2].equals("1")){
 			client.message(p[3],p[1],true);

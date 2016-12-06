@@ -21,7 +21,7 @@ public class _206OpponentMove extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-		//System.out.println("_206OpponentMove.run(BaseClient)");
+		System.out.println("_206OpponentMove.run(BaseClient)");
 		String[] p1 = {getParameters()[1], getParameters()[2]};
 		String[] p2 = {getParameters()[3], getParameters()[4]};
 		client.opponentMove(p1, p2);

@@ -16,7 +16,7 @@ public class _222TableLeft extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-		//System.out.println("_222TableLeft.run(BaseClient)");
+		System.out.println("_222TableLeft.run(BaseClient)");
 		String[] p = getParameters();
 		client.tableLeft(p[1]);
     }

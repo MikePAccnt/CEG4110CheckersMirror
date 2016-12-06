@@ -15,7 +15,7 @@ public class _220OpponentLeft extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-		//System.out.println("_220OpponentLeft.run(BaseClient)");
+		System.out.println("_220OpponentLeft.run(BaseClient)");
 		client.opponentLeftTable();
     }
 }

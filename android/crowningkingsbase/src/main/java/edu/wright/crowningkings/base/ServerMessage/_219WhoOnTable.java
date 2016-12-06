@@ -18,7 +18,7 @@ public class _219WhoOnTable extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-		//System.out.println("_219WhoOnTable.run(BaseClient)");
+		System.out.println("_219WhoOnTable.run(BaseClient)");
 		String[] p = getParameters();
 		client.whoOnTable(p[2], p[3], p[1], p[4], p[5]);
     }

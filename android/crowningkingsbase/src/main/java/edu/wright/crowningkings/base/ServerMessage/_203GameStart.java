@@ -15,7 +15,7 @@ public class _203GameStart extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-		//System.out.println("_203GameStart.run(BaseClient)");
+		System.out.println("_203GameStart.run(BaseClient)");
 		client.gameStart();
     }
 }

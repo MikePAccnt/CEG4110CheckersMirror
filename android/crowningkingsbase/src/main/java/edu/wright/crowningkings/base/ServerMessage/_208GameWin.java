@@ -15,7 +15,7 @@ public class _208GameWin extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-		//System.out.println("_208GameWin.run(BaseClient)");
+		System.out.println("_208GameWin.run(BaseClient)");
 		client.gameWon();
     }
 }
