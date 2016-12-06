@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">CrowningKings</string>
     <string name="username_hint">Username</string>
-    <string name="title_activity_lobby">Lobby</string>
+    <string name="lobby_activity">Lobby</string>
     <string name="message_activity">Message</string>
     <string name="table_activity">Table</string>
 
@@ -22,6 +22,10 @@
     <string name="table_dialog_ready_message">Are you ready to play?</string>
     <string name="ready_button">Start</string>
 
+    <string name="win_message">You win!</string>
+    <string name="lose_message">You lose!</string>
+    <string name="your_turn_message">Your turn</string>
+
 
     <string name="public_message_group_name">Public Group Message</string>
     <string name="make_new_message">New Message</string>
@@ -39,4 +43,14 @@
 
 
     <string name="insert_number"><![CDATA[<Insert Number>]]></string>
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_username">Username</string>
+    <string name="prompt_ip_addr">Server IP Address</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="error_invalid_ip_addr">This ip address is invalid</string>
+    <string name="error_invalid_username">Username can not contain spaces</string>
+    <string name="error_username_taken">Username already taken</string>
+    <string name="error_field_required">This field is required</string>
 </resources>

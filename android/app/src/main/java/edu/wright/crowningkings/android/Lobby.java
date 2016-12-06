@@ -82,7 +82,7 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
         androidUIService = new Intent(this, AndroidUIService.class);
         startService(androidUIService);
 
-        lobbyIntentFilter.addAction(Constants.USERNAME_REQUEST_INTENT);
+        //lobbyIntentFilter.addAction(Constants.USERNAME_REQUEST_INTENT);
         lobbyIntentFilter.addAction(Constants.SEND_USERNAME_REPLY_INTENT);
         lobbyIntentFilter.addAction(Constants.NEW_TABLE_INTENT);
         lobbyIntentFilter.addAction(Constants.WHO_IN_LOBBY_INTENT);
@@ -212,7 +212,6 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                System.out.println("runonuithread.run()");
                 tablesListArrayAdapter.clear();
                 for (String table : tableID) {
                     tablesListArrayAdapter.add(table);
@@ -273,25 +272,25 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
     }
 
 
-    public void sendUsernameRequest() {
-        AlertDialog.Builder builder;
-        builder = new AlertDialog.Builder(Lobby.this)
-                .setTitle(getResources().getString(R.string.username_request_dialog_title))
-                .setMessage(getResources().getString(R.string.username_request_dialog_message))
-                .setCancelable(false)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        sendUsernameReply("AndroidBob");
-                    }
-                });
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
+//    public void sendUsernameRequest() {
+//        AlertDialog.Builder builder;
+//        builder = new AlertDialog.Builder(Lobby.this)
+//                .setTitle(getResources().getString(R.string.username_request_dialog_title))
+//                .setMessage(getResources().getString(R.string.username_request_dialog_message))
+//                .setCancelable(false)
+//                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        sendUsernameReply("AndroidBob");
+//                    }
+//                });
+//        AlertDialog dialog = builder.create();
+//        dialog.show();
+//    }
 
 
-    public void sendUsernameReply(final String username) {
-        sendBroadcast(new Intent(Constants.SEND_USERNAME_REPLY_INTENT).putExtra(Constants.USERNAME_EXTRA, username));
-    }
+//    public void sendUsernameReply(final String username) {
+//        sendBroadcast(new Intent(Constants.SEND_USERNAME_REPLY_INTENT).putExtra(Constants.USERNAME_EXTRA, username));
+//    }
 
 
     public void whoInLobby(String[] users) {
@@ -376,14 +375,14 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
         @Override
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
-                case Constants.USERNAME_REQUEST_INTENT:
-                    Log.d(TAG, "USERNAME_REQUEST_INTENT");
-                    sendUsernameRequest();
-                    break;
-                case Constants.SEND_USERNAME_REPLY_INTENT:
-                    Log.d(TAG, "SEND_USERNAME_REPLY_INTENT");
-                    username = intent.getStringExtra(Constants.USERNAME_EXTRA);
-                    break;
+//                case Constants.USERNAME_REQUEST_INTENT:
+//                    Log.d(TAG, "USERNAME_REQUEST_INTENT");
+//                    sendUsernameRequest();
+//                    break;
+//                case Constants.SEND_USERNAME_REPLY_INTENT:
+//                    Log.d(TAG, "SEND_USERNAME_REPLY_INTENT");
+//                    username = intent.getStringExtra(Constants.USERNAME_EXTRA);
+//                    break;
                 case Constants.TABLE_LIST_INTENT:
                 case Constants.NEW_TABLE_INTENT:
                     addNewTables(intent.getStringArrayExtra(Constants.TABLE_ID_ARRAY_EXTRA));

@@ -25,14 +25,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="false"
-        android:visibility="invisible" />
+        android:visibility="gone" />
 
     <Button
+        android:id="@+id/ready_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:onClick="onReadyClick"
+        android:visibility="visible"
         android:text="@string/ready_button" />
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"

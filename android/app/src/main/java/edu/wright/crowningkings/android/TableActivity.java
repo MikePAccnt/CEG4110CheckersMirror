@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -17,6 +18,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by csmith on 11/22/16.
@@ -29,6 +33,10 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
     private Menu navPrivateMessagesMenu;
     private String tableId;
     private String username;
+    private BoardView boardView = null;
+    private Game game = null;
+    private Team myTeam = null;
+    private Team opponentTeam = null;
 
 
     @Override
@@ -44,8 +52,9 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
         toolbar.setTitle("Table " + tableId);
         setSupportActionBar(toolbar);
 
-        final BoardView boardView = (BoardView) findViewById(R.id.board_view);
-        boardView.setGame(new Game(tableId, new Board(8, Board.initializePieces(8)), Team.RED));
+        boardView = (BoardView) findViewById(R.id.board_view);
+//        game = new Game(tableId, new Board(Board.initializePieces()), Team.BLACK);
+//        boardView.setGame(game);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -145,6 +154,38 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
         dialog.show();
     }
 
+    private void displayWinDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(TableActivity.this)
+                .setMessage(getResources().getString(R.string.win_message))
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void displayLoseDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(TableActivity.this)
+                .setMessage(getResources().getString(R.string.lose_message))
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+    private void displayYourTurnDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(TableActivity.this)
+                .setMessage(getResources().getString(R.string.your_turn_message))
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     private void addUserToPrivateMessagesMenu(final String user) {
         this.runOnUiThread(new Runnable() {
             @Override
@@ -170,7 +211,16 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
                                         getResources().getString(R.string.table_dialog_ready_message))
                                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
-                                        Log.d(TAG, "I'M READY!");
+                                        sendBroadcast(new Intent(Constants.READY_INTENT));
+                                        View rb = findViewById(R.id.ready_button);
+                                        if (rb != null) {
+                                            rb.setVisibility(View.GONE);
+                                        }
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Log.d(TAG, "I'M NOT READY!");
                                     }
                                 });
                         AlertDialog dialog = builder.create();
@@ -181,32 +231,61 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
         }
     }
 
+    private  void opponentMove(int[] from, int[] to) {
+        Location fromLocation = new Location(from[0], from[1]);
+        Location toLocation = new Location(to[0], to[1]);
+        List<Location> moves = new ArrayList<>();
+        moves.add(toLocation);
+        Rules.move(game, game.getBoard().getPieceAtLocation(fromLocation), moves);
+    }
+
 
     private class TableActivityBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            //boardView = (BoardView) findViewById(R.id.board_view);
             switch (intent.getAction()) {
                 case Constants.GAME_START_INTENT:
                     Log.d(TAG, "GAME_START_INTENT");
-                    findViewById(R.id.board_view).setVisibility(View.VISIBLE);
+                    boardView.setVisibility(View.VISIBLE);
+                    View bv = findViewById(R.id.ready_button);
+                    if (bv != null) {
+                        bv.setVisibility(View.GONE);
+                    }
                     break;
                 case Constants.COLOR_BLACK_INTENT:
                     Log.d(TAG, "COLOR_BLACK_INTENT");
+                    myTeam = Team.BLACK;
+                    opponentTeam = Team.RED;
+                    game = new Game(tableId, new Board(Board.initializePieces()), myTeam);
+                    boardView.setGame(game);
                     break;
                 case Constants.COLOR_RED_INTENT:
                     Log.d(TAG, "COLOR_RED_INTENT");
+                    myTeam = Team.RED;
+                    opponentTeam = Team.BLACK;
+                    game = new Game(tableId, new Board(Board.initializePieces()), myTeam);
+                    boardView.setGame(game);
                     break;
                 case Constants.OPPONENT_MOVE_INTENT:
                     Log.d(TAG, "OPPONENT_MOVE_INTENT");
+                    String[] f = intent.getStringArrayExtra(Constants.FROM_LOCATION_EXTRA);
+                    int[] from = {Integer.parseInt(f[0]), Integer.parseInt(f[1])};
+                    String[] t = intent.getStringArrayExtra(Constants.TO_LOCATION_EXTRA);
+                    int[] to = {Integer.parseInt(t[0]), Integer.parseInt(t[1])};
+                    opponentMove(from, to);
                     break;
                 case Constants.BOARD_STATE_INTENT:
                     Log.d(TAG, "BOARD_STATE_INTENT");
+                    Log.d(TAG, intent.getStringExtra(Constants.BOARD_STATE_EXTRA));
                     break;
                 case Constants.GAME_WIN_INTENT:
                     Log.d(TAG, "GAME_WIN_INTENT");
+                    displayWinDialog();
                     break;
                 case Constants.GAME_LOSE_INTENT:
                     Log.d(TAG, "GAME_LOSE_INTENT");
+                    displayLoseDialog();
                     break;
                 case Constants.WHO_ON_TABLE:
                     Log.d(TAG, "WHO_ON_TABLE");
@@ -220,6 +299,8 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
                     break;
                 case Constants.YOUR_TURN_INTENT:
                     Log.d(TAG, "YOUR_TURN_INTENT");
+                    displayYourTurnDialog();
+                    game.setTurn(myTeam);
                     break;
                 case Constants.TABLE_LEFT_INTENT:
                     Log.d(TAG, "TABLE_LEFT_INTENT");
@@ -236,7 +317,6 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
                         addUserToPrivateMessagesMenu(intent.getStringExtra(Constants.USERNAME_EXTRA));
                     }
                     break;
-
             }
         }
     }

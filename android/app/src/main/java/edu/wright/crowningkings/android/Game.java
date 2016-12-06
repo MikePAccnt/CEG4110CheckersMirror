@@ -14,7 +14,7 @@ public class Game {
 
         this.id = id;
         this.board = board;
-        this.turn = turn;
+        //this.turn = turn;
     }
 
     public Board getBoard() {
@@ -31,5 +31,9 @@ public class Game {
 
     public void clearTurn() {
         this.turn = null;
+    }
+
+    public void setTurn(Team turn) {
+        this.turn = turn;
     }
 }

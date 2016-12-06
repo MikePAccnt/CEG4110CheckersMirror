@@ -49,6 +49,19 @@ public class Constants {
     public static final String NOW_OBSERVING_INTENT = "NOW_OBSERVING_INTENT";
     public static final String STOPPED_OBSERVING_INTENT = "STOPPED_OBSERVING_INTENT";
 
+    public static final String ERROR_NET_EXCEPTION_INTENT = "ERROR_NET_EXCEPTION_INTENT";
+    public static final String ERROR_NAME_IN_USE_INTENT = "ERROR_NAME_IN_USE_INTENT";
+    public static final String ERROR_ILLEGAL_MOVE_INTENT = "ERROR_ILLEGAL_MOVE_INTENT";
+    public static final String ERROR_TABLE_FULL_INTENT = "ERROR_TABLE_FULL_INTENT";
+    public static final String ERROR_NOT_IN_LOBBY_INTENT = "ERROR_NOT_IN_LOBBY_INTENT";
+    public static final String ERROR_BAD_MESSAGE_INTENT = "ERROR_BAD_MESSAGE_INTENT";
+    public static final String ERROR_IN_LOBBY_INTENT = "ERROR_IN_LOBBY_INTENT";
+    public static final String ERROR_BAD_USERNAME_INTENT = "ERROR_BAD_USERNAME_INTENT";
+    public static final String ERROR_PLAYERS_NOT_READY_INTENT = "ERROR_PLAYERS_NOT_READY_INTENT";
+    public static final String ERROR_NOT_YOUR_TURN_INTENT = "ERROR_NOT_YOUR_TURN_INTENT";
+    public static final String ERROR_TABLE_NOT_EXIST_INTENT = "ERROR_TABLE_NOT_EXIST_INTENT";
+    public static final String ERROR_GAME_NOT_CREATED_INTENT = "ERROR_GAME_NOT_CREATED_INTENT";
+    public static final String ERROR_NOT_OBSERVING_INTENT = "ERROR_NOT_OBSERVING_INTENT";
 
     public static final String TABLE_ID_ARRAY_EXTRA = "TABLE_ID_ARRAY_EXTRA";
     public static final String USERS_ARRAY_EXTRA = "USERS_ARRAY_EXTRA";

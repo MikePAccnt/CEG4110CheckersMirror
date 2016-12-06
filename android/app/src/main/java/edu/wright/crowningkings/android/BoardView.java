@@ -1,11 +1,15 @@
 package edu.wright.crowningkings.android;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.nfc.Tag;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -288,12 +292,20 @@ public class BoardView extends View {
                 selectedPiece = piece;
                 moves = new ArrayList<>();
             } else if (selectedPiece != null && moves.size() > 0 && moves.get(moves.size() - 1).equals(location)) {
-//                Rules.move(game, selectedPiece, moves);
+
+                Intent move = new Intent(Constants.MOVE_INTENT);
+                move.putExtra(Constants.TO_X_EXTRA, "" + location.getX());
+                move.putExtra(Constants.TO_Y_EXTRA, "" + location.getY());
+                move.putExtra(Constants.FROM_X_EXTRA, "" + selectedPiece.getLocation().getX());
+                move.putExtra(Constants.FROM_Y_EXTRA, "" + selectedPiece.getLocation().getY());
+                getContext().sendBroadcast(move);
+
+                Rules.move(game, selectedPiece, moves);
 //                gameService.move(game, new GameListener(boardView.getContext()));
                 selectedPiece = null;
                 moves = new ArrayList<>();
                 game.clearTurn();
-            } else if (selectedPiece != null) {// && Rules.isValidMove(selectedPiece, moves, location, board)) {
+            } else if (selectedPiece != null && Rules.isValidMove(selectedPiece, moves, location, board)) {
                 moves.add(location);
             }
 

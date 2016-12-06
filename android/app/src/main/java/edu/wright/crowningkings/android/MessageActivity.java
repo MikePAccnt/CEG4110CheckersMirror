@@ -51,7 +51,7 @@ public class MessageActivity extends AppCompatActivity {
     MessageActivityBroadcastReceiver messageActivityBroadcastReceiver;
     private boolean boundReceiveService = false;
     String targetString;
-    String targetUsername;
+    String targetUsername = null;
     boolean isNewChat = true;
 
     @Override

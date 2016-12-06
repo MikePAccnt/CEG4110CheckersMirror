@@ -220,8 +220,16 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
 
     @Override
     public void boardState(String[][] boardState) {
-        sendBroadcast(new Intent(Constants.OPPONENT_MOVE_INTENT)
-                .putExtra(Constants.BOARD_STATE_EXTRA, boardState));
+        String boardString = "";
+        for (String[] row : boardState) {
+            for (String item : row) {
+                boardString = boardString + " " + item;
+            }
+        }
+
+        System.out.println("boardState=" + boardState);
+        sendBroadcast(new Intent(Constants.BOARD_STATE_INTENT)
+                .putExtra(Constants.BOARD_STATE_EXTRA, boardString));
     }
 
     @Override
@@ -305,6 +313,33 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
     public void stoppedObserving(String tableID) {
         sendBroadcast(new Intent(Constants.STOPPED_OBSERVING_INTENT));
     }
+
+    public void netException(){}
+
+    public void nameInUse(){}
+
+    public void illegalMove(){}
+
+    public void tblFull(){}
+
+    public void notInLobby(){}
+
+    public void badMessage(){}
+
+    public void errorLobby(){}
+
+    public void badName(){}
+
+    public void playerNotReady(){}
+
+    public void notYourTurn(){}
+
+    public void tableNotExist(){}
+
+    public void gameNotCreated(){}
+
+    public void notObserving(){}
+
 
     @Nullable
     @Override
