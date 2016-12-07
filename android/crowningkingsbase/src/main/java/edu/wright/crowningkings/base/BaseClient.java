@@ -26,7 +26,7 @@ public class BaseClient {
      * Constructor methods
      */
     public BaseClient(AbstractUserInterface ui) {
-        String serverAddress = "192.168.75.1";
+        String serverAddress = "192.168.122.1";
 
         client = this;
         setServer(serverAddress, PORT_NUMBER);
@@ -155,7 +155,7 @@ public class BaseClient {
         ui.opponentMove(from,to);
     }
 
-    public void boardState(String[][] boardState){
+    public void boardState(String boardState){
         ui.boardState(boardState);
     }
 

@@ -153,7 +153,7 @@ public class CommandLineUI implements AbstractUserInterface {
     }
 
     @Override
-    public void boardState(String[][] boardState) {
+    public void boardState(String boardState) {
 
     }
 

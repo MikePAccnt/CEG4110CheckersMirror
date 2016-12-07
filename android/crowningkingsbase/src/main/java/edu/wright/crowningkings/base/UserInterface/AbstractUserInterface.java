@@ -27,7 +27,7 @@ public interface AbstractUserInterface {
 
     void opponentMove(String[] from, String[] to);
 
-    void boardState(String[][] boardState);
+    void boardState(String boardState);
 
     void gameWon();
 
