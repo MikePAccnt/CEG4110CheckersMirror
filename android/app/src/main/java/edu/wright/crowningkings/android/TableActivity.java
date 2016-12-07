@@ -24,7 +24,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by csmith on 11/22/16.
@@ -60,6 +62,10 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
 //        game = new Game(tableId, new Board(Board.initializePieces()), Team.BLACK);
 //        boardView.setGame(game);
 
+        if (getIntent().getStringExtra(Constants.JOIN_AS).equals(Constants.OBSERVER)) {
+            findViewById(R.id.ready_button).setVisibility(View.GONE);
+        }
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -69,7 +75,7 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.getMenu().add(getResources().getString(R.string.make_new_message));
-        navigationView.getMenu().add(getResources().getString(R.string.public_message_group_name));
+        //navigationView.getMenu().add(getResources().getString(R.string.public_message_group_name));
         navPrivateMessagesMenu = navigationView.getMenu().addSubMenu(getResources().getString(R.string.private_messages_menu_name));
 
 
@@ -97,6 +103,7 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
     public void onResume() {
         Log.d(TAG, "onResume()");
         super.onResume();
+        sendBroadcast(new Intent(Constants.READY_FOR_SERVER_MSGS_INTENT));
         registerReceiver(tableActivityBroadcastReceiver, tableActivityIntentFilter);
     }
 
@@ -111,7 +118,6 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
     public void onStop() {
         Log.d(TAG, "onStop()");
         super.onStop();
-        sendBroadcast(new Intent(Constants.LEAVE_TABLE_INTNENT));
     }
 
     @Override
@@ -120,7 +126,7 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            //leaveTable
+            sendBroadcast(new Intent(Constants.LEAVE_TABLE_INTNENT));
             super.onBackPressed();
         }
     }
@@ -147,6 +153,7 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
                     public void onClick(DialogInterface dialog, int which) {
                         sendBroadcast(new Intent(Constants.READY_INTENT));
                         view.setVisibility(View.GONE);
+                        findViewById(R.id.waiting_for_opponent).setVisibility(View.VISIBLE);
                     }
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -207,7 +214,7 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
             this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (!userOne.equals("-1") && !userTwo.equals("-1")) {
+                    if (!userOne.equals("-1") && !userTwo.equals("-1") && (username.equals(userOne) || username.equals(userTwo))) {
                         AlertDialog.Builder builder;
                         builder = new AlertDialog.Builder(TableActivity.this)
                                 .setTitle(String.format(getResources().getString(R.string.status_dialog_title), tableID))
@@ -235,6 +242,37 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
         }
     }
 
+    private void setBoardState(String board) {
+        final Set<Piece> pieces = new HashSet<>(8 * 8 / 2 - (2 * 8));
+        int counter = 0;
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                if (board.charAt(counter) == '1') {
+                    final Location location = new Location(x, y);
+                    pieces.add(new Piece(Team.BLACK, location));
+                } else if (board.charAt(counter) == '2') {
+                    final Location location = new Location(x, y);
+                    pieces.add(new Piece(Team.RED, location));
+                } else if (board.charAt(counter) == '3') {
+                    final Location location = new Location(x, y);
+                    Piece bk = new Piece(Team.BLACK, location);
+                    bk.makeKing();
+                    pieces.add(bk);
+                } else if (board.charAt(counter) == '4') {
+                    final Location location = new Location(x, y);
+                    Piece rk = new Piece(Team.RED, location);
+                    rk.makeKing();
+                    pieces.add(rk);
+                } else {
+                }
+                counter++;
+            }
+        }
+        game.getBoard().setPieces(pieces);
+        System.out.println("setting pieces");
+    }
+
+
     private void opponentMove(int[] from, int[] to) {
         Location fromLocation = new Location(from[0], from[1]);
         Location toLocation = new Location(to[0], to[1]);
@@ -246,7 +284,7 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
     private void postNotification(String fromUsername, String message, boolean privateMessage) {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setSmallIcon(R.drawable.ic_stat_logomakr_2oz5ib)
                         .setContentTitle(fromUsername)
                         .setContentText(message)
                         .setTicker("New message from " + fromUsername + " - \n" + message)
@@ -302,6 +340,10 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
                     if (bv != null) {
                         bv.setVisibility(View.GONE);
                     }
+                    View wait = findViewById(R.id.waiting_for_opponent);
+                    if (wait != null) {
+                        wait.setVisibility(View.GONE);
+                    }
                     break;
                 case Constants.COLOR_BLACK_INTENT:
                     Log.d(TAG, "COLOR_BLACK_INTENT");
@@ -324,10 +366,12 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
                     String[] t = intent.getStringArrayExtra(Constants.TO_LOCATION_EXTRA);
                     int[] to = {Integer.parseInt(t[0]), Integer.parseInt(t[1])};
                     opponentMove(from, to);
+                    boardView.invalidate();
                     break;
                 case Constants.BOARD_STATE_INTENT:
                     Log.d(TAG, "BOARD_STATE_INTENT");
                     Log.d(TAG, intent.getStringExtra(Constants.BOARD_STATE_EXTRA));
+                    setBoardState(intent.getStringExtra(Constants.BOARD_STATE_EXTRA));
                     break;
                 case Constants.GAME_WIN_INTENT:
                     Log.d(TAG, "GAME_WIN_INTENT");
@@ -362,13 +406,12 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
                     Log.d(TAG, "STOPPED_OBSERVING_INTENT");
                     break;
                 case Constants.NEW_MESSAGE_INTENT:
-                    postNotification(
-                            intent.getStringExtra(Constants.USERNAME_EXTRA),
-                            intent.getStringExtra(Constants.MESSAGE_EXTRA),
-                            intent.getBooleanExtra(Constants.PRIVATE_MESSAGE_EXTRA, true));
-
                     if (intent.getBooleanExtra(Constants.PRIVATE_MESSAGE_EXTRA, true)) {
                         addUserToPrivateMessagesMenu(intent.getStringExtra(Constants.USERNAME_EXTRA));
+                        postNotification(
+                                intent.getStringExtra(Constants.USERNAME_EXTRA),
+                                intent.getStringExtra(Constants.MESSAGE_EXTRA),
+                                intent.getBooleanExtra(Constants.PRIVATE_MESSAGE_EXTRA, true));
                     }
                     break;
             }

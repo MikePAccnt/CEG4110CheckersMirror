@@ -27,6 +27,9 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
     private String username = null;
     //    private IBinder mBinder = new AndroidUIBinder();
     private HashMap<String, ArrayList<Message>> allMessages = null;
+    private boolean uiIsReady = true;
+    private ArrayList<Intent> messageQueue = new ArrayList<>();
+
 
     private IntentFilter androidUIIntentFilter = new IntentFilter();
     private BroadcastReceiver androidUIBroadcastReceiver = new BroadcastReceiver() {
@@ -146,6 +149,12 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
                             .putExtra(Constants.USERNAME_EXTRA, fromtarget)
                             .putExtra(Constants.MESSAGES_ARRAY_EXTRA, getMessages(fromtarget)));
                     break;
+                case Constants.READY_FOR_SERVER_MSGS_INTENT:
+                    Log.d(TAG, "READY_FOR_SERVER_MSGS_INTENT");
+                    uiIsReady = true;
+                    for (Intent i : messageQueue) {
+                        sendBroadcast(i);
+                    }
             }
         }
     };
@@ -174,6 +183,7 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
         androidUIIntentFilter.addAction(Constants.ASK_TABLE_STATUS_INTENT);
         androidUIIntentFilter.addAction(Constants.OBSERVE_TABLE_INTENT);
         androidUIIntentFilter.addAction(Constants.REQUEST_CONVERSATION_MESSAGES_INTENT);
+        androidUIIntentFilter.addAction(Constants.READY_FOR_SERVER_MSGS_INTENT);
         registerReceiver(androidUIBroadcastReceiver, androidUIIntentFilter);
     }
 
@@ -182,6 +192,38 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
         Log.d(TAG, "onDestroy()");
         super.onDestroy();
         unregisterReceiver(androidUIBroadcastReceiver);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                client.quit();
+            }
+        }).start();
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public void sendBroadcast(Intent i) {
+        Log.d(TAG, "sendBroadcast");
+        String action = i.getAction();
+        if (uiIsReady && (action.equals(Constants.TABLE_JOINED_INTENT)
+                        || action.equals(Constants.IN_LOBBY_INTENT)
+                        || action.equals(Constants.NOW_OBSERVING_INTENT))) {
+            Log.d(TAG, "if");
+            uiIsReady = false;
+
+            super.sendBroadcast(i);
+        } else if (uiIsReady) {
+            Log.d(TAG, "else if");
+            super.sendBroadcast(i);
+        } else {
+            Log.d(TAG, "else");
+            messageQueue.add(i);
+        }
     }
 
     @Override
@@ -250,17 +292,17 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
     }
 
     @Override
-    public void boardState(String[][] boardState) {
-        String boardString = "";
-        for (String[] row : boardState) {
-            for (String item : row) {
-                boardString = boardString + " " + item;
-            }
-        }
-
+    public void boardState(String boardState) {
+//        String boardString = "";
+//        for (String[] row : boardState) {
+//            for (String item : row) {
+//                boardString = boardString + " " + item;
+//            }
+//        }
+//
         System.out.println("boardState=" + boardState);
         sendBroadcast(new Intent(Constants.BOARD_STATE_INTENT)
-                .putExtra(Constants.BOARD_STATE_EXTRA, boardString));
+                .putExtra(Constants.BOARD_STATE_EXTRA, boardState));
     }
 
     @Override
@@ -337,7 +379,8 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
 
     @Override
     public void nowObserving(String tableID) {
-        sendBroadcast(new Intent(Constants.NOW_OBSERVING_INTENT));
+        sendBroadcast(new Intent(Constants.NOW_OBSERVING_INTENT)
+                .putExtra(Constants.TABLE_ID_EXTRA, tableID));
     }
 
     @Override
@@ -423,16 +466,4 @@ public class AndroidUIService extends Service implements AbstractUserInterface {
         sendBroadcast(new Intent(Constants.ERROR_NOT_OBSERVING_INTENT));
     }
 
-
-//    public class AndroidUIBinder extends Binder {
-//        AndroidUIService getService() {
-//            return AndroidUIService.this;
-//        }
-//    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
 }

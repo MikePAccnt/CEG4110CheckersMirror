@@ -18,9 +18,7 @@
         <activity
             android:name=".Lobby"
             android:label="@string/lobby_activity"
-            android:theme="@style/AppTheme">
-
-        </activity>
+            android:theme="@style/AppTheme"></activity>
         <activity
             android:name=".MessageActivity"
             android:label="@string/message_activity"
@@ -37,13 +35,18 @@
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme" >
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>/>
+            </intent-filter>
+            />
         </activity>
+        <activity
+            android:name=".ObserveTable"
+            android:label="@string/title_activity_observe_table"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

@@ -65,6 +65,7 @@ public class Constants {
 
     public static final String CONVERSATION_MESSAGES_INTENT = "CONVERSATION_MESSAGES_INTENT";
     public static final String REQUEST_CONVERSATION_MESSAGES_INTENT = "REQUEST_CONVERSATION_MESSAGES_INTENT";
+    public static final String READY_FOR_SERVER_MSGS_INTENT = "READY_FOR_SERVER_MSGS_INTENT";
 
     public static final String TABLE_ID_ARRAY_EXTRA = "TABLE_ID_ARRAY_EXTRA";
     public static final String USERS_ARRAY_EXTRA = "USERS_ARRAY_EXTRA";

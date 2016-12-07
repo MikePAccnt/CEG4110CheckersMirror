@@ -31,11 +31,24 @@
         android:id="@+id/ready_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="false"
         android:onClick="onReadyClick"
         android:visibility="visible"
-        android:text="@string/ready_button" />
+        android:text="@string/ready_button"
+        android:layout_alignParentRight="false"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="false"
+        android:layout_centerVertical="true" />
+
+    <TextView
+        android:text="@string/waiting_for_oponent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/waiting_for_opponent"
+        android:layout_centerInParent="false"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone" />
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -43,5 +56,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="edu.wright.crowningkings.android.TableActivity"
-        tools:ignore="MergeRootFrame" />
+        tools:ignore="MergeRootFrame" >
+
+    </FrameLayout>
 </RelativeLayout>

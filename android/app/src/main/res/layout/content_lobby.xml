@@ -15,7 +15,7 @@
 
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="473dp"
+        android:layout_height="wrap_content"
         android:id="@+id/lobby_tables_list"
         android:layout_alignParentBottom="true"
         android:contextClickable="true"
@@ -24,4 +24,31 @@
         android:layout_alignParentEnd="true"
         android:clickable="true"
         android:longClickable="true" />
+
+    <LinearLayout
+        android:id="@+id/no_tables_icon"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_grid_off_white_48dp"
+            android:id="@+id/imageView2"
+            android:tint="@android:color/darker_gray"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="6dp" />
+
+        <TextView
+            android:text="@string/no_tables_available"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView"
+            android:layout_centerVertical="false"
+            android:layout_centerInParent="false"
+            android:layout_centerHorizontal="true" />
+    </LinearLayout>
+
 </RelativeLayout>

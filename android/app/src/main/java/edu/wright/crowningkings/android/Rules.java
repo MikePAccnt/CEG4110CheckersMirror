@@ -148,11 +148,11 @@ public final class Rules {
 
             piece.setLocation(location);
 
-            if (piece.getTeam() == Team.RED) {
+            if (piece.getTeam() == Team.BLACK) {
                 if (piece.getLocation().getY() == game.getBoard().getSpacesPerSide() - 1) {
                     piece.makeKing();
                 }
-            } else if (piece.getTeam() == Team.BLACK) {
+            } else if (piece.getTeam() == Team.RED) {
                 if (piece.getLocation().getY() == 0) {
                     piece.makeKing();
                 }

@@ -84,6 +84,7 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
         lobbyIntentFilter.addAction(Constants.NOW_IN_LOBBY_INTENT);
         lobbyIntentFilter.addAction(Constants.TABLE_JOINED_INTENT);
         lobbyIntentFilter.addAction(Constants.NEW_MESSAGE_INTENT);
+        lobbyIntentFilter.addAction(Constants.NOW_OBSERVING_INTENT);
         registerReceiver(lobbyBroadcastReceiver, lobbyIntentFilter);
     }
 
@@ -92,6 +93,7 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
     protected void onResume() {
         Log.d(TAG, "onResume()");
         super.onResume();
+        sendBroadcast(new Intent(Constants.READY_FOR_SERVER_MSGS_INTENT));
         registerReceiver(lobbyBroadcastReceiver, lobbyIntentFilter);
     }
 
@@ -221,6 +223,7 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
                 //tablesListArrayAdapter.clear();
                 for (String table : tableID) {
                     tablesListArrayAdapter.addTable(table);
+                    findViewById(R.id.no_tables_icon).setVisibility(View.GONE);
                 }
             }
         });
@@ -324,16 +327,28 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
         tableIntent.putExtra(Constants.JOIN_AS, Constants.PLAYER);
         tableIntent.putExtra(Constants.TABLE_ID_EXTRA, tableId);
         tableIntent.putExtra(Constants.USERNAME_EXTRA, username);
+        tableIntent.putExtra(Constants.JOIN_AS, Constants.PLAYER);
         startActivity(tableIntent);
 
         Log.d(TAG, "tableJoined(String)");
+    }
+
+    private void tableObserving(String tableId) {
+        Intent tableIntent = new Intent(this, ObserveTable.class);
+        tableIntent.putExtra(Constants.JOIN_AS, Constants.PLAYER);
+        tableIntent.putExtra(Constants.TABLE_ID_EXTRA, tableId);
+        tableIntent.putExtra(Constants.USERNAME_EXTRA, username);
+        tableIntent.putExtra(Constants.JOIN_AS, Constants.OBSERVER);
+        startActivity(tableIntent);
+
+        Log.d(TAG, "tableObserving(String)");
     }
 
 
     private void postNotification(String fromUsername, String message, boolean privateMessage) {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setSmallIcon(R.drawable.ic_stat_logomakr_2oz5ib)
                         .setContentTitle(fromUsername)
                         .setContentText(message)
                         .setTicker("New message from " + fromUsername + " - \n" + message)
@@ -412,6 +427,9 @@ public class Lobby extends AppCompatActivity implements NavigationView.OnNavigat
                     break;
                 case Constants.TABLE_JOINED_INTENT:
                     tableJoined(intent.getStringExtra(Constants.TABLE_ID_EXTRA));
+                    break;
+                case Constants.NOW_OBSERVING_INTENT:
+                    tableObserving(intent.getStringExtra(Constants.TABLE_ID_EXTRA));
                     break;
                 case Constants.NEW_MESSAGE_INTENT:
                     postNotification(
