@@ -245,8 +245,8 @@ public class TableActivity extends AppCompatActivity implements NavigationView.O
     private void setBoardState(String board) {
         final Set<Piece> pieces = new HashSet<>(8 * 8 / 2 - (2 * 8));
         int counter = 0;
-        for (int x = 0; x < 8; x++) {
-            for (int y = 0; y < 8; y++) {
+        for (int y = 0; y < 8; y++) {
+            for (int x = 0; x < 8; x++) {
                 if (board.charAt(counter) == '1') {
                     final Location location = new Location(x, y);
                     pieces.add(new Piece(Team.BLACK, location));
