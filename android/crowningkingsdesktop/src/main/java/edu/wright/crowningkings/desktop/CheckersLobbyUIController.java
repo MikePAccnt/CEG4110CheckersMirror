@@ -167,11 +167,14 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		 */
 		playButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
+				//currentGame = null;
 				if(currentGame != null){
 					//Handle this in a different way later on or leave it as is
-					updateLobbyChat("Server Message: " + "You are already in a game! You must quit this game to join another.");
-				} else {
+					currentGame.lobbyChatTextArea.setText(currentGame.lobbyChatTextArea.getText() + "\n" + "Server Message: You are already in a game! You must quit this one to join another.");
 					//Send message that the client wants to join this table
+					
+				} else {
+					System.out.println("Telling server I want to join this table!!!");
 					joinTable(tableID);
 				}
 				
@@ -268,6 +271,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		//Add the action listiner to the game board so the player can move the pieces
 		gameBoard.addMouseListener(new gameBoardListener(new int[] {-1,-1},gameBoard,this.color));
 		gameBoard.repaint();
+		currentGame.repaint();
 			
 	}
 
@@ -277,7 +281,8 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		currentGame.setVisible(true);
 		applyButtonActions(new Component[] {CheckersGameUI.readyButton, CheckersGameUI.quitButton});
 		gameBoard = (JPanel)currentGame.checkerBoard;
-		
+		gameBoard.repaint();
+		currentGame.repaint();
 		
 	}
 
@@ -506,6 +511,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
     }
 
     public void tableJoined(String tableID){
+    	System.out.println("I am joing a table!!!");
     	setJoinPlayTable(tableID,""); 
     }
 
@@ -542,7 +548,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
     public void whoOnTable(String userOne, String userTwo,String tableID, String userOneColor,String userTwoColor){
     	currentGame.lblPlayer1.setText(userOne);
-    	if(!userTwo.equals("-1")){
+    	if(!userTwo.equals(null)){
     		currentGame.lblPlayer2.setText(userTwo);
     	}
 
@@ -636,7 +642,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
     	tempF.setResizable(false);
     	tempF.setBounds(0,0,250,100);
     	tempF.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
+    	tempF.setVisible(true);
     	JLabel outCome = new JLabel(message);
     	outCome.setBounds(250/4,250/4,50,50);
     	tempF.add(outCome);

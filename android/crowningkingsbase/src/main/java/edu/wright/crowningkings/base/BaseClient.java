@@ -26,7 +26,7 @@ public class BaseClient {
      * Constructor methods
      */
     public BaseClient(AbstractUserInterface ui) {
-        String serverAddress = "130.108.28.165";
+        String serverAddress = "192.168.75.1";
 
         client = this;
         setServer(serverAddress, PORT_NUMBER);
