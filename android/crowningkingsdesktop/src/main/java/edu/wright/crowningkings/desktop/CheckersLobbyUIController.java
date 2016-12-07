@@ -432,7 +432,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
     	gameBoard.getComponentAt(fx,fy).setBounds(tx,ty,62,62);
     }
 
-    public void boardState(String[][] board){
+    public void boardState(String board){
     	System.out.println("In boardState");
     	//Later on update this so it draws the board differently depending on the players color
 		if(gameBoard == null){System.out.println("gameBoard is null!!!!!");}
@@ -441,53 +441,39 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 			if(c == null){System.out.println("c Was NULL!!!!!!");}
 			gameBoard.remove(c);
 		}
+		int counter = 0;
 
-		//Re-populate the board with the current board state from the server
-		for (int x = 0;x<board.length;x++ ) {
-			for(int y = 0;y<board[x].length;y++){
-				System.out.println("Inside the forloop in boardState");
+		//Populate the board with the updated board from the server
+		for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
 				int cx = (y*62)+2;
 				int cy = (x*62)+2;
-				System.out.println(board[x][y] == null ? "Yes":"No");
+                if (board.charAt(counter) == '1') {
+					JLabel temp = DesktopUIFactory.makePiece("Black");
+					temp.setName("Black");
+					temp.setBounds(cx,cy,62,62);
+					gameBoard.add(temp);
+                } else if (board.charAt(counter) == '2') {
+					JLabel temp = DesktopUIFactory.makePiece("Red");
+					temp.setName("Red");
+					temp.setBounds(cx,cy,62,62);
+					gameBoard.add(temp);
+                } else if (board.charAt(counter) == '3') {
+                   	JLabel temp = DesktopUIFactory.makePiece("Black_king");
+					temp.setName("Black");
+					temp.setBounds(cx,cy,62,62);
+					gameBoard.add(temp);
+                } else if (board.charAt(counter) == '4') {
+					JLabel temp = DesktopUIFactory.makePiece("Red_king");
+					temp.setName("Red");
+					temp.setBounds(cx,cy,62,62);
+					gameBoard.add(temp);              
+                } else {}
 
-				if(board[x][y].length() == 1){
-					if(board[x][y].charAt(0) == 'B'){
-						System.out.println("Making Black Piece");
-						JLabel temp = DesktopUIFactory.makePiece("Black");
-						if(temp == null) {System.out.println("GB: Temp is null!!!");}
-						temp.setName("Black");
-						temp.setBounds(cx,cy,62,62);
-						gameBoard.add(temp);
-						System.out.println("Made a Black piece");
-					} else {
-						System.out.println("Making Red Piece");
-						JLabel temp = DesktopUIFactory.makePiece("Red");
-						if(temp == null) {System.out.println("GB: Temp is null!!!");}
-						temp.setName("Red");
-						temp.setBounds(cx,cy,62,62);
-						gameBoard.add(temp);
-						System.out.println("Made a Red piece");
-					}
-				}
-				else if(board[x][y].length() == 2){
-					if(board[x][y].charAt(0) == 'B'){
-						JLabel temp = DesktopUIFactory.makePiece("Black_king");
-						temp.setName("Black");
-						temp.setBounds(cx,cy,62,62);
-						gameBoard.add(temp);
-					} else {
-						JLabel temp = DesktopUIFactory.makePiece("Red_king");
-						temp.setName("Red");
-						temp.setBounds(cx,cy,62,62);
-						gameBoard.add(temp);
-					}
-				}
-				else {
-					//Do nothing in the case that there is no piece in that spot.
-				}
-			}
-			
-		}
+                counter++;
+            }
+        }
+
 		gameBoard.repaint();
     }
 
