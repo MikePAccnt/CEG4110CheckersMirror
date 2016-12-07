@@ -125,11 +125,6 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 			gamePanelx = 12;
 		}
 		lobby.repaint();
-		try { 
-		    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
 	}
 
 	//This adds a new table to the lobbyPanel for viewing
