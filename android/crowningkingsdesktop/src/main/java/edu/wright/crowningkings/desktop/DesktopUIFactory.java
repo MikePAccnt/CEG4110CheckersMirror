@@ -22,10 +22,12 @@ public class DesktopUIFactory {
 
 
 	private static int tables = 1;
-	private static Image board = new ImageIcon("desktop\\RealCheckerBoard.jpg").getImage();
-	private static ImageIcon piece_black = new ImageIcon("desktop\\checkerspiece_black.png");
-	private static ImageIcon piece_red = new ImageIcon("desktop\\checkerspiece_red.png");
-	
+	private static Image board = new ImageIcon("desktop/RealCheckerBoard.jpg").getImage();
+	private static ImageIcon piece_black = new ImageIcon("desktop/checkerspiece_black.png");
+	private static ImageIcon piece_red = new ImageIcon("desktop/checkerspiece_red.png");
+	private static ImageIcon piece_black_king = new ImageIcon("desktop/checkerspiece_black_king.png");
+	private static ImageIcon piece_red_king = new ImageIcon("desktop/checkerspiece_red_king.png");
+
 	public static JPanel makeGamePanel(String tableID, Image im, LayoutManager layout){
 		JPanel panel = new ImagePanel(im);
 		panel.setLayout(layout);
@@ -92,6 +94,10 @@ public static class CheckersGameUI extends JFrame{
 	public static JLabel lblPlayer1;
 	public static JLabel lblPlayer2;
 	public static JLabel lblTurn;
+	public static JLabel color1Lbl;
+	public static JLabel color2Lbl;
+	public static JTextField messageTextField;
+	public static JTextArea lobbyChatTextArea;
 
 	public CheckersGameUI(){
 		
@@ -131,9 +137,9 @@ public static class CheckersGameUI extends JFrame{
 		grabbedLbl.setVisible(false);
 		gameLobby.add(grabbedLbl);
 		
-		JPanel observersPanel = new JPanel();
-		observersPanel.setBounds(10, 83, 230, 443);
-		observersPanel.setVisible(true);
+		// JPanel observersPanel = new JPanel();
+		// observersPanel.setBounds(10, 83, 230, 443);
+		// observersPanel.setVisible(true);
 		
 		lblPlayer1 = new JLabel("Player 1");
 		lblPlayer1.setHorizontalAlignment(SwingConstants.CENTER);
@@ -146,8 +152,6 @@ public static class CheckersGameUI extends JFrame{
 		lblPlayer2.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		lblPlayer2.setBounds(760, 302, 230, 23);
 		gameLobby.add(lblPlayer2);
-		gameLobby.add(observersPanel);
-		observersPanel.setLayout(null);
 
 		lblTurn = new JLabel("Your Turn");
 		lblTurn.setHorizontalAlignment(SwingConstants.CENTER);
@@ -156,23 +160,32 @@ public static class CheckersGameUI extends JFrame{
 		lblTurn.setVisible(false);
 		gameLobby.add(lblTurn);
 		
+		color1Lbl = new JLabel("");
+		color1Lbl.setBounds(840, 145, 62, 62);
+		gameLobby.add(color1Lbl);
 		
-		JLabel observersLbl = new JLabel("Observers");
-		observersLbl.setBounds(66, 13, 98, 19);
-		observersPanel.add(observersLbl);
-		observersLbl.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		observersLbl.setHorizontalAlignment(SwingConstants.CENTER);
-		observersLbl.setVisible(true);
+		color2Lbl = new JLabel("");
+		color2Lbl.setBounds(840, 362, 62, 62);
+		gameLobby.add(color2Lbl);
+		// gameLobby.add(observersPanel);
+		// observersPanel.setLayout(null);
 		
-		JScrollPane observersScrollPane = new JScrollPane();
-		observersScrollPane.setBounds(10, 43, 210, 389);
-		observersPanel.add(observersScrollPane);
+		// JLabel observersLbl = new JLabel("Observers");
+		// observersLbl.setBounds(66, 13, 98, 19);
+		// observersPanel.add(observersLbl);
+		// observersLbl.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		// observersLbl.setHorizontalAlignment(SwingConstants.CENTER);
+		// observersLbl.setVisible(true);
 		
-		JTextArea textArea = new JTextArea();
-		observersScrollPane.setViewportView(textArea);
-		textArea.setRows(1);
-		textArea.setColumns(1);
-		textArea.setEditable(false);
+		// JScrollPane observersScrollPane = new JScrollPane();
+		// observersScrollPane.setBounds(10, 43, 210, 389);
+		// observersPanel.add(observersScrollPane);
+		
+		// JTextArea textArea = new JTextArea();
+		// observersScrollPane.setViewportView(textArea);
+		// textArea.setRows(1);
+		// textArea.setColumns(1);
+		// textArea.setEditable(false);
 		
 		
 		JPanel messagePanel = new JPanel();
@@ -181,7 +194,7 @@ public static class CheckersGameUI extends JFrame{
 		messagePanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		messagePanel.setName("MessagePanel");
 		
-		JTextField messageTextField = new JTextField("");
+		messageTextField = new JTextField("");
 		messageTextField.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		messageTextField.setToolTipText("");
 		messageTextField.setHorizontalAlignment(SwingConstants.LEFT);
@@ -207,8 +220,8 @@ public static class CheckersGameUI extends JFrame{
 //		scrollPane.setBounds(0, 0, 990, 186);
 //		lobbyChatPanel.add(scrollPane);
 		
-		JTextArea lobbyChatTextArea = new JTextArea();
-		lobbyChatTextArea.setText("a\r\na\r\na\r\na\r\nasd\r\ns\r\nds\r\nds\r\nds\r\nde\r\nd\r\ned\r\ned\r\nef\r\nef\r\nef\r\nt\r\ng\r\ngf\r\ng\r\nt\r\nd\r\ndf\r\ndf\r\nr\r\ng\r\nr\r\ndf\r\ndf\r\n\r\nrf\r\nf\r\nd\r\nfd\r\nf\r\nr\r\nfdf");
+		lobbyChatTextArea = new JTextArea();
+		lobbyChatTextArea.setText("");
 		lobbyChatScrollPane.setViewportView(lobbyChatTextArea);
 		lobbyChatTextArea.setEditable(false);
 		lobbyChatTextArea.setLineWrap(true);
@@ -273,16 +286,24 @@ private static void fillBoard(JPanel cBoard){
 	} 
 
 //Creates a new "Checker piece" and gives it a name based on its color for use in playing
-public static JLabel makePiece(String color){
+public static JLabel makePiece(String type){
 	JLabel lab = new JLabel();
-	lab.setName(color);
-	if(color.equals("Black")){
+	lab.setName(type);
+	if(type.equals("Black")){
 		lab.setIcon(piece_black);
 		lab.setName("Black");
 	}
-	else if(color.equals("Red")){
+	else if(type.equals("Red")){
 		lab.setIcon(piece_red);
 		lab.setName("Red");
+	}
+	else if(type.equals("Black_king")){
+		lab.setIcon(piece_black_king);
+		lab.setName("Black_king");
+	}
+	else if(type.equals("Red_king")){
+		lab.setIcon(piece_red_king);
+		lab.setName("Red_king");
 	}
 	return lab;
 }

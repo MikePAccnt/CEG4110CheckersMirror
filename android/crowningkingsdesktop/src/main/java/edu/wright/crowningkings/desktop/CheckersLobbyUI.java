@@ -75,7 +75,7 @@ public class CheckersLobbyUI extends JFrame{
 		checkersMainPanel.setLayout(null);
 		
 		JLabel title = new JLabel("");
-		title.setIcon(new ImageIcon("C:\\Users\\Michael\\Pictures\\GameImages\\temptitle.png"));
+		title.setIcon(new ImageIcon("desktop/temptitle.png"));
 		title.setFont(new Font("Castellar", Font.PLAIN, 48));
 		title.setHorizontalAlignment(SwingConstants.CENTER);
 		title.setForeground(Color.WHITE);

@@ -19,6 +19,6 @@ public class _106Move extends AbstractServerMessage {
     }
 
     public void run(BaseClient client) {
-        //do something
+        System.out.println("Moving");
     }
 }

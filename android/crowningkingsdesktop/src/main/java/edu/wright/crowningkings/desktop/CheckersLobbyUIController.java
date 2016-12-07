@@ -60,8 +60,8 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	private int[] lastStartMove = {-1,-1};
 	private int[] lastEndMove = {-1,-1};
 	//private DesktopUIFactory factory;
-	private Image im = new ImageIcon("desktop\\checkerboard.jpg").getImage();
-	private Image im2 = new ImageIcon("desktop\\checkerboardFake.jpg").getImage();
+	private Image im = new ImageIcon("desktop/checkerboard.jpg").getImage();
+	private Image im2 = new ImageIcon("desktop/checkerboardFake.jpg").getImage();
 	//private Graphics g;
 	
 	public CheckersLobbyUIController(){
@@ -79,6 +79,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		messageTextField.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				String x = messageTextField.getText();
+
 				if((e.getKeyCode() == KeyEvent.VK_ENTER) && (x.equals("") == false) && !(x.matches("username:[\\w\\W]+"))){
 					if(x.matches("private[(][a-zA-Z0-9]+[)]:[\\w\\W]+")){
 
@@ -124,11 +125,6 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 			gamePanelx = 12;
 		}
 		lobby.repaint();
-		try { 
-		    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
 	}
 
 	//This adds a new table to the lobbyPanel for viewing
@@ -166,11 +162,14 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		 */
 		playButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
+				//currentGame = null;
 				if(currentGame != null){
 					//Handle this in a different way later on or leave it as is
-					updateLobbyChat("Server Message: " + "You are already in a game! You must quit this game to join another.");
-				} else {
+					currentGame.lobbyChatTextArea.setText(currentGame.lobbyChatTextArea.getText() + "\n" + "Server Message: You are already in a game! You must quit this one to join another.");
 					//Send message that the client wants to join this table
+					
+				} else {
+					System.out.println("Telling server I want to join this table!!!");
 					joinTable(tableID);
 				}
 				
@@ -228,6 +227,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 	}
 	
 	private void sendName(String name){
+		this.username = name;
 		client.setUsername(name);
 	}
 
@@ -240,9 +240,33 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		applyButtonActions(new Component[] {CheckersGameUI.readyButton, CheckersGameUI.quitButton});
 		gameBoard = (JPanel)currentGame.checkerBoard;
 
+		currentGame.messageTextField.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				String x = currentGame.messageTextField.getText();
+				if((e.getKeyCode() == KeyEvent.VK_ENTER) && (x.equals("") == false) ){
+					if(x.matches("private[(][a-zA-Z0-9]+[)]:[\\w\\W]+")){
+						    String[] temp = currentGame.messageTextField.getText().replace("private","").split(":");
+							String user = temp[0].replace("(", "").replace(")", "");
+							String msg = temp[1].trim();
+
+							client.messageClient(user,msg);
+							currentGame.lobbyChatTextArea.setText(currentGame.lobbyChatTextArea.getText() + "\n" + "Msg Sent to: " + user + " " + msg);
+							currentGame.messageTextField.setText("");
+					} else {
+						currentGame.lobbyChatTextArea.setText(currentGame.lobbyChatTextArea.getText() + "\n" + "Server Message: You can only send private messages here! private(name): text");
+						currentGame.messageTextField.setText("");
+					}
+				}
+				else if(e.getKeyCode()== KeyEvent.VK_ESCAPE){
+					currentGame.messageTextField.setText("");
+				}
+			}
+		});
+
 		//Add the action listiner to the game board so the player can move the pieces
 		gameBoard.addMouseListener(new gameBoardListener(new int[] {-1,-1},gameBoard,this.color));
 		gameBoard.repaint();
+		currentGame.repaint();
 			
 	}
 
@@ -252,7 +276,8 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 		currentGame.setVisible(true);
 		applyButtonActions(new Component[] {CheckersGameUI.readyButton, CheckersGameUI.quitButton});
 		gameBoard = (JPanel)currentGame.checkerBoard;
-		
+		gameBoard.repaint();
+		currentGame.repaint();
 		
 	}
 
@@ -271,19 +296,29 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
      */
 
     public void messageAll(String message){
-    	String mess = messageTextField.getText();
-		messageTextField.setText("");
-		client.messageAll(mess);
+    	if(!username.equals("")){
+	    	String mess = messageTextField.getText();
+			messageTextField.setText("");
+			client.messageAll(mess);
+		} else {
+			updateLobbyChat("Server Message: You have not signed into the server yet.");
+			messageTextField.setText("username: ");
+		}
     }
 
     public void messageClient(String toUser, String message){
-    	String[] temp = messageTextField.getText().replace("private","").split(":");
-		String user = temp[0].replace("(", "").replace(")", "");
-		String msg = temp[1].trim();
+	    if(!username.equals("")){
+	    	String[] temp = messageTextField.getText().replace("private","").split(":");
+			String user = temp[0].replace("(", "").replace(")", "");
+			String msg = temp[1].trim();
 
-		client.messageClient(user,msg);
-		updateLobbyChat("Msg Sent to: " + user + " " + msg);
-		messageTextField.setText("");
+			client.messageClient(user,msg);
+			updateLobbyChat("Msg Sent to: " + user + " " + msg);
+			messageTextField.setText("");
+		} else {
+			updateLobbyChat("Server Message: You have not signed into the server yet.");
+			messageTextField.setText("username: ");
+		}
     }
 
     public void makeTable(){
@@ -333,7 +368,11 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 
     public void message(String message, String from, boolean privateMessage){
     	if(privateMessage == true){
-    		updateLobbyChat("Private (" + from + ": " + message + ")");
+    		if(currentGame == null){
+    			updateLobbyChat("Private (" + from + ": " + message + ")");
+    		} else {
+    			currentGame.lobbyChatTextArea.setText(currentGame.lobbyChatTextArea.getText() + "\n" + from + ": " + message);
+    		}
     	} else {
     		updateLobbyChat(from + ": " + message);
     	}
@@ -353,7 +392,17 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
     		gameBoardListener gb = (gameBoardListener)gameBoard.getMouseListeners()[0];
     		gb.setColor("Black");
     	}
-    	//(gameBoardListener)gameBoard.getMouseListeners()[0].setColor("Black");
+
+    	JLabel black = DesktopUIFactory.makePiece("Black_king");
+    	JLabel red = DesktopUIFactory.makePiece("Red_king");
+    	if(currentGame.lblPlayer1.getText().equals(this.username)){
+    		currentGame.color1Lbl.setIcon(black.getIcon());
+    		currentGame.color2Lbl.setIcon(red.getIcon());
+    	} else {
+    		JLabel temp = DesktopUIFactory.makePiece("Red_king");
+    		currentGame.color2Lbl.setIcon(black.getIcon());
+    		currentGame.color1Lbl.setIcon(red.getIcon());
+    	}
     }
 
     public void colorRed(){
@@ -361,6 +410,17 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
     	if(gameBoard.getMouseListeners()[0] instanceof gameBoardListener){
     		gameBoardListener gb = (gameBoardListener)gameBoard.getMouseListeners()[0];
     		gb.setColor("Red");
+    	}
+
+    	JLabel black = DesktopUIFactory.makePiece("Black_king");
+    	JLabel red = DesktopUIFactory.makePiece("Red_king");
+    	if(currentGame.lblPlayer1.getText().equals(this.username)){
+    		currentGame.color2Lbl.setIcon(black.getIcon());
+    		currentGame.color1Lbl.setIcon(red.getIcon());
+    	} else {
+    		JLabel temp = DesktopUIFactory.makePiece("Red_king");
+    		currentGame.color1Lbl.setIcon(black.getIcon());
+    		currentGame.color2Lbl.setIcon(red.getIcon());
     	}
     }
 
@@ -390,23 +450,37 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 				int cy = (x*62)+2;
 				System.out.println(board[x][y] == null ? "Yes":"No");
 
-				if(board[x][y].charAt(0) == 'B'){
-					System.out.println("Making Black Piece");
-					JLabel temp = DesktopUIFactory.makePiece("Black");
-					if(temp == null) {System.out.println("GB: Temp is null!!!");}
-					temp.setName("Black");
-					temp.setBounds(cx,cy,62,62);
-					gameBoard.add(temp);
-					System.out.println("Made a Black piece");
+				if(board[x][y].length() == 1){
+					if(board[x][y].charAt(0) == 'B'){
+						System.out.println("Making Black Piece");
+						JLabel temp = DesktopUIFactory.makePiece("Black");
+						if(temp == null) {System.out.println("GB: Temp is null!!!");}
+						temp.setName("Black");
+						temp.setBounds(cx,cy,62,62);
+						gameBoard.add(temp);
+						System.out.println("Made a Black piece");
+					} else {
+						System.out.println("Making Red Piece");
+						JLabel temp = DesktopUIFactory.makePiece("Red");
+						if(temp == null) {System.out.println("GB: Temp is null!!!");}
+						temp.setName("Red");
+						temp.setBounds(cx,cy,62,62);
+						gameBoard.add(temp);
+						System.out.println("Made a Red piece");
+					}
 				}
-				else if(board[x][y].charAt(0) == 'R'){
-					System.out.println("Making Red Piece");
-					JLabel temp = DesktopUIFactory.makePiece("Red");
-					if(temp == null) {System.out.println("GB: Temp is null!!!");}
-					temp.setName("Red");
-					temp.setBounds(cx,cy,62,62);
-					gameBoard.add(temp);
-					System.out.println("Made a Red piece");
+				else if(board[x][y].length() == 2){
+					if(board[x][y].charAt(0) == 'B'){
+						JLabel temp = DesktopUIFactory.makePiece("Black_king");
+						temp.setName("Black");
+						temp.setBounds(cx,cy,62,62);
+						gameBoard.add(temp);
+					} else {
+						JLabel temp = DesktopUIFactory.makePiece("Red_king");
+						temp.setName("Red");
+						temp.setBounds(cx,cy,62,62);
+						gameBoard.add(temp);
+					}
 				}
 				else {
 					//Do nothing in the case that there is no piece in that spot.
@@ -432,6 +506,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
     }
 
     public void tableJoined(String tableID){
+    	System.out.println("I am joing a table!!!");
     	setJoinPlayTable(tableID,""); 
     }
 
@@ -467,6 +542,16 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
     public void inLobby(){}
 
     public void whoOnTable(String userOne, String userTwo,String tableID, String userOneColor,String userTwoColor){
+    	currentGame.lblPlayer1.setText(userOne);
+    	if(!userTwo.equals(null)){
+    		currentGame.lblPlayer2.setText(userTwo);
+    	}
+
+    	JLabel black = DesktopUIFactory.makePiece("Black_king");
+    	JLabel red = DesktopUIFactory.makePiece("Red_king");
+
+		currentGame.color1Lbl.setIcon(black.getIcon());
+		currentGame.color2Lbl.setIcon(red.getIcon());
 
     }
 
@@ -496,7 +581,11 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
     
     public void netException(){}
 
-    public void nameInUse(){}
+    public void nameInUse(){
+    	this.username = "";
+    	updateLobbyChat("Server Message: Username is taken restart client because the server doesn't let you try again.");
+    	messageTextField.setText("username: ");
+    }
 
     public void illegalMove(){
     	turn = true;
@@ -514,21 +603,31 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
     	updateLobbyChat("Server Message: That table is full!");
     }
 
-    public void notInLobby(){}
+    public void notInLobby(){
+    	currentGame.lobbyChatTextArea.setText(currentGame.lobbyChatTextArea.getText() + "\n" + "Server Message: Leave your current game to join another.");
+    }
 
     public void badMessage(){}
 
     public void errorLobby(){}
 
-    public void badName(){}
+    public void badName(){
+    	this.username = "";
+    	updateLobbyChat("Server Message: Bad username restart client because the server doesn't let you try again.");
+    	messageTextField.setText("username: ");
+    }
 
-    public void playerNotReady(){}
+    public void playerNotReady(){
+
+    }
 
     public void notYourTurn(){}
 
     public void tableNotExist(){}
 
-    public void gameNotCreated(){}
+    public void gameNotCreated(){
+    	currentGame.lobbyChatTextArea.setText(currentGame.lobbyChatTextArea.getText() + "\n" + "Server Message: You need to wait for another player to join.");
+    }
 
     public void notObserving(){}
 
@@ -538,7 +637,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
     	tempF.setResizable(false);
     	tempF.setBounds(0,0,250,100);
     	tempF.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
+    	tempF.setVisible(true);
     	JLabel outCome = new JLabel(message);
     	outCome.setBounds(250/4,250/4,50,50);
     	tempF.add(outCome);
@@ -602,7 +701,7 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 					}
 				} else {}
 			}
-			else {
+			else if(cords[0] != -1 && cords[1] != -1){
 				JLabel temp2 = (JLabel)pan.getComponentAt(cords[0],cords[1]);
 				String tX = Integer.toString((e.getX()/62));
 				String tY = Integer.toString((e.getY()/62));
@@ -632,8 +731,6 @@ public class CheckersLobbyUIController implements AbstractUserInterface{
 			}
 		}
 	}
-
-
 
 }
 
