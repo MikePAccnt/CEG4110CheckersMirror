@@ -33,7 +33,7 @@ public class _207BoardState extends AbstractServerMessage {
                 } else if (p[2].charAt(counter) == '4') {
                     board[x][y] = "RK";
                 } else {
-                    board[x][y] = " ";
+                    board[x][y] = "";
                 }
                 counter++;
             }
